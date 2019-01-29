@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Frags.Core.Controllers.Results;
+using Frags.Core.Controllers.ViewModels;
 using Frags.Core.DataAccess;
 
 namespace Frags.Core.Controllers
@@ -18,7 +19,13 @@ namespace Frags.Core.Controllers
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            return GenericResult.Result($"{character.Name}: {character.Id}");
+            return GenericResult.Result($"{character.Name}: {character.Id}")
+                .WithViewModel(new ShowCharacterViewModel() 
+                {
+                    Name = character.Name,
+                    Description = "",
+                    Story = ""
+                });
         }
 
         public async Task<IResult> RollAsync(ulong callerId, string skill)

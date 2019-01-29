@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Frags.Core.Controllers;
+using Frags.Core.Controllers.ViewModels;
 
 namespace Frags.Discord.Modules
 {
@@ -19,7 +20,9 @@ namespace Frags.Discord.Modules
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.ShowCharacterAsync(discordId);
-            await ReplyAsync(result.Message);
+            var view = (ShowCharacterViewModel) result.ViewModel;
+            
+            await ReplyAsync($"{view.Name} | {view.Description} | {view.Story}");
         }  
 
         [Command("roll")]
