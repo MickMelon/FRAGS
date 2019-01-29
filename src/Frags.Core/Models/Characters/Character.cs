@@ -9,5 +9,10 @@ namespace Frags.Core.Models.Characters
         public string Story { get; set; }
         
         public int Experience { get; set; }
+
+        public int Roll(string skill)
+        {
+            return 46;
+        }
     }
 }

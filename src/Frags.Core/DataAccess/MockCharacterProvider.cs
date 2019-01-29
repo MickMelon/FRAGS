@@ -13,7 +13,7 @@ namespace Frags.Core.DataAccess
         public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
         {
             await Task.Delay(0);
-            throw new System.NotImplementedException();
+            return true;
         }
 
         public async Task<Character> GetActiveCharacterAsync(ulong discordId)
@@ -29,13 +29,12 @@ namespace Frags.Core.DataAccess
         public async Task<List<Character>> GetAllCharactersAsync(ulong discordId)
         {
             await Task.Delay(0);
-            throw new System.NotImplementedException();
+            return new List<Character>();
         }
 
         public async Task UpdateCharacterAsync(Character character)
         {
-            await Task.Delay(0);
-            throw new System.NotImplementedException();
+            await Task.Delay(0);            
         }
     }
 }
