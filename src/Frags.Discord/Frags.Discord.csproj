@@ -5,4 +5,13 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Discord.Net" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Frags.Core\Frags.Core.csproj" />
+    <ProjectReference Include="..\Frags.Database\Frags.Database.csproj" />
+  </ItemGroup>
+
 </Project>
