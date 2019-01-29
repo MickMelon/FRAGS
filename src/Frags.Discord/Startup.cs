@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Frags.Core.Controllers;
+using Frags.Core.DataAccess;
 using Frags.Discord.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,9 +32,8 @@ namespace Frags.Discord
             IServiceCollection services = new ServiceCollection();
                 
             services = AddDiscordServices(services);
-            // TODO:
-            //services = AddDatabaseServices(services);
-            //services = AddGameServices(services);
+            services = AddDatabaseServices(services);
+            services = AddGameServices(services);
 
             return services.BuildServiceProvider();
         } 
@@ -52,5 +53,13 @@ namespace Frags.Discord
                 }))
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<LogService>();
+
+        private IServiceCollection AddDatabaseServices(IServiceCollection services) =>
+            services
+                .AddTransient<ICharacterProvider, MockCharacterProvider>();
+
+        private IServiceCollection AddGameServices(IServiceCollection services) =>
+            services
+                .AddSingleton<CharacterController>();
     }
 }
