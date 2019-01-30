@@ -23,8 +23,8 @@ namespace Frags.Core.Controllers
                 .WithViewModel(new ShowCharacterViewModel() 
                 {
                     Name = character.Name,
-                    Description = "",
-                    Story = ""
+                    Description = "Description",
+                    Story = "Story"
                 });
         }
 

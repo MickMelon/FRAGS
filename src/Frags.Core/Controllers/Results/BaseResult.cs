@@ -1,5 +1,6 @@
 using System;
 using Frags.Core.Common.Attributes;
+using Frags.Core.Controllers.ViewModels;
 
 namespace Frags.Core.Controllers.Results
 {
@@ -13,11 +14,11 @@ namespace Frags.Core.Controllers.Results
             Message = message;
         }
 
-        public IResult WithViewModel(Object viewModel)
+        public IResult WithViewModel(Object obj)
         {
-            if (Common.Attributes.ViewModel.IsViewModel(ViewModel))
-                ViewModel = viewModel;
-
+            if (Common.Attributes.ViewModel.IsViewModel(obj))
+                ViewModel = obj;
+                
             return this;
         }
     }
