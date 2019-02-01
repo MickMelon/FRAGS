@@ -9,6 +9,7 @@ namespace Frags.Core.DataAccess
      * The real implementation of this class would be
      * contained in the Frags.Database project.    
      */
+    /// <inheritdoc/>
     public class MockCharacterProvider : ICharacterProvider
     {
         private List<Character> _characters;
@@ -25,6 +26,7 @@ namespace Frags.Core.DataAccess
             };
         }
 
+        /// <inheritdoc/>
         public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
         {
             var character = new Character() { Id = (int)discordId, Name = name };
@@ -33,18 +35,21 @@ namespace Frags.Core.DataAccess
             return true;
         }
 
+        /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong discordId)
         {
             await Task.Delay(0); // just to ignore warning
             return _characters.Where(c => c.Id == (int)discordId).FirstOrDefault();            
         }
 
+        /// <inheritdoc/>
         public async Task<List<Character>> GetAllCharactersAsync(ulong discordId)
         {
             await Task.Delay(0); // just to ignore warning
             return _characters.Where(c => c.Id == (int)discordId).ToList();
         }
 
+        /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
             var dbChar = _characters.Where(c => c.Id == (int)character.Id).FirstOrDefault();

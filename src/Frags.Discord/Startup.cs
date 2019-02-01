@@ -10,8 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Frags.Discord
 {
+    /// <summary>
+    /// Used to start the Discord bot.
+    /// </summary>
     internal class Startup
     {
+        /// <summary>
+        /// Sets up the services and starts the bot.
+        /// </summary>
         public async Task StartAsync()
         {
             var services = BuildServiceProvider();
@@ -27,6 +33,10 @@ namespace Frags.Discord
             await Task.Delay(-1);
         }
 
+        /// <summary>
+        /// Builds the service provider.
+        /// </summary>
+        /// <returns>The built service provider.</returns>
         private IServiceProvider BuildServiceProvider()
         {
             IServiceCollection services = new ServiceCollection();
@@ -38,6 +48,9 @@ namespace Frags.Discord
             return services.BuildServiceProvider();
         } 
 
+        /// <summary>
+        /// Adds the Discord services to the collection..
+        /// </summary>
         private IServiceCollection AddDiscordServices(IServiceCollection services) =>
             services
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
@@ -54,10 +67,16 @@ namespace Frags.Discord
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<LogService>();
 
+        /// <summary>
+        /// Adds the database services to the collection.
+        /// </summary>
         private IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
                 .AddTransient<ICharacterProvider, MockCharacterProvider>();
 
+        /// <summary>
+        /// Adds the game services to the collection.
+        /// </summary>
         private IServiceCollection AddGameServices(IServiceCollection services) =>
             services
                 .AddSingleton<CharacterController>()
