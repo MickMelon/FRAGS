@@ -60,6 +60,7 @@ namespace Frags.Discord
 
         private IServiceCollection AddGameServices(IServiceCollection services) =>
             services
-                .AddSingleton<CharacterController>();
+                .AddSingleton<CharacterController>()
+                .AddSingleton<RollController>();
     }
 }

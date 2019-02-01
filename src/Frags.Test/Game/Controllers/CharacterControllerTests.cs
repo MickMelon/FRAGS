@@ -1,8 +1,11 @@
 using System.Threading.Tasks;
 using Frags.Core.Controllers;
 using Frags.Core.Controllers.Results;
+using Frags.Core.Controllers.ViewModels;
 using Frags.Core.DataAccess;
+using Frags.Core.Common.Extensions;
 using Xunit;
+using Frags.Core.Common;
 
 namespace Frags.Test.Game.Controllers
 {
@@ -15,13 +18,18 @@ namespace Frags.Test.Game.Controllers
             // Arrange
             var provider = new MockCharacterProvider();
             var controller = new CharacterController(provider);
+            var dbChar = await provider.GetActiveCharacterAsync(1);
 
             // Act
             var result = await controller.ShowCharacterAsync(1);
+            var charResult = result as CharacterResult;
+            var viewModel = charResult.ViewModel as ShowCharacterViewModel;
 
             // Assert
-            //Assert.NotEqual(CharacterResult.CharacterNotFound(), result);
-            // Compare CharacterResult
+            Assert.True(
+                viewModel.Name.EqualsIgnoreCase(dbChar.Name) &&
+                viewModel.Story.EqualsIgnoreCase(dbChar.Story) &&
+                viewModel.Description.EqualsIgnoreCase(dbChar.Description));
         }
 
         [Fact]
@@ -32,54 +40,10 @@ namespace Frags.Test.Game.Controllers
             var controller = new CharacterController(provider);
 
             // Act
-            var result = await controller.ShowCharacterAsync(1);
+            var result = await controller.ShowCharacterAsync(0);
 
             // Assert
-            Assert.Equal(CharacterResult.CharacterNotFound(), result);
-        }
-        #endregion
-
-        #region RollAsync Tests
-        [Fact]
-        public async Task Roll_ValidIdValidSkill_Success()
-        {
-            // Arrange
-            var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
-
-            // Act
-            var result = await controller.RollAsync(1, "lockpick");
-
-            // Assert
-            //Assert.Equal()
-        }
-
-        [Fact]
-        public async Task Roll_ValidIdInvalidSkill_ReturnErrorResult()
-        {
-            // Arrange
-            var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
-
-            // Act
-            var result = await controller.RollAsync(1, "dfg");
-
-            // Assert
-            Assert.Equal(GenericResult.Result("TODO"), result);
-        }
-
-        [Fact]
-        public async Task Roll_InvalidId_ReturnError()
-        {
-            // Arrange
-            var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
-
-            // Act
-            var result = await controller.RollAsync(1, "dfg");
-
-            // Assert
-            Assert.Equal(GenericResult.Result("TODO"), result);
+            Assert.Equal(Messages.CHAR_NOT_FOUND, result.Message);
         }
         #endregion
     }
