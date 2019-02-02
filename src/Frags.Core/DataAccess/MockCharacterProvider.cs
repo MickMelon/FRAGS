@@ -18,18 +18,18 @@ namespace Frags.Core.DataAccess
         {
             _characters = new List<Character>()
             {
-                new Character() { Id = 1, Name = "c1", Story = "s1", Description = "d1" },
-                new Character() { Id = 2, Name = "c2", Story = "s2", Description = "d2" },
-                new Character() { Id = 3, Name = "c3", Story = "s3", Description = "d3" },
-                new Character() { Id = 4, Name = "c4", Story = "s4", Description = "d4" },
-                new Character() { Id = 5, Name = "c5", Story = "s5", Description = "d5" }
+                new Character(1,"c1", "s1", "d1"),
+                new Character(2,"c2", "s2", "d2"),
+                new Character(3,"c3", "s3", "d3"),
+                new Character(4,"c4", "s4", "d4"),
+                new Character(5,"c5", "s5", "d5")
             };
         }
 
         /// <inheritdoc/>
         public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
         {
-            var character = new Character() { Id = (int)discordId, Name = name };
+            var character = new Character((int)discordId, name);
             _characters.Add(character);
             await Task.Delay(0); // just to ignore warning
             return true;

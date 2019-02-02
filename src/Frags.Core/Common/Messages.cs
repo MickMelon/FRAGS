@@ -9,5 +9,9 @@ namespace Frags.Core.Common
         #region NPC
         public static readonly string NPC_NOT_FOUND = "NPC not found.";
         #endregion
+
+        #region Skills
+        public static readonly string SKILL_NOT_FOUND = "Skill not found.";
+        #endregion
     }
 }

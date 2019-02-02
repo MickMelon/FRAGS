@@ -1,3 +1,6 @@
+using System;
+using Frags.Core.Common;
+
 namespace Frags.Core.Models.Characters
 {
     /// <summary>
@@ -13,26 +16,35 @@ namespace Frags.Core.Models.Characters
         /// <summary>
         /// The character's name.
         /// </summary>
-        /// <value></value>
         public string Name { get; set; }
 
         /// <summary>
         /// The character's description.
         /// </summary>
-        /// <value></value>
         public string Description { get; set; }
 
         /// <summary>
         /// The character's story.
         /// </summary>
-        /// <value></value>
         public string Story { get; set; }
         
         /// <summary>
         /// The character's current experience.
         /// </summary>
-        /// <value></value>
         public int Experience { get; set; }
+
+        /// <summary>
+        /// The character's level calculated from the experience.
+        /// </summary>
+        public int Level { get => Character.GetLevelFromExperience(Experience); }
+
+        public Character(int id, string name, string description = "", string story = "")
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+            Story = story;
+        }
 
         /// <summary>
         /// Rolls the specified skill for the character.
@@ -43,5 +55,8 @@ namespace Frags.Core.Models.Characters
         {
             return 46;
         }
+
+        public static int GetLevelFromExperience(int experience) =>
+            Convert.ToInt32((Math.Sqrt(experience + 125) / (10 * Math.Sqrt(5))));
     }
 }

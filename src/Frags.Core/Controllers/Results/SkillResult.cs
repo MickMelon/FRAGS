@@ -1,3 +1,5 @@
+using Frags.Core.Common;
+
 namespace Frags.Core.Controllers.Results
 {
     public class SkillResult : BaseResult
@@ -7,6 +9,6 @@ namespace Frags.Core.Controllers.Results
         }
 
         public static SkillResult SkillNotFound() =>
-            new SkillResult("Skill not found", false);
+            new SkillResult(Messages.SKILL_NOT_FOUND, false);
     }
 }
