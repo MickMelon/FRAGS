@@ -8,7 +8,7 @@ namespace Frags.Core.Controllers.Results
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericResult" /> class
         /// </summary>
-        public GenericResult(string message, bool success = true) : base(message, success)
+        public GenericResult(string message, bool success = true, object viewModel = null) : base(message, success, viewModel)
         {
         }
 

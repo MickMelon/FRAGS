@@ -24,12 +24,5 @@ namespace Frags.Core.Controllers.Results
         /// Objects are identified as a ViewModel by the ViewModelAttribute class.
         /// </remarks>
         Object ViewModel { get; }
-
-        /// <summary>
-        /// Adds a ViewModel to the result.
-        /// </summary>
-        /// <param name="obj">Object with ViewModelAttribute</param>
-        /// <returns>Itself (this)</returns>
-        IResult WithViewModel(Object obj);
     }
 }

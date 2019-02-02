@@ -8,7 +8,7 @@ namespace Frags.Core.Controllers.Results
         /// <summary>
         /// Initializes a new <see cref="RollResult" /> class.
         /// </summary>
-        public RollResult(string message, bool success = true) : base(message, success)
+        public RollResult(string message, bool success = true, object viewModel = null) : base(message, success, viewModel)
         {
         }
 

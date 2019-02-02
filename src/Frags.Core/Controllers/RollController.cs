@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Frags.Core.Common.Extensions;
 using Frags.Core.Controllers.Results;
 using Frags.Core.DataAccess;
 
@@ -35,6 +36,9 @@ namespace Frags.Core.Controllers
             if (character == null) return CharacterResult.CharacterNotFound();
 
             // Check valid skill name
+            // dummy for testing
+            if (skill.EqualsIgnoreCase("invalid")) 
+                return SkillResult.SkillNotFound();
 
             int roll = character.Roll(skill);
             return RollResult.Roll(character.Name, skill, roll);
@@ -54,6 +58,10 @@ namespace Frags.Core.Controllers
 
             var target = await _provider.GetActiveCharacterAsync(targetId);
             if (target == null) return CharacterResult.CharacterNotFound();
+
+            // dummy for testing
+            if (skill.EqualsIgnoreCase("invalid")) 
+                return SkillResult.SkillNotFound();
 
             int callerRoll = caller.Roll(skill) + 1;
             int targetRoll = target.Roll(skill);

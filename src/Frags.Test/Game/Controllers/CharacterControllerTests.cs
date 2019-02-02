@@ -13,7 +13,7 @@ namespace Frags.Test.Game.Controllers
     {
         #region ShowCharacterAsync Tests
         [Fact]
-        public async Task ShowCharacter_ValidId_Success()
+        public async Task ShowCharacter_ValidId_ReturnSuccess()
         {
             // Arrange
             var provider = new MockCharacterProvider();

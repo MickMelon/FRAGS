@@ -9,13 +9,22 @@ namespace Frags.Core.Controllers.Results
     /// </summary>
     public abstract class BaseResult : IResult
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Indicates whether the operation was successful.
+        /// </summary>
         public bool IsSuccess { get; private set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// The message of the result.
+        /// </summary>
         public string Message { get; private set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// The optional ViewModel as part of the result.
+        /// </summary>
+        /// <remarks>
+        /// Objects are identified as a ViewModel by the ViewModelAttribute class.
+        /// </remarks>
         public Object ViewModel { get; private set; }
 
         /// <summary>
@@ -23,19 +32,13 @@ namespace Frags.Core.Controllers.Results
         /// </summary>
         /// <param name="message">The result message.</param>
         /// <param name="success">Whether the operation was successful.</param>
-        protected BaseResult(string message, bool success = true)
+        protected BaseResult(string message, bool success = true, Object viewModel = null)
         {
             Message = message;
             IsSuccess = success;
-        }
 
-        /// <inheritdoc/>
-        public IResult WithViewModel(Object obj)
-        {
-            if (Common.Attributes.ViewModelAttribute.IsViewModel(obj))
-                ViewModel = obj;
-                
-            return this;
+            if (viewModel != null && ViewModelAttribute.IsViewModel(viewModel))
+                ViewModel = viewModel;
         }
     }
 }

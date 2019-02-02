@@ -12,7 +12,7 @@ namespace Frags.Core.Controllers.Results
         /// <summary>
         /// Initializes a new instance of the <see cref="CharacterResult" /> class.
         /// </summary>
-        public CharacterResult(string message, bool success = true) : base(message, success)
+        public CharacterResult(string message, bool success = true, object viewModel = null) : base(message, success, viewModel)
         {
         }
 
@@ -21,13 +21,13 @@ namespace Frags.Core.Controllers.Results
         /// </summary>
         /// <param name="character">The character to show.</param>
         public static IResult Show(Character character) =>
-            new CharacterResult($"{character.Name}: {character.Id}")
-                .WithViewModel(new ShowCharacterViewModel()
+            new CharacterResult($"{character.Name}: {character.Id}", 
+                viewModel: new ShowCharacterViewModel()
                 {
                     Name = character.Name,
                     Story = character.Story,
                     Description = character.Description
-                });            
+                });        
 
         /// <summary>
         /// Returns a new <see cref="CharacterResult" />.
