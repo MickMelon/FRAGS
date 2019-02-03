@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Frags.Core.Models.Characters;
+using Frags.Core.Characters;
 
 namespace Frags.Core.DataAccess
 {

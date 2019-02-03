@@ -1,6 +1,6 @@
 
+using Frags.Core.Characters;
 using Frags.Core.Common;
-using Frags.Core.Models.Characters;
 using Frags.Presentation.ViewModels;
 
 namespace Frags.Presentation.Results

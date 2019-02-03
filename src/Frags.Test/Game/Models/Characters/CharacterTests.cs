@@ -1,4 +1,4 @@
-using Frags.Core.Models.Characters;
+using Frags.Core.Characters;
 using Xunit;
 
 namespace Frags.Test.Game.Models.Characters

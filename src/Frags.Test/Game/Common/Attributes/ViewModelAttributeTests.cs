@@ -1,4 +1,4 @@
-using Frags.Core.Models.Characters;
+using Frags.Core.Characters;
 using Frags.Presentation.Attributes;
 using Frags.Presentation.ViewModels;
 using Xunit;

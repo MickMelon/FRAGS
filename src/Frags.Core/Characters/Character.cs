@@ -1,7 +1,7 @@
 using System;
 using Frags.Core.Common;
 
-namespace Frags.Core.Models.Characters
+namespace Frags.Core.Characters
 {
     /// <summary>
     /// The Character model.
