@@ -26,18 +26,13 @@ namespace Frags.Presentation.Controllers
 
         /// <summary>
         /// Gets the caller's active character and returns the result.
-        /// </summary>
+        /// </summary> 
         /// <param name="callerId">Discord ID of the caller.</param>
         /// <returns>A new CharacterResult object.</returns>
         public async Task<IResult> ShowCharacterAsync(ulong callerId)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
-            return CharacterResult.Show(character);
-        }
-
-        public IResult ShowCharacter(Character character)
-        {
             return CharacterResult.Show(character);
         }
     }

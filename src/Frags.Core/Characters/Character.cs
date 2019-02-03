@@ -38,6 +38,13 @@ namespace Frags.Core.Characters
         /// </summary>
         public int Level { get => Character.GetLevelFromExperience(Experience); }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Character" /> class.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="story"></param>
         public Character(int id, string name, string description = "", string story = "")
         {
             Id = id;
@@ -53,7 +60,7 @@ namespace Frags.Core.Characters
         /// <returns>What the character rolled.</returns>
         public int Roll(string skill)
         {
-            return 46;
+            return GameRandom.D20();
         }
 
         public static int GetLevelFromExperience(int experience) =>
