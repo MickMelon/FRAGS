@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using Frags.Core.Controllers;
-using Frags.Core.Controllers.Results;
-using Frags.Core.Controllers.ViewModels;
 using Frags.Core.DataAccess;
 using Frags.Core.Common.Extensions;
 using Xunit;
 using Frags.Core.Common;
+using Frags.Presentation.Controllers;
+using Frags.Presentation.Results;
+using Frags.Presentation.ViewModels;
 
 namespace Frags.Test.Game.Controllers
 {

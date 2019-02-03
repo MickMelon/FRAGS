@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Frags.Core.Controllers;
 using Frags.Core.DataAccess;
 using Frags.Discord.Services;
+using Frags.Presentation.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Frags.Discord

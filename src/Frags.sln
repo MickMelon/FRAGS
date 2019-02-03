@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Core", "Frags.Core\Fr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Test", "Frags.Test\Frags.Test.csproj", "{2DAE48C0-7EBF-435D-A895-21FC3707FCB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Presentation", "Frags.Presentation\Frags.Presentation.csproj", "{CCED0792-81E1-49ED-8ED9-043684E5BD64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,17 @@ Global
 		{2DAE48C0-7EBF-435D-A895-21FC3707FCB4}.Release|x64.Build.0 = Release|Any CPU
 		{2DAE48C0-7EBF-435D-A895-21FC3707FCB4}.Release|x86.ActiveCfg = Release|Any CPU
 		{2DAE48C0-7EBF-435D-A895-21FC3707FCB4}.Release|x86.Build.0 = Release|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Debug|x64.Build.0 = Debug|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Debug|x86.Build.0 = Debug|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Release|x64.ActiveCfg = Release|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Release|x64.Build.0 = Release|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Release|x86.ActiveCfg = Release|Any CPU
+		{CCED0792-81E1-49ED-8ED9-043684E5BD64}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

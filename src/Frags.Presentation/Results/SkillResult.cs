@@ -1,6 +1,6 @@
 using Frags.Core.Common;
 
-namespace Frags.Core.Controllers.Results
+namespace Frags.Presentation.Results
 {
     public class SkillResult : BaseResult
     {

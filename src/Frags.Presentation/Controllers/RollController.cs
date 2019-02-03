@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Frags.Core.Common.Extensions;
-using Frags.Core.Controllers.Results;
 using Frags.Core.DataAccess;
+using Frags.Presentation.Results;
 
-namespace Frags.Core.Controllers
+namespace Frags.Presentation.Controllers
 {
     /// <summary>
     /// This class controls roll related actions.

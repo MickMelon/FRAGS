@@ -1,6 +1,6 @@
 using System;
 
-namespace Frags.Core.Common.Attributes
+namespace Frags.Presentation.Attributes
 {
     /// <summary>
     /// Marks whether a class is a ViewModel.

@@ -1,6 +1,6 @@
 using System;
 
-namespace Frags.Core.Controllers.Results
+namespace Frags.Presentation.Results
 {
     /// <summary>
     /// Contains information for the result of the controller.

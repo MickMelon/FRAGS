@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Frags.Core.Controllers;
-using Frags.Core.Controllers.Results;
 using Frags.Core.DataAccess;
+using Frags.Presentation.Controllers;
+using Frags.Presentation.Results;
 using Xunit;
 
 namespace Frags.Test.Game.Controllers

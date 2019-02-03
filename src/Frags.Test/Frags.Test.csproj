@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Frags.Core\Frags.Core.csproj" />
     <ProjectReference Include="..\Frags.Database\Frags.Database.csproj" />
+    <ProjectReference Include="..\Frags.Presentation\Frags.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

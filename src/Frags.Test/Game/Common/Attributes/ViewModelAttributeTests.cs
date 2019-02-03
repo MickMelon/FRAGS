@@ -1,6 +1,6 @@
-using Frags.Core.Common.Attributes;
-using Frags.Core.Controllers.ViewModels;
 using Frags.Core.Models.Characters;
+using Frags.Presentation.Attributes;
+using Frags.Presentation.ViewModels;
 using Xunit;
 
 namespace Frags.Test.Game.Common.Attributes

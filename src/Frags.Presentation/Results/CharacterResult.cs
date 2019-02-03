@@ -1,8 +1,9 @@
-using Frags.Core.Common;
-using Frags.Core.Controllers.ViewModels;
-using Frags.Core.Models.Characters;
 
-namespace Frags.Core.Controllers.Results
+using Frags.Core.Common;
+using Frags.Core.Models.Characters;
+using Frags.Presentation.ViewModels;
+
+namespace Frags.Presentation.Results
 {
     /// <summary>
     /// Represents a result type for characters.

@@ -1,4 +1,4 @@
-namespace Frags.Core.Controllers.Results
+namespace Frags.Presentation.Results
 {
     /// <summary>
     /// Represents a result type for general purposes.

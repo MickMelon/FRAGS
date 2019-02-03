@@ -1,8 +1,7 @@
 using System;
-using Frags.Core.Common.Attributes;
-using Frags.Core.Controllers.ViewModels;
+using Frags.Presentation.Attributes;
 
-namespace Frags.Core.Controllers.Results
+namespace Frags.Presentation.Results
 {
     /// <summary>
     /// The parent Result class that all Results inherit from.

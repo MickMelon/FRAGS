@@ -1,6 +1,6 @@
-using Frags.Core.Common.Attributes;
+using Frags.Presentation.Attributes;
 
-namespace Frags.Core.Controllers.ViewModels
+namespace Frags.Presentation.ViewModels
 {
     /// <summary>
     /// The ViewModel used for showing a character's details.

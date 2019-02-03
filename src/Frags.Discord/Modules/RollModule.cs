@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Frags.Core.Controllers;
+using Frags.Presentation.Controllers;
 
 namespace Frags.Discord.Modules
 {
