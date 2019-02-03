@@ -1,7 +1,7 @@
 using Xunit;
 using Frags.Core.Common.Extensions;
 
-namespace Frags.Test.Game.Common.Extensions
+namespace Frags.Test.Core.Common.Extensions
 {
     public class StringExtensionsTests
     {

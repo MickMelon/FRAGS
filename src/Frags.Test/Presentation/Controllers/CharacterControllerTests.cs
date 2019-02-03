@@ -7,7 +7,7 @@ using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels;
 
-namespace Frags.Test.Game.Controllers
+namespace Frags.Test.Presentation.Controllers
 {
     public class CharacterControllerTests
     {

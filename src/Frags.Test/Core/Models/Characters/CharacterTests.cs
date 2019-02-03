@@ -1,7 +1,7 @@
 using Frags.Core.Characters;
 using Xunit;
 
-namespace Frags.Test.Game.Models.Characters
+namespace Frags.Test.Core.Models.Characters
 {
     public class CharacterTests
     {

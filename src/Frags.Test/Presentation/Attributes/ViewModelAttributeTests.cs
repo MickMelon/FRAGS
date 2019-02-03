@@ -3,7 +3,7 @@ using Frags.Presentation.Attributes;
 using Frags.Presentation.ViewModels;
 using Xunit;
 
-namespace Frags.Test.Game.Common.Attributes
+namespace Frags.Test.Presentation.Attributes
 {
     public class ViewModelAttributeTests
     {

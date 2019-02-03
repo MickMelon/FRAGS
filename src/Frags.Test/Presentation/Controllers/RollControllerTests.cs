@@ -4,7 +4,7 @@ using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
 using Xunit;
 
-namespace Frags.Test.Game.Controllers
+namespace Frags.Test.Presentation.Controllers
 {
     public class RollControllerTests
     {
