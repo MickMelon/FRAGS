@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using Frags.Core.Characters;
 using Frags.Core.DataAccess;
-using Frags.Presentation.Controllers.Interfaces;
 using Frags.Presentation.Results;
 
 namespace Frags.Presentation.Controllers
@@ -9,7 +8,7 @@ namespace Frags.Presentation.Controllers
     /// <summary>
     /// This class controls character related actions.
     /// </summary>
-    public class CharacterController : ICharacterController
+    public class CharacterController
     {
         /// <summary>
         /// Used to interact with the character database.
