@@ -5,6 +5,9 @@ namespace Frags.Core.Common
     /// <summary>
     /// Contains the single Random for "true RNG".
     /// </summary>
+    /// <remarks>
+    /// May need to use some sort of lock to make this thread safe?
+    /// </remarks>
     public static class GameRandom
     {
         /// <summary>

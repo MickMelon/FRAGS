@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Database", "Frags.Database\Frags.Database.csproj", "{ABB0B73F-4EBC-4C97-A18B-C986260B7F30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Database", "src/Frags.Database\Frags.Database.csproj", "{ABB0B73F-4EBC-4C97-A18B-C986260B7F30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Discord", "Frags.Discord\Frags.Discord.csproj", "{7E8ADB03-7860-4A9D-A862-93BE4134AAE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Discord", "src/Frags.Discord\Frags.Discord.csproj", "{7E8ADB03-7860-4A9D-A862-93BE4134AAE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Core", "Frags.Core\Frags.Core.csproj", "{3A1151E6-D038-449F-B6CF-2A3DCE938A5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Core", "src/Frags.Core\Frags.Core.csproj", "{3A1151E6-D038-449F-B6CF-2A3DCE938A5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Test", "Frags.Test\Frags.Test.csproj", "{2DAE48C0-7EBF-435D-A895-21FC3707FCB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Test", "src/Frags.Test\Frags.Test.csproj", "{2DAE48C0-7EBF-435D-A895-21FC3707FCB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Presentation", "Frags.Presentation\Frags.Presentation.csproj", "{CCED0792-81E1-49ED-8ED9-043684E5BD64}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frags.Presentation", "src/Frags.Presentation\Frags.Presentation.csproj", "{CCED0792-81E1-49ED-8ED9-043684E5BD64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
