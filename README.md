@@ -1,0 +1,1 @@
+[![Build Status](https://api.travis-ci.com/MickMelon/FRAGS.svg?token=P1egJpVyyPkzUiprE8yS&branch=master)]
