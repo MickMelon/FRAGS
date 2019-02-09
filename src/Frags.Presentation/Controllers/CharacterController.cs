@@ -50,7 +50,7 @@ namespace Frags.Presentation.Controllers
             var existing = characters.Where(c => c.Name.EqualsIgnoreCase(name)).FirstOrDefault();
             if (existing != null) return CharacterResult.NameAlreadyExists();
 
-            var newCharacter = await _provider.CreateCharacterAsync(callerId, name);
+            await _provider.CreateCharacterAsync(callerId, name);
             return CharacterResult.CharacterCreatedSuccessfully();
         }
     }

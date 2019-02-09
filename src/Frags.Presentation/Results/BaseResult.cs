@@ -7,7 +7,7 @@ namespace Frags.Presentation.Results
     /// <summary>
     /// The parent Result class that all Results inherit from.
     /// </summary>
-    public abstract class BaseResult : IResult
+    public abstract class BaseResult : IResult, IEquatable<BaseResult>
     {
         /// <summary>
         /// Indicates whether the operation was successful.
