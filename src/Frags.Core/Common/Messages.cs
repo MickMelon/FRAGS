@@ -1,6 +1,6 @@
 namespace Frags.Core.Common
 {
-    public class Messages
+    public static class Messages
     {
         #region Character
         public static readonly string CHAR_NOT_FOUND = "Character not found.";

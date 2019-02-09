@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using Frags.Core.DataAccess;
-using Frags.Core.Common.Extensions;
-using Xunit;
 using Frags.Core.Common;
+using Frags.Core.Common.Extensions;
+using Frags.Core.DataAccess;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels;
+using Xunit;
 
 namespace Frags.Test.Presentation.Controllers
 {
@@ -26,7 +26,7 @@ namespace Frags.Test.Presentation.Controllers
             var viewModel = charResult.ViewModel as ShowCharacterViewModel;
 
             // Assert
-            Assert.True(
+            Assert.True(CharacterResult.Show(dbChar).Equals(result) &&
                 viewModel.Name.EqualsIgnoreCase(dbChar.Name) &&
                 viewModel.Story.EqualsIgnoreCase(dbChar.Story) &&
                 viewModel.Description.EqualsIgnoreCase(dbChar.Description));
@@ -43,7 +43,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.ShowCharacterAsync(0);
 
             // Assert
-            Assert.Equal(Messages.CHAR_NOT_FOUND, result.Message);
+            Assert.Equal(CharacterResult.CharacterNotFound(), result);
         }
         #endregion
     }

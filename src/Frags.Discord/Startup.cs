@@ -37,7 +37,7 @@ namespace Frags.Discord
         /// Builds the service provider.
         /// </summary>
         /// <returns>The built service provider.</returns>
-        private IServiceProvider BuildServiceProvider()
+        private static IServiceProvider BuildServiceProvider()
         {
             IServiceCollection services = new ServiceCollection();
                 
@@ -51,7 +51,7 @@ namespace Frags.Discord
         /// <summary>
         /// Adds the Discord services to the collection..
         /// </summary>
-        private IServiceCollection AddDiscordServices(IServiceCollection services) =>
+        private static IServiceCollection AddDiscordServices(IServiceCollection services) =>
             services
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
@@ -70,14 +70,14 @@ namespace Frags.Discord
         /// <summary>
         /// Adds the database services to the collection.
         /// </summary>
-        private IServiceCollection AddDatabaseServices(IServiceCollection services) =>
+        private static IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
                 .AddTransient<ICharacterProvider, MockCharacterProvider>();
 
         /// <summary>
         /// Adds the game services to the collection.
         /// </summary>
-        private IServiceCollection AddGameServices(IServiceCollection services) =>
+        private static IServiceCollection AddGameServices(IServiceCollection services) =>
             services
                 .AddSingleton<CharacterController>()
                 .AddSingleton<RollController>();

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
@@ -20,7 +21,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.RollAsync(1, "strength");
 
             // Assert
-            Assert.True(result.IsSuccess);
+            Assert.True(result.GetType() == typeof(RollResult) && result.IsSuccess);
         }
 
         [Fact]
@@ -34,7 +35,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.RollAsync(1, "invalid");
 
             // Assert
-            Assert.Equal(SkillResult.SkillNotFound().Message, result.Message);
+            Assert.True(SkillResult.SkillNotFound().Equals(result));
         }
 
         [Fact]
@@ -48,7 +49,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.RollAsync(0, "strength");
 
             // Assert
-            Assert.Equal(CharacterResult.CharacterNotFound().Message, result.Message);
+            Assert.Equal(CharacterResult.CharacterNotFound(), result);
         }
         #endregion
 
@@ -64,7 +65,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.RollAgainstAsync(1, 2, "strength");
 
             // Assert
-            Assert.True(result.IsSuccess);
+            Assert.True(result.GetType() == typeof(RollResult) && result.IsSuccess);
         }
 
         [Fact]
@@ -78,7 +79,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.RollAgainstAsync(0, 2, "strength");
 
             // Assert
-            Assert.Equal(CharacterResult.CharacterNotFound().Message, result.Message);
+            Assert.Equal(CharacterResult.CharacterNotFound(), result);
         }
 
         [Fact]
@@ -92,7 +93,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.RollAgainstAsync(1, 0, "strength");
 
             // Assert
-            Assert.Equal(CharacterResult.CharacterNotFound().Message, result.Message);
+            Assert.Equal(CharacterResult.CharacterNotFound(), result);
         }
 
         [Fact]
@@ -106,7 +107,7 @@ namespace Frags.Test.Presentation.Controllers
             var result = await controller.RollAgainstAsync(1, 2, "invalid");
 
             // Assert
-            Assert.Equal(SkillResult.SkillNotFound().Message, result.Message);
+            Assert.Equal(SkillResult.SkillNotFound(), result);
         }
         #endregion
     }

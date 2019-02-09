@@ -1,4 +1,5 @@
 using System;
+using Frags.Core.Common.Extensions;
 using Frags.Presentation.Attributes;
 
 namespace Frags.Presentation.Results
@@ -38,6 +39,54 @@ namespace Frags.Presentation.Results
 
             if (viewModel != null && ViewModelAttribute.IsViewModel(viewModel))
                 ViewModel = viewModel;
+        }
+
+        /// <summary>
+        /// Checks whether the values of an object is equal to this object.
+        /// </summary>
+        /// <param name="obj">The object to compare.</param>
+        /// <returns>Whether the objects values are equals.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj != null && obj is BaseResult result)
+                return IsSuccess == result.IsSuccess &&
+                       Message.EqualsIgnoreCase(result.Message);
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether the values of the BaseResults are equal.
+        /// </summary>
+        /// <remarks>
+        /// This is an overload of the overriden Equals because it will
+        /// save performance because there's no need to check if parameter
+        /// is BaseResult type.
+        /// </remarks>
+        /// <param name="result">The result to check.</param>
+        /// <returns>Whether the results match.</returns>
+        public bool Equals(BaseResult result) =>
+            result != null && 
+            IsSuccess == result.IsSuccess &&
+            Message.EqualsIgnoreCase(result.Message) &&
+            ViewModel.GetType() == result.ViewModel.GetType();
+
+        /// <summary>
+        /// Gets the object's hash code.
+        /// </summary>
+        /// <remarks>
+        /// Josh Bloch's algorithm.
+        /// </remarks>
+        /// <returns>The object's hash code.</returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 41;
+                hash = hash * 53 + base.GetHashCode();
+                hash = hash * 53 + Message.GetHashCode();
+                return hash;
+            }
         }
     }
 }
