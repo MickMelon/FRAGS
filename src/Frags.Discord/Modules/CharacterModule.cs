@@ -15,7 +15,7 @@ namespace Frags.Discord.Modules
         {
             _controller = controller;
         }
-
+        
         [Command("show")]
         public async Task ShowCharacterAsync()
         {
@@ -31,5 +31,13 @@ namespace Frags.Discord.Modules
             var view = (ShowCharacterViewModel) result.ViewModel;            
             await ReplyAsync($"{view.Name} | {view.Description} | {view.Story}");
         }  
+
+        [Command("create")]
+        public async Task CreateCharacterAsync(string name)
+        {
+            ulong discordId = Context.User.Id;
+            var result = await _controller.CreateCharacterAsync(discordId, name);
+            await ReplyAsync(result.Message);
+        }
     }
 }

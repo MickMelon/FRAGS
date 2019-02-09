@@ -4,6 +4,8 @@ namespace Frags.Core.Common
     {
         #region Character
         public static readonly string CHAR_NOT_FOUND = "Character not found.";
+        public static readonly string CHAR_NAME_EXISTS = "You already have a character with that name.";
+        public static readonly string CHAR_CREATE_SUCCESS = "Character created successfully.";
         #endregion
 
         #region NPC

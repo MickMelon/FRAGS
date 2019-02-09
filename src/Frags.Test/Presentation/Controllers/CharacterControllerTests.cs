@@ -46,5 +46,49 @@ namespace Frags.Test.Presentation.Controllers
             Assert.Equal(CharacterResult.CharacterNotFound(), result);
         }
         #endregion
+
+        #region CreateCharacterAsync Tests
+        [Fact]
+        public async Task CreateCharacter_ValidValues_ReturnSuccess()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider);
+
+            // Act
+            var result = await controller.CreateCharacterAsync(1, "c");
+
+            // Assert
+            Assert.Equal(CharacterResult.CharacterCreatedSuccessfully(), result);
+        }
+
+        [Fact]
+        public async Task CreateCharacter_PlayerHasExistingName_ReturnNameAlreadyExists()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider);
+
+            // Act
+            var result = await controller.CreateCharacterAsync(1, "c1"); // Existing
+
+            // Assert
+            Assert.Equal(CharacterResult.NameAlreadyExists(), result);
+        }
+
+        [Fact]
+        public async Task CreateCharacter_ExistingNameButNotBelongingToPlayer_ReturnSuccess()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider);
+
+            // Act
+            var result = await controller.CreateCharacterAsync(1, "c2"); // Existing
+
+            // Assert
+            Assert.Equal(CharacterResult.CharacterCreatedSuccessfully(), result);
+        }
+        #endregion
     }
 }

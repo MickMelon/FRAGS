@@ -41,5 +41,17 @@ namespace Frags.Presentation.Results
         /// </summary>
         public static CharacterResult NpcNotFound() =>
             new CharacterResult(Messages.NPC_NOT_FOUND, false);
+
+        /// <summary>
+        /// Returns a new <see cref="CharacterResult" />.
+        /// </summary>
+        public static CharacterResult NameAlreadyExists() =>
+            new CharacterResult(Messages.CHAR_NAME_EXISTS, false);
+
+        /// <summary>
+        /// Returns a new <see cref="CharacterResult" />.
+        /// </summary>
+        public static CharacterResult CharacterCreatedSuccessfully() =>
+            new CharacterResult(Messages.CHAR_CREATE_SUCCESS, true);
     }
 }
