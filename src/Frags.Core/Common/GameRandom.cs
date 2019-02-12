@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Frags.Core.Common
 {
@@ -13,7 +14,17 @@ namespace Frags.Core.Common
         /// <summary>
         /// The Random object.
         /// </summary>
-        private static readonly Random _random = new Random();
+        private static Random _global = new Random();
+
+        /// <summary>
+        /// Creates a new Random per-thread using a seed from another instance of Random
+        /// </summary>
+        private static ThreadLocal<Random> _local = new ThreadLocal<Random>(() =>
+        {
+            int seed;
+            lock (_global) seed = _global.Next();
+            return new Random(seed);
+        });
 
         /// <summary>
         /// Rolls a four sided die.
@@ -52,6 +63,6 @@ namespace Frags.Core.Common
         /// <param name="maximum">The maximum value.</param>
         /// <returns>A random number between minimum and maximum.</returns>
         public static int Between(int minimum, int maximum) =>
-            _random.Next(minimum, maximum);
+            _local.Value.Next(minimum, maximum);
     }
 }

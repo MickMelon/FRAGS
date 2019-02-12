@@ -1,11 +1,23 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Frags.Core.Common;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Frags.Test.Core.Common
 {
     public class GameRandomTests
     {
+        private readonly ITestOutputHelper output;
+
+        public GameRandomTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         [Theory]
         [InlineData(-1, 0)]
         [InlineData(0, 0)]
@@ -24,6 +36,20 @@ namespace Frags.Test.Core.Common
         public void Between_MaximumLowerThanMinimum_ThrowException(int minimum, int maximum)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => GameRandom.Between(minimum, maximum));
+        }
+
+        [Fact]
+        public void MultiThread_NumbersAreUnique()
+        {
+            var collection = new BlockingCollection<int>();
+
+            Parallel.ForEach(Enumerable.Range(0, 1000), i =>
+            {
+                var random = GameRandom.Between(int.MinValue, int.MaxValue);
+                collection.Add(random);
+            });
+            output.WriteLine($"Repeated values: {collection.Count() - collection.Distinct().Count()}");
+            Assert.True(collection.Distinct().Count() == collection.Count());
         }
 
         [Fact]
