@@ -25,7 +25,7 @@ namespace Frags.Test.Database.DataAccess
             await provider.CreateCharacterAsync(2, "bob");
             var result = await provider.GetActiveCharacterAsync(2);
 
-            Assert.True(result.Id == 2);
+            Assert.True(result.UserIdentifier == 2);
         }
         #endregion
     }

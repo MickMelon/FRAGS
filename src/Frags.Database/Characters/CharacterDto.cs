@@ -8,6 +8,10 @@ namespace Frags.Database.Characters
     /// </summary>
     public class CharacterDto : BaseModel
     {
+        public ulong UserIdentifier { get; set; }
+
+        public bool Active { get; set; }
+        
         /// <summary>
         /// The character's name.
         /// </summary>

@@ -11,7 +11,21 @@ namespace Frags.Core.Characters
         /// <summary>
         /// The character's unique identifier.
         /// </summary>
-        public int Id { get; set; }
+        public int Id { get; private set; }
+        
+        /// <summary>
+        /// The unique identifier of the user that owns the character.
+        /// </summary>
+        /// <remarks>
+        /// Currently it's the DiscordID, but has been named UserIdentifier just
+        /// in case Discord is changed for something else one day.
+        /// </remarks>
+        public ulong UserIdentifier { get; private set; }
+
+        /// <summary>
+        /// Whether this character is the user's active character.
+        /// </summary>
+        public bool Active { get; set; }
 
         /// <summary>
         /// The character's name.
@@ -41,13 +55,29 @@ namespace Frags.Core.Characters
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
-        /// <param name="description"></param>
-        /// <param name="story"></param>
-        public Character(int id, string name, string description = "", string story = "")
+        /// <param name="userIdentifier">The unique identifier of user that owns character.</param>
+        /// <param name="name">The character's name.</param>
+        public Character(ulong userIdentifier, string name)
+        {
+            UserIdentifier = userIdentifier;
+            Name = name;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Character" /> class.
+        /// </summary>
+        /// <param name="id">The character's unique identifier.</param>
+        /// <param name="userIdentifier">The unique identifier of user that owns character.</param>
+        /// <param name="active">Whether this is the active character.</param>
+        /// <param name="name">The character's name.</param>
+        /// <param name="description">The character's description.</param>
+        /// <param name="story">The character's story.</param>
+        public Character(int id, ulong userIdentifier, bool active, string name,
+            string description = "", string story = "")
         {
             Id = id;
+            UserIdentifier = userIdentifier;
+            Active = active;
             Name = name;
             Description = description;
             Story = story;
