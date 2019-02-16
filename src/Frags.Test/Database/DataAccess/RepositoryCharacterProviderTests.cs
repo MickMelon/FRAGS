@@ -18,7 +18,7 @@ namespace Frags.Test.Database.DataAccess
         public async Task CreateCharacter_EntityMatchesInput()
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
-            var efRepo = new EfSqliteRepository<CharacterDto>(context);
+            var efRepo = new EfThreadSafeRepository<CharacterDto>(context);
 
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<Character, CharacterDto>());
             var mapper = new Mapper(mapperConfig);

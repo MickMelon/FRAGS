@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Frags.Database.Repositories
 {
-    public class EfSqliteRepository<T> : IRepository<T> where T : BaseModel
+    public class EfThreadSafeRepository<T> : IRepository<T> where T : BaseModel
     {
         private readonly RpgContext _context;
 
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public EfSqliteRepository(RpgContext context)
+        public EfThreadSafeRepository(RpgContext context)
         {
             _context = context;
         }
