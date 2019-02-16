@@ -7,6 +7,8 @@ namespace Frags.Database
     {
         public DbSet<CharacterDto> Characters { get; set; }
 
+        public RpgContext() {}
+
         public RpgContext(DbContextOptions<RpgContext> options) : base(options)
         {
         }
