@@ -12,13 +12,14 @@ namespace Frags.Database.DataAccess
 {
     public class RepositoryCharacterProvider : ICharacterProvider
     {
-        private IRepository<CharacterDto> _charRepo;
-        private IMapper _mapper;
+        private readonly IRepository<CharacterDto> _charRepo;
+        private readonly IMapper _mapper;
 
-        public RepositoryCharacterProvider(IMapper mapper, IRepository<CharacterDto> charRepo)
+        public RepositoryCharacterProvider(IRepository<CharacterDto> charRepo)
         {
-            _mapper = mapper;
             _charRepo = charRepo;
+            
+            _mapper = new Mapper(new MapperConfiguration(x => x.CreateMap<Character, CharacterDto>()));
         }
 
         /// <inheritdoc/>

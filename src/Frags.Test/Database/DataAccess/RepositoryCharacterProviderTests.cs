@@ -19,11 +19,8 @@ namespace Frags.Test.Database.DataAccess
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
             var efRepo = new EfThreadSafeRepository<CharacterDto>(context);
-
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<Character, CharacterDto>());
-            var mapper = new Mapper(mapperConfig);
             
-            var provider = new RepositoryCharacterProvider(mapper, efRepo);
+            var provider = new RepositoryCharacterProvider(efRepo);
 
             await provider.CreateCharacterAsync(2, "bob");
             var result = await provider.GetActiveCharacterAsync(2);
