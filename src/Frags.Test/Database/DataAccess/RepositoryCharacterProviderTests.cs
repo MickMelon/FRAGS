@@ -25,10 +25,10 @@ namespace Frags.Test.Database.DataAccess
             
             var provider = new RepositoryCharacterProvider(mapper, efRepo);
 
-            var expected = await provider.CreateCharacterAsync(2, "bob");
+            await provider.CreateCharacterAsync(2, "bob");
             var result = await provider.GetActiveCharacterAsync(2);
 
-            Assert.True(expected.Equals(result));
+            Assert.True(result.Id == 2);
         }
         #endregion
     }
