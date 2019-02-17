@@ -23,9 +23,9 @@ namespace Frags.Test.Database.DataAccess
             var provider = new RepositoryCharacterProvider(efRepo);
 
             await provider.CreateCharacterAsync(2, "bob");
-            var result = await provider.GetActiveCharacterAsync(2);
+            var result = await provider.GetAllCharactersAsync(2);
 
-            Assert.True(result.UserIdentifier == 2);
+            Assert.True(result[0].UserIdentifier == 2);
         }
         #endregion
     }
