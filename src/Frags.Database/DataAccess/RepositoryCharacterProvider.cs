@@ -81,9 +81,17 @@ namespace Frags.Database.DataAccess
 
             if (character.Active)
             {
-                var active = await _activeRepo.Query.FirstOrDefaultAsync(x => x.Character.Equals(character));
-                if (active != null) active.Character = dbChar;
-                await _activeRepo.SaveAsync(active);
+                var active = await _activeRepo.Query.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
+                
+                if (active != null)
+                {
+                    active.Character = dbChar;
+                    await _activeRepo.SaveAsync(active);
+                }
+                else
+                {
+                    await _activeRepo.AddAsync(new ActiveCharacter { UserIdentifier = character.UserIdentifier, Character = dbChar });
+                }
             }
 
             await _charRepo.SaveAsync(dbChar);
