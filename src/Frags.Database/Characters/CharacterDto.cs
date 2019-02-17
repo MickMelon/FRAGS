@@ -1,5 +1,6 @@
 using Frags.Database;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frags.Database.Characters
 {
@@ -8,9 +9,12 @@ namespace Frags.Database.Characters
     /// </summary>
     public class CharacterDto : BaseModel
     {
+        [Key]
+        public int Id { get; set; }
+
         public ulong UserIdentifier { get; set; }
 
-        public bool Active { get; set; }
+        public bool Active { get; }
         
         /// <summary>
         /// The character's name.

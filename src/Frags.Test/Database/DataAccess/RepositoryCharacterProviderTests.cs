@@ -19,13 +19,14 @@ namespace Frags.Test.Database.DataAccess
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
             var efRepo = new EfThreadSafeRepository<CharacterDto>(context);
+            var actRepo = new EfThreadSafeRepository<ActiveCharacter>(context);
             
-            var provider = new RepositoryCharacterProvider(efRepo);
+            var provider = new RepositoryCharacterProvider(actRepo, efRepo);
 
-            await provider.CreateCharacterAsync(2, "bob");
-            var result = await provider.GetAllCharactersAsync(2);
+            await provider.CreateCharacterAsync(1, 305847674974896128, true, "Melon Head");
+            var result = await provider.GetActiveCharacterAsync(305847674974896128);
 
-            Assert.True(result[0].UserIdentifier == 2);
+            Assert.True(result.UserIdentifier == 305847674974896128);
         }
         #endregion
     }
