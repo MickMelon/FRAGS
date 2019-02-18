@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Frags.Core.Common;
+using Frags.Core.Statistics;
 
 namespace Frags.Core.Characters
 {
@@ -37,6 +39,11 @@ namespace Frags.Core.Characters
         /// The character's level calculated from the experience.
         /// </summary>
         public int Level { get => Character.GetLevelFromExperience(Experience); }
+
+        /// <summary>
+        /// The character's statistics.
+        /// </summary>
+        public ICollection<StatisticValue> Statistics { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.
