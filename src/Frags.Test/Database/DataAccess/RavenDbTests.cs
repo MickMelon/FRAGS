@@ -29,7 +29,7 @@ namespace Frags.Test.Database.DataAccess
                 var charRepo = new RavenDbRepository<CharacterDto>(asyncSession, syncSession);
                 var actRepo = new RavenDbRepository<User>(asyncSession, syncSession);
 
-                var provider = new RepositoryCharacterProvider(actRepo, charRepo);
+                var provider = new RavenDbCharacterProvider(actRepo, charRepo);
 
                 await provider.CreateCharacterAsync(1, 305847674974896128, true, "Melon Head");
 

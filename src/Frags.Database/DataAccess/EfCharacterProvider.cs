@@ -6,19 +6,18 @@ using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Database.Characters;
 using Frags.Database.Repositories;
-using Raven.Client.Documents;
-//using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
 {
-    public class RepositoryCharacterProvider : ICharacterProvider
+    public class EfCharacterProvider : ICharacterProvider
     {
         private readonly IRepository<User> _activeRepo;
         private readonly IRepository<CharacterDto> _charRepo;
 
         private readonly IMapper _mapper;
 
-        public RepositoryCharacterProvider(IRepository<User> activeRepo, IRepository<CharacterDto> charRepo)
+        public EfCharacterProvider(IRepository<User> activeRepo, IRepository<CharacterDto> charRepo)
         {
             _activeRepo = activeRepo;
             _charRepo = charRepo;

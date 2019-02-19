@@ -11,7 +11,7 @@ using Xunit.Abstractions;
 
 namespace Frags.Test.Database.DataAccess
 {
-    public class RepositoryCharacterProviderTests
+    public class EfCharacterProviderTests
     {
         #region Character Creation Tests
         [Fact]
@@ -21,7 +21,7 @@ namespace Frags.Test.Database.DataAccess
             var efRepo = new EfThreadSafeRepository<CharacterDto>(context);
             var actRepo = new EfThreadSafeRepository<User>(context);
             
-            var provider = new RepositoryCharacterProvider(actRepo, efRepo);
+            var provider = new EfCharacterProvider(actRepo, efRepo);
 
             await provider.CreateCharacterAsync(1, 305847674974896128, true, "Melon Head");
             var result = await provider.GetActiveCharacterAsync(305847674974896128);
