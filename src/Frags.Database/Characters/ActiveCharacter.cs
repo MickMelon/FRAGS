@@ -7,11 +7,12 @@ namespace Frags.Database.Characters
     /// <summary>
     /// Keeps track of active characters in the database.
     /// </summary>
-    public class ActiveCharacter : BaseModel
+    public class User : BaseModel
     {
-        [Key]
+        public string Id { get; set; }
+
         public ulong UserIdentifier { get; set; }
 
-        public CharacterDto Character { get; set; }
+        public CharacterDto ActiveCharacter { get; set; }
     }
 }

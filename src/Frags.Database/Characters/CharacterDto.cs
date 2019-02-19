@@ -9,8 +9,8 @@ namespace Frags.Database.Characters
     /// </summary>
     public class CharacterDto : BaseModel
     {
-        [Key]
-        public int Id { get; set; }
+        //[Key]
+        public string Id { get; set; }
 
         public ulong UserIdentifier { get; set; }
 

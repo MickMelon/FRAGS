@@ -15,11 +15,11 @@ namespace Frags.Test.Database.DataAccess
     {
         #region Character Creation Tests
         [Fact]
-        public async Task CreateCharacter_EntityMatchesInput()
+        public async Task EntityFramework_CreateCharacter_EntityMatchesInput()
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
             var efRepo = new EfThreadSafeRepository<CharacterDto>(context);
-            var actRepo = new EfThreadSafeRepository<ActiveCharacter>(context);
+            var actRepo = new EfThreadSafeRepository<User>(context);
             
             var provider = new RepositoryCharacterProvider(actRepo, efRepo);
 

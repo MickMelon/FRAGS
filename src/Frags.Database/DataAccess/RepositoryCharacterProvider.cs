@@ -6,18 +6,19 @@ using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Database.Characters;
 using Frags.Database.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Raven.Client.Documents;
+//using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
 {
     public class RepositoryCharacterProvider : ICharacterProvider
     {
-        private readonly IRepository<ActiveCharacter> _activeRepo;
+        private readonly IRepository<User> _activeRepo;
         private readonly IRepository<CharacterDto> _charRepo;
 
         private readonly IMapper _mapper;
 
-        public RepositoryCharacterProvider(IRepository<ActiveCharacter> activeRepo, IRepository<CharacterDto> charRepo)
+        public RepositoryCharacterProvider(IRepository<User> activeRepo, IRepository<CharacterDto> charRepo)
         {
             _activeRepo = activeRepo;
             _charRepo = charRepo;
@@ -35,7 +36,7 @@ namespace Frags.Database.DataAccess
                 var active = await _activeRepo.Query.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
 
                 if (active == null)
-                    await _activeRepo.AddAsync(new ActiveCharacter { UserIdentifier = character.UserIdentifier, Character = charDto });
+                    await _activeRepo.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
             }
 
             return charDto;
@@ -61,7 +62,7 @@ namespace Frags.Database.DataAccess
             var active = await _activeRepo.Query.Where(c => c.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
             if (active == null) return null;
 
-            return _mapper.Map<Character>(active.Character);
+            return _mapper.Map<Character>(active.ActiveCharacter);
         }
 
         /// <inheritdoc/>
@@ -74,7 +75,7 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
-            var dbChar = await _charRepo.Query.Where(c => c.Id == character.Id).FirstOrDefaultAsync();
+            var dbChar = await _charRepo.Query.Where(c => c.Equals(character)).FirstOrDefaultAsync();
             if (dbChar == null) return;
             
             dbChar = _mapper.Map<CharacterDto>(character);
@@ -85,12 +86,12 @@ namespace Frags.Database.DataAccess
                 
                 if (active != null)
                 {
-                    active.Character = dbChar;
+                    active.ActiveCharacter = dbChar;
                     await _activeRepo.SaveAsync(active);
                 }
                 else
                 {
-                    await _activeRepo.AddAsync(new ActiveCharacter { UserIdentifier = character.UserIdentifier, Character = dbChar });
+                    await _activeRepo.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = dbChar });
                 }
             }
 

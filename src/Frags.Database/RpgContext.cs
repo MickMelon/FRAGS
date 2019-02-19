@@ -6,7 +6,7 @@ namespace Frags.Database
     public class RpgContext : DbContext
     {
         public DbSet<CharacterDto> Characters { get; set; }
-        public DbSet<ActiveCharacter> ActiveCharacters { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public RpgContext() {}
 
