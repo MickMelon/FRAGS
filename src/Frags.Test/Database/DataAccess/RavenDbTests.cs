@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Database.Characters;
@@ -23,13 +24,7 @@ namespace Frags.Test.Database.DataAccess
         {
             using (var store = GetDocumentStore())
             {
-                var syncSession = store.OpenSession();
-                var asyncSession = store.OpenAsyncSession();
-
-                var charRepo = new RavenDbRepository<CharacterDto>(asyncSession, syncSession);
-                var actRepo = new RavenDbRepository<User>(asyncSession, syncSession);
-
-                var provider = new RavenDbCharacterProvider(actRepo, charRepo);
+                var provider = new RavenDbCharacterProvider(store);
 
                 await provider.CreateCharacterAsync(1, 305847674974896128, true, "Melon Head");
 
