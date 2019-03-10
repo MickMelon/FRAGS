@@ -62,7 +62,14 @@ namespace Frags.Core.Common
         /// <param name="minimum">The minimum value.</param>
         /// <param name="maximum">The maximum value.</param>
         /// <returns>A random number between minimum and maximum.</returns>
-        public static int Between(int minimum, int maximum) =>
-            _local.Value.Next(minimum, maximum);
+        public static int Between(int minimum, int maximum)
+        {
+            // Prevent MaxValue from wrapping around, and to keep Random's Exception message
+            // for maxValue being lower than minValue
+            if (maximum >= Int32.MaxValue || maximum < minimum)
+                return _local.Value.Next(minimum, maximum);
+
+            return _local.Value.Next(minimum, maximum + 1);
+        }
     }
 }
