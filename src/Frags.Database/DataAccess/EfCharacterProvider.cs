@@ -12,56 +12,56 @@ namespace Frags.Database.DataAccess
 {
     public class EfCharacterProvider : ICharacterProvider
     {
-        private readonly IRepository<User> _activeRepo;
+        private readonly IRepository<User> _userRepo;
         private readonly IRepository<CharacterDto> _charRepo;
 
         private readonly IMapper _mapper;
 
-        public EfCharacterProvider(IRepository<User> activeRepo, IRepository<CharacterDto> charRepo)
+        public EfCharacterProvider(IRepository<User> userRepo, IRepository<CharacterDto> charRepo)
         {
-            _activeRepo = activeRepo;
+            _userRepo = userRepo;
             _charRepo = charRepo;
             
             _mapper = new Mapper(new MapperConfiguration(x => x.CreateMap<Character, CharacterDto>()));
         }
 
-        private async Task<CharacterDto> CreateCharacterAsync(Character character)
+        private async Task<bool> CreateCharacterAsync(Character character)
         {
             var charDto = _mapper.Map<CharacterDto>(character);
+
+            // Check the database for a character with the same ID as the new one
+            // If one exists, don't add it
+            if (await _charRepo.Query.CountAsync(x => x.Id == charDto.Id) > 0)
+                return false;
+
             await _charRepo.AddAsync(charDto);
 
             if (character.Active)
             {
-                var active = await _activeRepo.Query.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
+                var user = await _userRepo.Query.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
 
-                if (active == null)
-                    await _activeRepo.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
+                if (user == null)
+                    await _userRepo.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
             }
 
-            return charDto;
+            return true;
         }
 
         /// <inheritdoc/>
-        public async Task<bool> CreateCharacterAsync(ulong userIdentifier, string name)
-        {
+        public async Task<bool> CreateCharacterAsync(ulong userIdentifier, string name) =>
             await CreateCharacterAsync(new Character(userIdentifier, name));
-            return true;
-        }
 
-        public async Task<bool> CreateCharacterAsync(int id, ulong userIdentifier, bool active, string name,
-            string description = "", string story = "")
-        {
+        public async Task<bool> CreateCharacterAsync(string id, ulong userIdentifier, bool active, string name,
+            string description = "", string story = "") =>
             await CreateCharacterAsync(new Character(id, userIdentifier, active, name, description, story));
-            return true;
-        }
 
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
         {
-            var active = await _activeRepo.Query.Where(c => c.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
-            if (active == null) return null;
+            var user = await _userRepo.Query.Where(c => c.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
+            if (user == null) return null;
 
-            return _mapper.Map<Character>(active.ActiveCharacter);
+            return _mapper.Map<Character>(user.ActiveCharacter);
         }
 
         /// <inheritdoc/>
@@ -74,27 +74,27 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
-            var dbChar = await _charRepo.Query.Where(c => c.Equals(character)).FirstOrDefaultAsync();
-            if (dbChar == null) return;
+            // If the character does not exist in the database, abort
+            if (await _charRepo.Query.Where(c => c.Id.Equals(character.Id)).CountAsync() <= 0)
+                return;
             
-            dbChar = _mapper.Map<CharacterDto>(character);
+            var dbChar = _mapper.Map<CharacterDto>(character);
+            await _charRepo.SaveAsync(dbChar);
 
             if (character.Active)
             {
-                var active = await _activeRepo.Query.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
+                var user = await _userRepo.Query.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
                 
-                if (active != null)
+                if (user != null)
                 {
-                    active.ActiveCharacter = dbChar;
-                    await _activeRepo.SaveAsync(active);
+                    user.ActiveCharacter = dbChar;
+                    await _userRepo.SaveAsync(user);
                 }
                 else
                 {
-                    await _activeRepo.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = dbChar });
+                    await _userRepo.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = dbChar });
                 }
-            }
-
-            await _charRepo.SaveAsync(dbChar);
+            }            
         }
     }
 }

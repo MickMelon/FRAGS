@@ -8,10 +8,10 @@ namespace Frags.Core.Characters
     /// </summary>
     public class Character
     {
-        /// <summary>
+        /// <summarDy>
         /// The character's unique identifier.
         /// </summary>
-        public int Id { get; private set; }
+        public string Id { get; private set; }
         
         /// <summary>
         /// The unique identifier of the user that owns the character.
@@ -72,7 +72,7 @@ namespace Frags.Core.Characters
         /// <param name="name">The character's name.</param>
         /// <param name="description">The character's description.</param>
         /// <param name="story">The character's story.</param>
-        public Character(int id, ulong userIdentifier, bool active, string name,
+        public Character(string id, ulong userIdentifier, bool active, string name,
             string description = "", string story = "")
         {
             Id = id;

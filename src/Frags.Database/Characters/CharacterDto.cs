@@ -14,7 +14,7 @@ namespace Frags.Database.Characters
 
         public ulong UserIdentifier { get; set; }
 
-        public bool Active { get; }
+        public bool Active { get; set; }
         
         /// <summary>
         /// The character's name.

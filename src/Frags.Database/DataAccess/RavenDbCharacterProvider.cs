@@ -23,43 +23,47 @@ namespace Frags.Database.DataAccess
             _mapper = new Mapper(new MapperConfiguration(x => x.CreateMap<Character, CharacterDto>()));
         }
 
-        private async Task<CharacterDto> CreateCharacterAsync(Character character)
+        private async Task<bool> CreateCharacterAsync(Character character)
         {
             var charDto = _mapper.Map<CharacterDto>(character);
 
             using (var session = _store.OpenAsyncSession())
             {
+                // Check the database for a character with the same ID as the new one
+                // If one exists, don't add it
+                if (await session.Query<CharacterDto>().CountAsync(x => x.Id == charDto.Id) > 0)
+                    return false;
+
+                // Add the new character to the database
                 await session.StoreAsync(charDto);
 
+                // Find a matching user object with the character
                 var user = await session.Query<User>().FirstOrDefaultAsync(usr => usr.UserIdentifier == character.UserIdentifier);
 
                 if (user == null)
                 {
+                    // Create a User object if one doesn't already exist (we'll set their only character as Active)
                     await session.StoreAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
                 }
                 else if (character.Active)
                 {
+                    // If the character is Active, match it on the User object
                     user.ActiveCharacter = charDto;
                 }
 
                 await session.SaveChangesAsync();
-                return charDto;
+                return true;
             }
         }
 
         /// <inheritdoc/>
-        public async Task<bool> CreateCharacterAsync(ulong userIdentifier, string name)
-        {
+        public async Task<bool> CreateCharacterAsync(ulong userIdentifier, string name) =>
             await CreateCharacterAsync(new Character(userIdentifier, name));
-            return true;
-        }
 
-        public async Task<bool> CreateCharacterAsync(int id, ulong userIdentifier, bool active, string name,
-            string description = "", string story = "")
-        {
+        /// <inheritdoc/>
+        public async Task<bool> CreateCharacterAsync(string id, ulong userIdentifier, bool active, string name,
+            string description = "", string story = "") =>
             await CreateCharacterAsync(new Character(id, userIdentifier, active, name, description, story));
-            return true;
-        }
 
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
@@ -88,27 +92,34 @@ namespace Frags.Database.DataAccess
         {
             using (var session = _store.OpenAsyncSession())
             {
-                var dbChar = await session.Query<CharacterDto>().Where(c => c.Equals(character)).FirstOrDefaultAsync();
-                if (dbChar == null) return;
+                // Search the database for a CharacterDto matching "character's" ID
+                var dbChar = await session.Query<CharacterDto>().Where(c => c.Id.Equals(character.Id)).FirstOrDefaultAsync();
+                // If it doesn't exist, abort
+                if (dbChar == null)
+                    return;
 
+                // Replace dbChar with a mapped version of "character" to overwrite later
                 dbChar = _mapper.Map<CharacterDto>(character);
 
+                // We only need to update the User object if a different character becomes Active
                 if (character.Active)
                 {
-                    var active = await session.Query<User>().FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
+                    // Find a matching user object with the character
+                    var user = await session.Query<User>().FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
 
-                    if (active != null)
+                    // User object exists
+                    if (user != null)
                     {
-                        active.ActiveCharacter = dbChar;
-                        await session.StoreAsync(active);
+                        // Set updated character as Active
+                        user.ActiveCharacter = dbChar;
                     }
                     else
                     {
+                        // Make a new User object (this shouldn't really happen since CreateCharacterAsync will generate a User object)
                         await session.StoreAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = dbChar });
                     }
                 }
 
-                await session.StoreAsync(dbChar);
                 await session.SaveChangesAsync();
             }
         }

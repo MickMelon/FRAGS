@@ -18,11 +18,11 @@ namespace Frags.Core.DataAccess
         {
             _characters = new List<Character>()
             {
-                new Character(1, 1, true, "c1", "s1", "d1"),
-                new Character(2, 2, true, "c2", "s2", "d2"),
-                new Character(3, 3, true, "c3", "s3", "d3"),
-                new Character(4, 4, true, "c4", "s4", "d4"),
-                new Character(5, 5, true, "c5", "s5", "d5")
+                new Character("1", 1, true, "c1", "s1", "d1"),
+                new Character("2", 2, true, "c2", "s2", "d2"),
+                new Character("3", 3, true, "c3", "s3", "d3"),
+                new Character("4", 4, true, "c4", "s4", "d4"),
+                new Character("5", 5, true, "c5", "s5", "d5")
             };
         }
 
@@ -39,20 +39,20 @@ namespace Frags.Core.DataAccess
         public async Task<Character> GetActiveCharacterAsync(ulong discordId)
         {
             await Task.Delay(0); // just to ignore warning
-            return _characters.Where(c => c.Id == (int)discordId).FirstOrDefault();            
+            return _characters.Where(c => c.UserIdentifier == discordId).FirstOrDefault();            
         }
 
         /// <inheritdoc/>
         public async Task<List<Character>> GetAllCharactersAsync(ulong discordId)
         {
             await Task.Delay(0); // just to ignore warning
-            return _characters.Where(c => c.Id == (int)discordId).ToList();
+            return _characters.Where(c => c.UserIdentifier == discordId).ToList();
         }
 
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
-            var dbChar = _characters.Where(c => c.Id == (int)character.Id).FirstOrDefault();
+            var dbChar = _characters.Where(c => c.Id.Equals(character.Id)).FirstOrDefault();
             if (dbChar == null) return;
             
             dbChar = character;
