@@ -8,7 +8,7 @@ namespace Frags.Core.Characters
     /// </summary>
     public class Character
     {
-        /// <summarDy>
+        /// <summary>
         /// The character's unique identifier.
         /// </summary>
         public string Id { get; private set; }
