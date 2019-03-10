@@ -43,7 +43,7 @@ namespace Frags.Core.Characters
         /// <summary>
         /// The character's statistics.
         /// </summary>
-        public ICollection<StatisticValue> Statistics { get; set; }
+        public IDictionary<Statistic, StatisticValue> Statistics { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.
@@ -68,6 +68,21 @@ namespace Frags.Core.Characters
         public int Roll(string skill)
         {
             return GameRandom.D20();
+        }
+
+        /// <summary>
+        /// Rolls the specified skill for the character.
+        /// </summary>
+        /// <param name="skill">The skill name.</param>
+        /// <returns>What the character rolled.</returns>
+        public int? RollStatistic(Statistic stat, IRollStrategy strategy)
+        {
+            if (Statistics.TryGetValue(stat, out StatisticValue value))
+            {
+                return strategy.RollStatistic(stat, this);
+            }
+            
+            return null;
         }
 
         public static int GetLevelFromExperience(int experience) =>

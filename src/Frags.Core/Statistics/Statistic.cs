@@ -6,7 +6,7 @@ namespace Frags.Core.Statistics
     /// <summary>
     /// The statistic model.
     /// </summary>
-    public class Statistic
+    public abstract class Statistic
     {
         /// <summary>
         /// The statistics's name.

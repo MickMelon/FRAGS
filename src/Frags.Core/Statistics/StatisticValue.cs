@@ -6,16 +6,22 @@ namespace Frags.Core.Statistics
     /// <summary>
     /// The statistic-value model.
     /// </summary>
-    public class StatisticValue
+    public struct StatisticValue
     {
-        /// <summary>
-        /// The statistic associated with the value.
-        /// </summary>
-        public Statistic Statistic { get; set; }
-
         /// <summary>
         /// The value associated with the statistic.
         /// </summary>
         public int Value { get; set; }
+
+        /// <summary>
+        /// Determines whether to apply an (optional) bonus
+        /// when increasing the value or using this Statistic
+        /// </summary>
+        public bool IsProficient { get; set; }
+
+        /// <summary>
+        /// Represents a bonus to add to a roll.
+        /// </summary>
+        public int Proficiency { get; set; }
     }
 }
