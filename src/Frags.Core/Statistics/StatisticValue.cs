@@ -11,7 +11,7 @@ namespace Frags.Core.Statistics
         /// <summary>
         /// The value associated with the statistic.
         /// </summary>
-        public int Value { get; set; }
+        public double Value { get; set; }
 
         /// <summary>
         /// Determines whether to apply an (optional) bonus
@@ -22,6 +22,6 @@ namespace Frags.Core.Statistics
         /// <summary>
         /// Represents a bonus to add to a roll.
         /// </summary>
-        public int Proficiency { get; set; }
+        public double Proficiency { get; set; }
     }
 }
