@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Frags.Core.Common;
+using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 
 namespace Frags.Core.Characters
@@ -77,6 +78,8 @@ namespace Frags.Core.Characters
         /// <returns>What the character rolled.</returns>
         public double? RollStatistic(Statistic stat, IRollStrategy strategy)
         {
+            if (stat == null || strategy == null || Statistics == null) return null;
+
             if (Statistics.TryGetValue(stat, out StatisticValue value))
             {
                 return strategy.RollStatistic(stat, this);

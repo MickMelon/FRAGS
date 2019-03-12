@@ -1,6 +1,7 @@
 using Frags.Core.Characters;
+using Frags.Core.Statistics;
 
-namespace Frags.Core.Statistics
+namespace Frags.Core.Game.Rolling
 {
     public interface IRollStrategy
     {

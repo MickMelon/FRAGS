@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
+using Frags.Core.Game.Rolling;
+using Frags.Core.Statistics;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
 using Xunit;
@@ -9,13 +12,24 @@ namespace Frags.Test.Presentation.Controllers
 {
     public class RollControllerTests
     {
+        private static readonly Attribute strength = new Attribute { Name = "Strength" };
+        private static readonly StatisticValue value = new StatisticValue { Value = 5 };
+
         #region RollAsync Tests
         [Fact]
         public async Task Roll_ValidValues_ReturnSuccess()
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider);
+            await provider.CreateCharacterAsync(1, "bob");
+            var chars = await provider.GetAllCharactersAsync(1);
+
+            // Give the new character a Statistic to test
+            chars[0].Statistics = new Dictionary<Statistic, StatisticValue> { { strength, value } };
+
+            await provider.UpdateCharacterAsync(chars[0]);
+
+            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAsync(1, "strength");
@@ -29,7 +43,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider);
+            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAsync(1, "invalid");
@@ -43,7 +57,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider);
+            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAsync(0, "strength");
@@ -59,7 +73,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider);
+            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(1, 2, "strength");
@@ -73,7 +87,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider);
+            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(0, 2, "strength");
@@ -87,7 +101,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider);
+            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(1, 0, "strength");
@@ -101,7 +115,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider);
+            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(1, 2, "invalid");

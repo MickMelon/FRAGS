@@ -7,4 +7,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Frags.Core\Frags.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+  </ItemGroup>
 </Project>
