@@ -9,9 +9,9 @@ namespace Frags.Core.Statistics
         /// and determines if they pass or fail the check.
         /// </summary>
         /// <returns>
-        /// Returns a positive or negative integer representing 
+        /// Returns a positive or negative number representing 
         /// how good or bad a roll turned out.
         /// </returns>
-        int? RollStatistic(Statistic stat, Character character);
+        double? RollStatistic(Statistic stat, Character character);
     }
 }

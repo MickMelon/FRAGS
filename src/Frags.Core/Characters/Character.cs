@@ -75,7 +75,7 @@ namespace Frags.Core.Characters
         /// </summary>
         /// <param name="skill">The skill name.</param>
         /// <returns>What the character rolled.</returns>
-        public int? RollStatistic(Statistic stat, IRollStrategy strategy)
+        public double? RollStatistic(Statistic stat, IRollStrategy strategy)
         {
             if (Statistics.TryGetValue(stat, out StatisticValue value))
             {
