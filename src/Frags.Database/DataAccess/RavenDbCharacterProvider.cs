@@ -52,7 +52,7 @@ namespace Frags.Database.DataAccess
                 }
 
                 await session.SaveChangesAsync();
-                return character;
+                return _mapper.Map<Character>(charDto);
             }
         }
 

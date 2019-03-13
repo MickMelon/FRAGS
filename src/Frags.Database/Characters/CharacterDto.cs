@@ -1,6 +1,10 @@
-using Frags.Database;
+using Frags.Core.Common;
+using Frags.Core.Statistics;
+using Frags.Database.Statistics;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Frags.Database.Characters
 {
@@ -35,5 +39,23 @@ namespace Frags.Database.Characters
         /// The character's current experience.
         /// </summary>
         public int Experience { get; set; }
+
+        /// <summary>
+        /// The character's statistics.
+        /// </summary>
+        public IDictionary<Statistic, StatisticValue> Statistics
+        {
+            get
+            {
+                var dict = new Dictionary<Statistic, StatisticValue>();
+
+                foreach (var stat in StatisticMappings)
+                    dict.Add(stat.Statistic, stat.StatisticValue);
+                    
+                return dict;
+            }
+        }
+
+        public IList<StatisticMapping> StatisticMappings { get; set; }
     }
 }

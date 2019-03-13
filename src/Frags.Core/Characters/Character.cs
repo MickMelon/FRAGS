@@ -89,6 +89,8 @@ namespace Frags.Core.Characters
             Name = name;
             Description = description;
             Story = story;
+
+            Statistics = new Dictionary<Statistic, StatisticValue>();
         }
 
         /// <summary>

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Frags.Core.Statistics;
 using Frags.Database.Characters;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,7 +7,9 @@ namespace Frags.Database
 {
     public class RpgContext : DbContext
     {
+        public DbSet<Attribute> Attributes { get; set; }
         public DbSet<CharacterDto> Characters { get; set; }
+        public DbSet<Skill> Skills { get; set; }
         public DbSet<User> Users { get; set; }
 
         public RpgContext() {}
@@ -20,6 +24,11 @@ namespace Frags.Database
             {
                 optionsBuilder.UseSqlite("Filename=test.db");
             }
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Ignore<IDictionary<Statistic, StatisticValue>>();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Frags.Core.Statistics
     /// </summary>
     public class Attribute : Statistic
     {
-        public Attribute(string id, string name, string description = "") : base(id, name, description)
+        public Attribute(string name, string description = "") : base(name, description)
         {
         }
     }

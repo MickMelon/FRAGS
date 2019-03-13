@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
+using Frags.Core.Statistics;
 using Frags.Database.Characters;
 using Frags.Database.DataAccess;
 using Frags.Database.Repositories;
@@ -33,6 +35,29 @@ namespace Frags.Test.Database.DataAccess
                 var result = await provider.GetActiveCharacterAsync(305847674974896128);
 
                 Assert.True(result.UserIdentifier == 305847674974896128);
+            }
+        }
+
+        [Fact]
+        public async Task RavenDb_CharacterStatistics_EntityMatchesInput()
+        {
+            using (var store = GetDocumentStore())
+            {
+                var provider = new RavenDbCharacterProvider(store);
+
+                var strength = new Attribute("1", "Strength");
+                var character = await provider.CreateCharacterAsync("1", 305847674974896128, true, "Melon Head");
+                character.Statistics = new Dictionary<Statistic, StatisticValue>
+                {
+                    { strength, new StatisticValue(5) }
+                };
+                WaitForIndexing(store);
+
+                await provider.UpdateCharacterAsync(character);
+                WaitForIndexing(store);
+                var result = await provider.GetActiveCharacterAsync(305847674974896128);
+
+                Assert.True(result.Statistics.Count > 0);
             }
         }
 

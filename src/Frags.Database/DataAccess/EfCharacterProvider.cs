@@ -6,6 +6,7 @@ using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Database.Characters;
 using Frags.Database.Repositories;
+using Frags.Database.Resolvers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -22,7 +23,14 @@ namespace Frags.Database.DataAccess
             _userRepo = userRepo;
             _charRepo = charRepo;
             
-            _mapper = new Mapper(new MapperConfiguration(x => x.CreateMap<Character, CharacterDto>()));
+            var mapperConfig = new MapperConfiguration(cfg => {
+                cfg.CreateMap<Character, CharacterDto>()
+                    .ForMember(dto => dto.StatisticMappings, opt => opt.MapFrom<StatDictionaryToList>());
+                cfg.CreateMap<CharacterDto, Character>()
+                    .ForMember(poco => poco.Statistics, opt => opt.MapFrom<StatListToDictionary>());
+            });
+
+            _mapper = new Mapper(mapperConfig);
         }
 
         private async Task<Character> CreateCharacterAsync(Character character)
@@ -44,7 +52,7 @@ namespace Frags.Database.DataAccess
                     await _userRepo.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
             }
 
-            return character;
+            return _mapper.Map<Character>(charDto);
         }
 
         /// <inheritdoc/>

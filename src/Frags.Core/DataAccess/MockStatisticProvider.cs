@@ -21,8 +21,8 @@ namespace Frags.Core.DataAccess
 
         public MockStatisticProvider()
         {
-            var str = new Attribute("1", "Strength");
-            var lifting = new Skill(str, "2", "Powerlifting");
+            var str = new Attribute("Strength");
+            var lifting = new Skill(str, "Powerlifting");
 
             _statistics = new List<Statistic>()
             {

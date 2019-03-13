@@ -6,7 +6,7 @@ namespace Frags.Core.Statistics
     /// <summary>
     /// The statistic model.
     /// </summary>
-    public abstract class Statistic
+    public abstract class Statistic : BaseModel
     {
         /// <summary>
         /// The statistics's unique identifier.
@@ -23,9 +23,8 @@ namespace Frags.Core.Statistics
         /// </summary>
         public string Description { get; set; }
 
-        protected Statistic(string id, string name, string description = "")
+        protected Statistic(string name, string description = "")
         {
-            Id = id;
             Name = name;
             Description = description;
         }

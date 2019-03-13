@@ -1,4 +1,4 @@
-using Frags.Database;
+using Frags.Core.Common;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;

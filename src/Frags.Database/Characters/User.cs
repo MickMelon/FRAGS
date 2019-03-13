@@ -1,4 +1,4 @@
-using Frags.Database;
+using Frags.Core.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 
