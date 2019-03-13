@@ -12,7 +12,7 @@ namespace Frags.Core.DataAccess
         /// <summary>
         /// Adds a new character to the database.
         /// </summary>
-        /// <param name="discordId">Discord ID.</param>
+        /// <param name="userIdentifier">The user identifier.</param>
         /// <param name="name">Character's name.</param>
         /// <returns>Whether the character was added successfully.</returns>
         Task<Character> CreateCharacterAsync(ulong discordId, string name);
@@ -20,21 +20,21 @@ namespace Frags.Core.DataAccess
         /// <summary>
         /// Gets the active character for the user.
         /// </summary>
-        /// <param name="discordId">Discord ID</param>
+        /// <param name="userIdentifier">The user identifier.</param>
         /// <returns>Active character or null if none.</returns>
-        Task<Character> GetActiveCharacterAsync(ulong discordId);
+        Task<Character> GetActiveCharacterAsync(ulong userIdentifier);
 
         /// <summary>
         /// Gets all the characters for the user.
         /// </summary>
-        /// <param name="discordId">Discord ID</param>
+        /// <param name="userIdentifier">The user identifier.</param>
         /// <returns>A list containing all the user's characters.</returns>
-        Task<List<Character>> GetAllCharactersAsync(ulong discordId);
+        Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier);
 
         /// <summary>
         /// Saves a character in the database.
         /// </summary>
-        /// <param name="character">The character to be saved.</param>
+        /// <param name="userIdentifier">The character to be saved.</param>
         Task UpdateCharacterAsync(Character character);
     }
 }

@@ -68,7 +68,6 @@ namespace Frags.Core.Common
             // for maxValue being lower than minValue
             if (maximum >= Int32.MaxValue || maximum < minimum)
                 return _local.Value.Next(minimum, maximum);
-
             return _local.Value.Next(minimum, maximum + 1);
         }
     }
