@@ -66,16 +66,23 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
         {
-            var user = await _userRepo.Query.Where(c => c.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
-            if (user == null) return null;
+            var character = await _userRepo.Query.Where(c => c.UserIdentifier == userIdentifier)
+                .Select(x => x.ActiveCharacter)
+                    .Include(y => y.StatisticMappings)
+                .FirstOrDefaultAsync();
+            
+            if (character == null) return null;
 
-            return _mapper.Map<Character>(user.ActiveCharacter);
+            return _mapper.Map<Character>(character);
         }
 
         /// <inheritdoc/>
         public async Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier)
         {
-            var charDtos = await _charRepo.Query.Where(c => c.UserIdentifier == userIdentifier).ToListAsync();
+            var charDtos = await _charRepo.Query.Where(c => c.UserIdentifier == userIdentifier)
+                .Include(x => x.StatisticMappings)
+                .ToListAsync();
+                
             return _mapper.Map<List<Character>>(charDtos);
         }
 

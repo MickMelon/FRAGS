@@ -48,8 +48,9 @@ namespace Frags.Test.Database.DataAccess
             var strength = await deps.statProvider.CreateAttributeAsync("Strength");
             var value = new StatisticValue(5);
 
-            var result = await deps.charProvider.CreateCharacterAsync(id, userIdentifier, true, name);
+            await deps.charProvider.CreateCharacterAsync(id, userIdentifier, true, name);
 
+            var result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
             // Simulate transient dependencies (will fail without this)
             deps = LoadDependencies();
 
