@@ -72,9 +72,9 @@ namespace Frags.Core.Characters
         }
 
         /// <summary>
-        /// Rolls the specified skill for the character.
+        /// Rolls the specified statistic for the character.
         /// </summary>
-        /// <param name="skill">The skill name.</param>
+        /// <param name="stat">The statistic name.</param>
         /// <returns>What the character rolled.</returns>
         public double? RollStatistic(Statistic stat, IRollStrategy strategy)
         {

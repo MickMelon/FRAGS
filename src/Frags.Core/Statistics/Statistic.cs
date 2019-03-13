@@ -9,6 +9,11 @@ namespace Frags.Core.Statistics
     public abstract class Statistic
     {
         /// <summary>
+        /// The statistics's unique identifier.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// The statistics's name.
         /// </summary>
         public string Name { get; set; }
@@ -17,5 +22,12 @@ namespace Frags.Core.Statistics
         /// The statistics's description.
         /// </summary>
         public string Description { get; set; }
+
+        protected Statistic(string id, string name, string description = "")
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+        }
     }
 }

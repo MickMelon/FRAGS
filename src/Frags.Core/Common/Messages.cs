@@ -8,12 +8,16 @@ namespace Frags.Core.Common
         public static readonly string CHAR_CREATE_SUCCESS = "Character created successfully.";
         #endregion
 
+        #region Game
+        public static readonly string ROLL_FAILED = "Error rolling character statistic.";
+        #endregion
+
         #region NPC
         public static readonly string NPC_NOT_FOUND = "NPC not found.";
         #endregion
 
-        #region Skills
-        public static readonly string SKILL_NOT_FOUND = "Skill not found.";
+        #region Statistics
+        public static readonly string STAT_NOT_FOUND = "Statistic not found.";
         #endregion
     }
 }

@@ -15,7 +15,7 @@ namespace Frags.Core.DataAccess
         /// <param name="discordId">Discord ID.</param>
         /// <param name="name">Character's name.</param>
         /// <returns>Whether the character was added successfully.</returns>
-        Task<bool> CreateCharacterAsync(ulong discordId, string name);
+        Task<Character> CreateCharacterAsync(ulong discordId, string name);
 
         /// <summary>
         /// Gets the active character for the user.

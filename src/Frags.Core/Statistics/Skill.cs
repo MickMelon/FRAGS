@@ -8,6 +8,11 @@ namespace Frags.Core.Statistics
     /// </summary>
     public class Skill : Statistic
     {
+        public Skill(Attribute attribute, string id, string name, string description = "") : base(id, name, description)
+        {
+            Attribute = attribute;
+        }
+
         /// <summary>
         /// The skill's associated attribute.
         /// 

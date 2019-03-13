@@ -2,13 +2,13 @@ using Frags.Core.Common;
 
 namespace Frags.Presentation.Results
 {
-    public class SkillResult : BaseResult
+    public class StatisticResult : BaseResult
     {
-        public SkillResult(string message, bool success = true, object viewModel = null) : base(message, success, viewModel)
+        public StatisticResult(string message, bool success = true, object viewModel = null) : base(message, success, viewModel)
         {
         }
 
-        public static SkillResult SkillNotFound() =>
-            new SkillResult(Messages.SKILL_NOT_FOUND, false);
+        public static StatisticResult StatisticNotFound() =>
+            new StatisticResult(Messages.STAT_NOT_FOUND, false);
     }
 }

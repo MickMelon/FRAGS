@@ -15,19 +15,19 @@ namespace Frags.Discord.Modules
         }
 
         [Command("roll")]
-        public async Task RollAsync(string skill)
+        public async Task RollAsync(string stat)
         {
             ulong discordId = Context.User.Id;
-            var result = await _controller.RollAsync(discordId, skill);
+            var result = await _controller.RollAsync(discordId, stat);
             await ReplyAsync(result.Message);
         }
 
         [Command("rollagainst")]
-        public async Task RollAgainstAsync(IUser targetUser, string skill)
+        public async Task RollAgainstAsync(IUser targetUser, string stat)
         {
             ulong discordId = Context.User.Id;
             ulong targetDiscordId = targetUser.Id;
-            var result = await _controller.RollAgainstAsync(discordId, targetDiscordId, skill);
+            var result = await _controller.RollAgainstAsync(discordId, targetDiscordId, stat);
             await ReplyAsync(result.Message);
         }
     }

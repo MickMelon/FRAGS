@@ -17,6 +17,12 @@ namespace Frags.Presentation.Controllers
         /// Used to interact with the character database.
         /// </summary>
         private readonly ICharacterProvider _provider;
+
+        /// <summary>
+        /// Used to interact with the statistic database.
+        /// </summary>
+        private readonly IStatisticProvider _statProvider;
+
         /// <summary>
         /// Used to determine which RollStrategy to use.
         /// </summary>
@@ -26,9 +32,10 @@ namespace Frags.Presentation.Controllers
         /// Initializes a new instance of the <see cref="RollController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public RollController(ICharacterProvider provider, RollOptions options)
+        public RollController(ICharacterProvider provider, IStatisticProvider statProvider, RollOptions options)
         {
             _provider = provider;
+            _statProvider = statProvider;
 
             _strategy = GetStrategy(options.RollMode);
         }
@@ -47,38 +54,35 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
-        /// Performs a roll on a character's skill and returns the result.
+        /// Performs a roll on a character's statistic and returns the result.
         /// </summary>
         /// <param name="callerId">Discord ID of the caller.</param>
-        /// <param name="skill">The skill name.</param>
+        /// <param name="statName">The statistic name.</param>
         /// <returns>The result of the roll.</returns>
-        public async Task<IResult> RollAsync(ulong callerId, string skill)
+        public async Task<IResult> RollAsync(ulong callerId, string statName)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            // Check valid skill name
-            // dummy for testing
-            if (skill.EqualsIgnoreCase("invalid")) 
-                return SkillResult.SkillNotFound();
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
 
-            int roll = character.Roll(skill);
+            double? result = character.RollStatistic(stat, _strategy);
 
-            // We need to resolve the string into a Statistic first
-            // and use Configuration to figure out which Strategy to use
-            double? result = character.RollStatistic(new Skill(), _strategy);
+            if (result.HasValue)
+                return RollResult.Roll(character.Name, statName, result.Value);
 
-            return RollResult.Roll(character.Name, skill, roll);
+            return RollResult.RollFailed();
         }
 
         /// <summary>
-        /// Performs a duel between two characters rolling a skill and returns the result.
+        /// Performs a duel between two characters rolling a statistic and returns the result.
         /// </summary>
         /// <param name="callerId">Discord ID of the caller.</param>
         /// <param name="targetId">Discord ID of the target.</param>
-        /// <param name="skill">The skill name.</param>
+        /// <param name="statName">The statistic name.</param>
         /// <returns>The result of the roll.</returns>
-        public async Task<IResult> RollAgainstAsync(ulong callerId, ulong targetId, string skill)
+        public async Task<IResult> RollAgainstAsync(ulong callerId, ulong targetId, string statName)
         {
             var caller = await _provider.GetActiveCharacterAsync(callerId);
             if (caller == null) return CharacterResult.CharacterNotFound();
@@ -86,14 +90,16 @@ namespace Frags.Presentation.Controllers
             var target = await _provider.GetActiveCharacterAsync(targetId);
             if (target == null) return CharacterResult.CharacterNotFound();
 
-            // dummy for testing
-            if (skill.EqualsIgnoreCase("invalid")) 
-                return SkillResult.SkillNotFound();
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
 
-            int callerRoll = caller.Roll(skill) + 1;
-            int targetRoll = target.Roll(skill);
+            double? callerRoll = caller.RollStatistic(stat, _strategy);
+            double? targetRoll = target.RollStatistic(stat, _strategy);
 
-            return RollResult.RollAgainst(caller.Name, target.Name, callerRoll, targetRoll);
+            if (callerRoll.HasValue && targetRoll.HasValue)
+                return RollResult.RollAgainst(caller.Name, target.Name, callerRoll.Value, targetRoll.Value);
+
+            return RollResult.RollFailed();
         }
     }
 }

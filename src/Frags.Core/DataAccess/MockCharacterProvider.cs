@@ -27,12 +27,11 @@ namespace Frags.Core.DataAccess
         }
 
         /// <inheritdoc/>
-        public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
+        public async Task<Character> CreateCharacterAsync(ulong discordId, string name)
         {
             var character = new Character((int)discordId, name);
             _characters.Add(character);
-            await Task.Delay(0); // just to ignore warning
-            return true;
+            return await Task.FromResult(character);
         }
 
         /// <inheritdoc/>

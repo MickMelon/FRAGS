@@ -23,5 +23,18 @@ namespace Frags.Core.Statistics
         /// Represents a bonus to add to a roll.
         /// </summary>
         public double Proficiency { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatisticValue" /> class.
+        /// </summary>
+        /// <param name="val">The value of the associated statistic.</param>
+        /// <param name="isProficient">Whether or not to mark this statistic as proficient.</param>
+        /// <param name="proficiency">The bonus that is applied if this statistic is marked proficient.</param>
+        public StatisticValue(double val, bool isProficient = false, double proficiency = 0)
+        {
+            Value = val;
+            IsProficient = isProficient;
+            Proficiency = proficiency;
+        }
     }
 }

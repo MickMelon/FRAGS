@@ -1,3 +1,5 @@
+using Frags.Core.Common;
+
 namespace Frags.Presentation.Results
 {
     /// <summary>
@@ -21,6 +23,12 @@ namespace Frags.Presentation.Results
         /// <param name="rollValue">What the character rolled.</param>
         public static RollResult Roll(string name, string stat, double rollValue) =>
             new RollResult($"{name} rolled a {rollValue} in {stat}.");
+
+        /// <summary>
+        /// Returns a <see cref="RollResult" />.
+        /// </summary>
+        public static RollResult RollFailed() =>
+            new RollResult(Messages.ROLL_FAILED, false);
 
         /// <summary>
         /// Returns a <see cref="RollResult" />.

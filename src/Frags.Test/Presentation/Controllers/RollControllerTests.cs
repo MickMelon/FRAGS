@@ -12,24 +12,23 @@ namespace Frags.Test.Presentation.Controllers
 {
     public class RollControllerTests
     {
-        private static readonly Attribute strength = new Attribute { Name = "Strength" };
-        private static readonly StatisticValue value = new StatisticValue { Value = 5 };
-
         #region RollAsync Tests
         [Fact]
         public async Task Roll_ValidValues_ReturnSuccess()
         {
             // Arrange
+            var statProvider = new MockStatisticProvider();
+            var strength = await statProvider.GetStatisticAsync("Strength");
+
             var provider = new MockCharacterProvider();
-            await provider.CreateCharacterAsync(1, "bob");
             var chars = await provider.GetAllCharactersAsync(1);
 
             // Give the new character a Statistic to test
-            chars[0].Statistics = new Dictionary<Statistic, StatisticValue> { { strength, value } };
+            chars[0].Statistics = new Dictionary<Statistic, StatisticValue> { { strength, new StatisticValue(5) } };
 
             await provider.UpdateCharacterAsync(chars[0]);
 
-            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAsync(1, "strength");
@@ -39,17 +38,37 @@ namespace Frags.Test.Presentation.Controllers
         }
 
         [Fact]
-        public async Task Roll_InvalidSkill_ReturnSkillNotFound()
+        public async Task Roll_InvalidStat_ReturnStatNotFound()
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
+            var statProvider = new MockStatisticProvider();
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAsync(1, "invalid");
 
             // Assert
-            Assert.True(SkillResult.SkillNotFound().Equals(result));
+            Assert.True(StatisticResult.StatisticNotFound().Equals(result));
+        }
+
+        [Fact]
+        public async Task Roll_InvalidStatValues_ReturnRollFailed()
+        {
+            // Arrange
+            var statProvider = new MockStatisticProvider();
+            var strength = await statProvider.GetStatisticAsync("Strength");
+
+            var provider = new MockCharacterProvider();
+
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
+
+            // Act
+            // Character should have null or empty Statistics list.
+            var result = await controller.RollAsync(1, "strength");
+
+            // Assert
+            Assert.True(RollResult.RollFailed().Equals(result));
         }
 
         [Fact]
@@ -57,7 +76,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
+            var statProvider = new MockStatisticProvider();
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAsync(0, "strength");
@@ -72,8 +92,15 @@ namespace Frags.Test.Presentation.Controllers
         public async Task RollAgainst_ValidValues_ReturnSuccess()
         {
             // Arrange
+            var statProvider = new MockStatisticProvider();
+            var strength = await statProvider.GetStatisticAsync("Strength");
+
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
+            // Give characters statistics
+            (await provider.GetAllCharactersAsync(1))[0].Statistics = new Dictionary<Statistic, StatisticValue>{ { strength, new StatisticValue(5) } };
+            (await provider.GetAllCharactersAsync(2))[0].Statistics = new Dictionary<Statistic, StatisticValue>{ { strength, new StatisticValue(5) } };
+            
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(1, 2, "strength");
@@ -87,7 +114,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
+            var statProvider = new MockStatisticProvider();
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(0, 2, "strength");
@@ -101,7 +129,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
+            var statProvider = new MockStatisticProvider();
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(1, 0, "strength");
@@ -111,17 +140,33 @@ namespace Frags.Test.Presentation.Controllers
         }
 
         [Fact]
-        public async Task RollAgainst_InvalidSkill_ReturnSkillNotFound()
+        public async Task RollAgainst_InvalidStat_ReturnStatNotFound()
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new RollController(provider, new RollOptions { RollMode = RollMode.Mock });
+            var statProvider = new MockStatisticProvider();
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
             var result = await controller.RollAgainstAsync(1, 2, "invalid");
 
             // Assert
-            Assert.Equal(SkillResult.SkillNotFound(), result);
+            Assert.Equal(StatisticResult.StatisticNotFound(), result);
+        }
+
+        [Fact]
+        public async Task RollAgainst_InvalidStatValues_ReturnRollFailed()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
+
+            // Act
+            var result = await controller.RollAgainstAsync(1, 2, "strength");
+
+            // Assert
+            Assert.Equal(RollResult.RollFailed(), result);
         }
         #endregion
     }
