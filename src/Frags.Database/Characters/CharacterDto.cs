@@ -1,6 +1,7 @@
 using Frags.Core.Common;
 using Frags.Core.Statistics;
 using Frags.Database.Statistics;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -43,6 +44,7 @@ namespace Frags.Database.Characters
         /// <summary>
         /// The character's statistics.
         /// </summary>
+        [JsonIgnore]
         public IDictionary<Statistic, StatisticValue> Statistics
         {
             get

@@ -44,13 +44,11 @@ namespace Frags.Test.Database.DataAccess
             using (var store = GetDocumentStore())
             {
                 var provider = new RavenDbCharacterProvider(store);
+                var statProvider = new RavenDbStatisticProvider(store);
 
-                var strength = new Attribute("1", "Strength");
+                var strength = await statProvider.CreateAttributeAsync("Strength");
                 var character = await provider.CreateCharacterAsync("1", 305847674974896128, true, "Melon Head");
-                character.Statistics = new Dictionary<Statistic, StatisticValue>
-                {
-                    { strength, new StatisticValue(5) }
-                };
+                character.Statistics.Add(strength, new StatisticValue(5));
                 WaitForIndexing(store);
 
                 await provider.UpdateCharacterAsync(character);

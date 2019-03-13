@@ -13,8 +13,6 @@ namespace Frags.Database.DataAccess
     {
         private readonly IRepository<Statistic> _statRepo;
 
-        private readonly IMapper _mapper;
-
         public EfStatisticProvider(IRepository<Statistic> statRepo)
         {
             _statRepo = statRepo;

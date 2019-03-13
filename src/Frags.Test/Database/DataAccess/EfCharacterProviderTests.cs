@@ -41,7 +41,7 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CharacterStatistics_EntityMatchesInput()
         {
-            var deps = ReloadDependencies();
+            var deps = LoadDependencies();
 
             ulong userIdentifier = 305847674974896128;
             string oldName = "Melon Head", id = "1";
@@ -53,7 +53,7 @@ namespace Frags.Test.Database.DataAccess
             var result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
 
             // Simulate transient dependencies (will fail without this)
-            deps = ReloadDependencies();
+            deps = LoadDependencies();
 
             result.Statistics = new Dictionary<Statistic, StatisticValue>{ { strength, value } };
             await deps.charProvider.UpdateCharacterAsync(result);
@@ -65,7 +65,7 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_UpdateCharacter_EntityMatchesInput()
         {
-            var deps = ReloadDependencies();
+            var deps = LoadDependencies();
 
             ulong userIdentifier = 305847674974896128;
             string oldName = "Melon Head", newName = "Mr. Melon", id = "1";
@@ -75,7 +75,7 @@ namespace Frags.Test.Database.DataAccess
             var result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
 
             // Simulate transient dependencies (will fail without this)
-            deps = ReloadDependencies();
+            deps = LoadDependencies();
 
             result.Name = newName;
             await deps.charProvider.UpdateCharacterAsync(result);
@@ -84,7 +84,7 @@ namespace Frags.Test.Database.DataAccess
             Assert.Equal(newName, result.Name);
         }
 
-        private (RpgContext context, EfThreadSafeRepository<CharacterDto> charRepo, EfThreadSafeRepository<User> userRepo, EfThreadSafeRepository<Statistic> statRepo, EfCharacterProvider charProvider, EfStatisticProvider statProvider) ReloadDependencies()
+        private (RpgContext context, EfThreadSafeRepository<CharacterDto> charRepo, EfThreadSafeRepository<User> userRepo, EfThreadSafeRepository<Statistic> statRepo, EfCharacterProvider charProvider, EfStatisticProvider statProvider) LoadDependencies()
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").EnableSensitiveDataLogging().Options);
             var charRepo = new EfThreadSafeRepository<CharacterDto>(context);

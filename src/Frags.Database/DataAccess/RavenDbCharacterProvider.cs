@@ -6,6 +6,7 @@ using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Database.Characters;
 using Frags.Database.Repositories;
+using Frags.Database.Resolvers;
 using Raven.Client.Documents;
 
 namespace Frags.Database.DataAccess
@@ -20,7 +21,14 @@ namespace Frags.Database.DataAccess
         {
             _store = store;
             
-            _mapper = new Mapper(new MapperConfiguration(x => x.CreateMap<Character, CharacterDto>()));
+            var mapperConfig = new MapperConfiguration(cfg => {
+                cfg.CreateMap<Character, CharacterDto>()
+                    .ForMember(dto => dto.StatisticMappings, opt => opt.MapFrom<StatDictionaryToList>());
+                cfg.CreateMap<CharacterDto, Character>()
+                    .ForMember(poco => poco.Statistics, opt => opt.MapFrom<StatListToDictionary>());
+            });
+
+            _mapper = new Mapper(mapperConfig);
         }
 
         private async Task<Character> CreateCharacterAsync(Character character)
