@@ -6,7 +6,6 @@ using Frags.Core.Statistics;
 using Frags.Database;
 using Frags.Database.Characters;
 using Frags.Database.DataAccess;
-using Frags.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,10 +26,7 @@ namespace Frags.Test.Database.DataAccess
         public async Task EntityFramework_CreateCharacter_EntityMatchesInput()
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
-            var efRepo = new EfThreadSafeRepository<CharacterDto>(context);
-            var actRepo = new EfThreadSafeRepository<User>(context);
-            
-            var provider = new EfCharacterProvider(actRepo, efRepo);
+            var provider = new EfCharacterProvider(context);
 
             await provider.CreateCharacterAsync("1", 305847674974896128, true, "Melon Head");
             var result = await provider.GetActiveCharacterAsync(305847674974896128);
@@ -41,60 +37,49 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CharacterStatistics_EntityMatchesInput()
         {
-            var deps = LoadDependencies();
+            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            var provider = new EfCharacterProvider(context);
+            var statProvider = new EfStatisticProvider(context);
 
             ulong userIdentifier = 305847674974896128;
             string name = "Melon Head", id = "1";
-            var strength = await deps.statProvider.CreateAttributeAsync("Strength");
+            var strength = await statProvider.CreateAttributeAsync("Strength");
             var value = new StatisticValue(5);
 
-            await deps.charProvider.CreateCharacterAsync(id, userIdentifier, true, name);
+            var result = await provider.CreateCharacterAsync(id, userIdentifier, true, name);
 
-            var result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
             // Simulate transient dependencies (will fail without this)
-            deps = LoadDependencies();
+            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            provider = new EfCharacterProvider(context);
 
             result.Statistics.Add(strength, value);
-            await deps.charProvider.UpdateCharacterAsync(result);
+            await provider.UpdateCharacterAsync(result);
 
-            result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
+            result = await provider.GetActiveCharacterAsync(userIdentifier);
             Assert.True(result.Statistics.Count > 0);
         }
 
         [Fact]
         public async Task EntityFramework_UpdateCharacter_EntityMatchesInput()
         {
-            var deps = LoadDependencies();
-
+            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            var provider = new EfCharacterProvider(context);
+            
             ulong userIdentifier = 305847674974896128;
             string oldName = "Melon Head", newName = "Mr. Melon", id = "1";
 
-            await deps.charProvider.CreateCharacterAsync(id, userIdentifier, true, oldName);
-
-            var result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
+            var result = await provider.CreateCharacterAsync(id, userIdentifier, true, oldName);
+            context.Dispose();
 
             // Simulate transient dependencies (will fail without this)
-            deps = LoadDependencies();
+            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            provider = new EfCharacterProvider(context);
 
             result.Name = newName;
-            await deps.charProvider.UpdateCharacterAsync(result);
+            await provider.UpdateCharacterAsync(result);
 
-            result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
+            result = await provider.GetActiveCharacterAsync(userIdentifier);
             Assert.Equal(newName, result.Name);
-        }
-
-        private (RpgContext context, EfThreadSafeRepository<CharacterDto> charRepo, EfThreadSafeRepository<User> userRepo, EfThreadSafeRepository<Statistic> statRepo, EfCharacterProvider charProvider, EfStatisticProvider statProvider) LoadDependencies()
-        {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").EnableSensitiveDataLogging().Options);
-            var charRepo = new EfThreadSafeRepository<CharacterDto>(context);
-            var userRepo = new EfThreadSafeRepository<User>(context);
-            var statRepo = new EfThreadSafeRepository<Statistic>(context);
-            return (context,
-            charRepo,
-            userRepo,
-            statRepo,
-            new EfCharacterProvider(userRepo, charRepo),
-            new EfStatisticProvider(statRepo));
         }
         #endregion
     }
