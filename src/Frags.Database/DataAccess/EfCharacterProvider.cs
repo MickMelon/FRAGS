@@ -66,8 +66,9 @@ namespace Frags.Database.DataAccess
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
         {
             var character = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
-                .Select(x => x.ActiveCharacter)
-                    .Include(y => y.StatisticMappings)
+                .Select(usr => usr.ActiveCharacter)
+                    .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.Statistic)
+                    .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.StatisticValue)
                 .FirstOrDefaultAsync();
             
             if (character == null) return null;
@@ -79,7 +80,8 @@ namespace Frags.Database.DataAccess
         public async Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier)
         {
             var charDtos = await _context.Characters.Where(c => c.UserIdentifier == userIdentifier)
-                .Include(x => x.StatisticMappings)
+                .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.Statistic)
+                .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.StatisticValue)
                 .ToListAsync();
                 
             return _mapper.Map<List<Character>>(charDtos);

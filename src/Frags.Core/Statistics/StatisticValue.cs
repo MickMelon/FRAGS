@@ -6,8 +6,10 @@ namespace Frags.Core.Statistics
     /// <summary>
     /// The statistic-value model.
     /// </summary>
-    public struct StatisticValue
+    public class StatisticValue
     {
+        public string Id { get; set; }
+
         /// <summary>
         /// The value associated with the statistic.
         /// </summary>
@@ -36,5 +38,7 @@ namespace Frags.Core.Statistics
             IsProficient = isProficient;
             Proficiency = proficiency;
         }
+
+        private StatisticValue() { }
     }
 }

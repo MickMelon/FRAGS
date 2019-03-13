@@ -14,13 +14,6 @@ namespace Frags.Test.Database.DataAccess
 {
     public class EfCharacterProviderTests
     {
-        private readonly ITestOutputHelper _output;
-
-        public EfCharacterProviderTests(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
         #region Character Creation Tests
         [Fact]
         public async Task EntityFramework_CreateCharacter_EntityMatchesInput()
@@ -43,14 +36,16 @@ namespace Frags.Test.Database.DataAccess
 
             ulong userIdentifier = 305847674974896128;
             string name = "Melon Head", id = "1";
+            
             var strength = await statProvider.CreateAttributeAsync("Strength");
             var value = new StatisticValue(5);
-
-            var result = await provider.CreateCharacterAsync(id, userIdentifier, true, name);
+            await provider.CreateCharacterAsync(id, userIdentifier, true, name);
+            var result = await provider.GetActiveCharacterAsync(userIdentifier);
 
             // Simulate transient dependencies (will fail without this)
             context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
             provider = new EfCharacterProvider(context);
+            statProvider = new EfStatisticProvider(context);
 
             result.Statistics.Add(strength, value);
             await provider.UpdateCharacterAsync(result);
