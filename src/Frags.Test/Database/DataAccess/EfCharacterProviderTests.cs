@@ -44,18 +44,16 @@ namespace Frags.Test.Database.DataAccess
             var deps = LoadDependencies();
 
             ulong userIdentifier = 305847674974896128;
-            string oldName = "Melon Head", id = "1";
+            string name = "Melon Head", id = "1";
             var strength = await deps.statProvider.CreateAttributeAsync("Strength");
             var value = new StatisticValue(5);
 
-            await deps.charProvider.CreateCharacterAsync(id, userIdentifier, true, oldName);
-
-            var result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
+            var result = await deps.charProvider.CreateCharacterAsync(id, userIdentifier, true, name);
 
             // Simulate transient dependencies (will fail without this)
             deps = LoadDependencies();
 
-            result.Statistics = new Dictionary<Statistic, StatisticValue>{ { strength, value } };
+            result.Statistics.Add(strength, value);
             await deps.charProvider.UpdateCharacterAsync(result);
 
             result = await deps.charProvider.GetActiveCharacterAsync(userIdentifier);
