@@ -12,7 +12,7 @@ namespace Frags.Test.Presentation.Controllers
 {
     public class RollControllerTests
     {
-        #region RollAsync Tests
+        #region RollStatisticAsync Tests
         [Fact]
         public async Task Roll_ValidValues_ReturnSuccess()
         {
@@ -31,7 +31,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAsync(1, "strength");
+            var result = await controller.RollStatisticAsync(1, "strength");
 
             // Assert
             Assert.True(result.GetType() == typeof(RollResult) && result.IsSuccess);
@@ -46,7 +46,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAsync(1, "invalid");
+            var result = await controller.RollStatisticAsync(1, "invalid");
 
             // Assert
             Assert.True(StatisticResult.StatisticNotFound().Equals(result));
@@ -65,7 +65,7 @@ namespace Frags.Test.Presentation.Controllers
 
             // Act
             // Character should have null or empty Statistics list.
-            var result = await controller.RollAsync(1, "strength");
+            var result = await controller.RollStatisticAsync(1, "strength");
 
             // Assert
             Assert.True(RollResult.RollFailed().Equals(result));
@@ -80,14 +80,14 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAsync(0, "strength");
+            var result = await controller.RollStatisticAsync(0, "strength");
 
             // Assert
             Assert.Equal(CharacterResult.CharacterNotFound(), result);
         }
         #endregion
 
-        #region RollAgainstAsync Tests
+        #region RollStatisticAgainstAsync Tests
         [Fact]
         public async Task RollAgainst_ValidValues_ReturnSuccess()
         {
@@ -103,7 +103,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAgainstAsync(1, 2, "strength");
+            var result = await controller.RollStatisticAgainstAsync(1, 2, "strength");
 
             // Assert
             Assert.True(result.GetType() == typeof(RollResult) && result.IsSuccess);
@@ -118,7 +118,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAgainstAsync(0, 2, "strength");
+            var result = await controller.RollStatisticAgainstAsync(0, 2, "strength");
 
             // Assert
             Assert.Equal(CharacterResult.CharacterNotFound(), result);
@@ -133,7 +133,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAgainstAsync(1, 0, "strength");
+            var result = await controller.RollStatisticAgainstAsync(1, 0, "strength");
 
             // Assert
             Assert.Equal(CharacterResult.CharacterNotFound(), result);
@@ -148,7 +148,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAgainstAsync(1, 2, "invalid");
+            var result = await controller.RollStatisticAgainstAsync(1, 2, "invalid");
 
             // Assert
             Assert.Equal(StatisticResult.StatisticNotFound(), result);
@@ -163,7 +163,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 
             // Act
-            var result = await controller.RollAgainstAsync(1, 2, "strength");
+            var result = await controller.RollStatisticAgainstAsync(1, 2, "strength");
 
             // Assert
             Assert.Equal(RollResult.RollFailed(), result);

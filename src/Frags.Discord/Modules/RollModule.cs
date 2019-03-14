@@ -18,7 +18,7 @@ namespace Frags.Discord.Modules
         public async Task RollAsync(string stat)
         {
             ulong discordId = Context.User.Id;
-            var result = await _controller.RollAsync(discordId, stat);
+            var result = await _controller.RollStatisticAsync(discordId, stat);
             await ReplyAsync(result.Message);
         }
 
@@ -27,7 +27,7 @@ namespace Frags.Discord.Modules
         {
             ulong discordId = Context.User.Id;
             ulong targetDiscordId = targetUser.Id;
-            var result = await _controller.RollAgainstAsync(discordId, targetDiscordId, stat);
+            var result = await _controller.RollStatisticAgainstAsync(discordId, targetDiscordId, stat);
             await ReplyAsync(result.Message);
         }
     }

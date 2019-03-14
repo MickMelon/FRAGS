@@ -44,6 +44,10 @@ namespace Frags.Presentation.Controllers
         /// Used to get an instance of IRollStrategy by reading
         /// from the Configuartion passed to this instance of RollController.
         /// </summary>
+        /// <remarks>
+        /// There's definitely a better way to implement this, namely
+        /// with a separate factory class and all sorts of interfaces to make it
+        /// dependency injection friendly, just thought it was overkill.
         private IRollStrategy GetStrategy(RollMode mode)
         {
             switch (mode)
@@ -59,7 +63,7 @@ namespace Frags.Presentation.Controllers
         /// <param name="callerId">Discord ID of the caller.</param>
         /// <param name="statName">The statistic name.</param>
         /// <returns>The result of the roll.</returns>
-        public async Task<IResult> RollAsync(ulong callerId, string statName)
+        public async Task<IResult> RollStatisticAsync(ulong callerId, string statName)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
@@ -82,7 +86,7 @@ namespace Frags.Presentation.Controllers
         /// <param name="targetId">Discord ID of the target.</param>
         /// <param name="statName">The statistic name.</param>
         /// <returns>The result of the roll.</returns>
-        public async Task<IResult> RollAgainstAsync(ulong callerId, ulong targetId, string statName)
+        public async Task<IResult> RollStatisticAgainstAsync(ulong callerId, ulong targetId, string statName)
         {
             var caller = await _provider.GetActiveCharacterAsync(callerId);
             if (caller == null) return CharacterResult.CharacterNotFound();
