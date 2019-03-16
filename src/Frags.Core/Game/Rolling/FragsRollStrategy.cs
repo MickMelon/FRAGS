@@ -2,6 +2,7 @@ using System;
 using Frags.Core.Characters;
 using Frags.Core.Common;
 using Frags.Core.Statistics;
+using Attribute = Frags.Core.Statistics.Attribute;
 
 namespace Frags.Core.Game.Rolling
 {
@@ -15,7 +16,7 @@ namespace Frags.Core.Game.Rolling
             var statValue = character.Statistics[stat].Value;
             if (statValue <= 0) return -125;
 
-            if (stat is Statistics.Attribute)
+            if (stat is Attribute)
             {
                 maxSuccessRoll = Math.Round(32.2 * Math.Sqrt(statValue) - 7);
             }

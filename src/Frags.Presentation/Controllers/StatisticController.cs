@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
 using Frags.Core.DataAccess;
+using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
 using Frags.Presentation.Results;
 
@@ -33,71 +34,65 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
+        /// Creates a new Attribute in the database.
+        /// </summary>
+        /// <param name="statName">The name for the new attribute.</param>
+        /// <returns>
+        /// A result detailing if the operation was successful or why it failed.
+        /// </returns>
+        public async Task<IResult> CreateAttributeAsync(string statName)
+        {
+            if (await _statProvider.GetStatisticAsync(statName) != null)
+                return StatisticResult.NameAlreadyExists();
+
+            var result = await _statProvider.CreateAttributeAsync(statName);
+            if (result == null) return StatisticResult.StatisticCreationFailed();
+            return StatisticResult.StatisticCreatedSuccessfully();
+        }
+
+        /// <summary>
+        /// Creates a new Skill in the database.
+        /// </summary>
+        /// <param name="statName">The name for the new skill.</param>
+        /// <param name="attribName">The name of the attribute to go with the skill. Must exist in the database beforehand.</param>
+        /// <returns>
+        /// A result detailing if the operation was successful or why it failed.
+        /// </returns>
+        public async Task<IResult> CreateSkillAsync(string statName, string attribName)
+        {
+            if (await _statProvider.GetStatisticAsync(statName) != null)
+                return StatisticResult.NameAlreadyExists();
+
+            var result = await _statProvider.CreateSkillAsync(statName, attribName);
+            if (result == null) return StatisticResult.StatisticCreationFailed();
+            return StatisticResult.StatisticCreatedSuccessfully();
+        }
+
+        /// <summary>
         /// Used to set a character's attributes up.
         /// </summary>
         /// <param name="callerId">The user identifier of the caller.</param>
         /// <param name="values">What to set the initial attributes to.</param>
-        public async Task<IResult> SetAttributeAsync(ulong callerId, string statName, int newValue)
+        public async Task<IResult> SetStatisticAsync(ulong callerId, string statName, int newValue)
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
-            if (character.Level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character)) return CharacterResult.LevelTooHigh();
 
             var statistic = await _statProvider.GetStatisticAsync(statName);
-            if (!(statistic is Attribute)) return StatisticResult.StatisticNotFound();
+            if (statistic == null) return StatisticResult.StatisticNotFound();
 
-            if (newValue < _statOptions.InitialAttributeMin) return GenericResult.ValueTooLow();
-            if (newValue > _statOptions.InitialAttributeMax) return GenericResult.ValueTooHigh();
-
-            // Get an IEnumerable of the character's current attributes
-            var attribs = character.Statistics.Where(x => x.Key is Attribute).ToDictionary(x => (Attribute)x.Key, x => x.Value);
-            var sum = attribs.Sum(x => x.Value.Value);
-
-            StatisticValue currentVal = new StatisticValue(0);
-            // Save the old value for later
-            bool containsStat = false;
-            if (character.Statistics.ContainsKey(statistic))
+            try
             {
-                currentVal = character.Statistics[statistic];
-                containsStat = true;
+                // TODO: Find a better way to get an instance of IProgressionStrategy
+                await character.SetStatistic(new GenericProgressionStrategy(_statProvider, _statOptions), statistic, newValue);
+                await _charProvider.UpdateCharacterAsync(character);
+                return StatisticResult.StatisticSetSucessfully();
             }
-
-            // Make sure the character has enough remaining points to do that (we refund the current stat value since we're overwriting it)
-            if (_statOptions.InitialAttributePoints - (sum - currentVal.Value + newValue) < 0) return GenericResult.NotEnoughPoints();
-
-            // Check if they go over the limit for attributes set to the max
-            // Example: InitialAttributesAtMax is set to 2 and InitialAttributeMax is set to 10
-            // If we already have 2 attributes with a value of 10 and we try to set a third, disallow it.
-            if (_statOptions.InitialAttributesAtMax > 0 &&
-                newValue == _statOptions.InitialAttributeMax &&
-                    attribs.Count(x => x.Value.Value == _statOptions.InitialAttributeMax) + 1 > _statOptions.InitialAttributesAtMax)
-                        return StatisticResult.TooManyAtMax(_statOptions.InitialAttributesAtMax);
-
-            if (containsStat)
-                character.Statistics[statistic] = new StatisticValue(newValue);
-            else
-                character.Statistics.Add(statistic, new StatisticValue(newValue));
-
-            await _charProvider.UpdateCharacterAsync(character);
-            return StatisticResult.StatisticSetSucessfully();
+            catch (System.Exception e)
+            {
+                return GenericResult.Failure(e.Message);
+                throw e;
+            }
         }
-
-        /// <summary>
-        /// Checks if a character's starting attributes have been set.
-        /// </summary>
-        private async Task<bool> InitialAttributesSet(Character character)
-        {
-            if (character == null || character.Statistics == null) return false;
-
-            var attribs = character.Statistics.Where(x => x.Key is Attribute).ToDictionary(x => (Attribute)x.Key, x => x.Value);
-            var sum = attribs.Sum(x => x.Value.Value);
-
-            // Character attributes don't match up with database attributes
-            if (attribs.Count != (await _statProvider.GetAllStatisticsAsync()).OfType<Attribute>().Count()) return false;
-            // Character has not set their initial attribute values
-            if (sum < _statOptions.InitialAttributePoints) return false;
-            
-            return true;
-}
     }
 }

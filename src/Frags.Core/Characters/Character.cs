@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Frags.Core.Common;
 using Frags.Core.Game.Rolling;
+using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
 
 namespace Frags.Core.Characters
@@ -110,7 +112,7 @@ namespace Frags.Core.Characters
         /// </summary>
         /// <param name="stat">The statistic name.</param>
         /// <returns>What the character rolled.</returns>
-        public double? RollStatistic(Statistic stat, IRollStrategy strategy)
+        public double? RollStatistic(IRollStrategy strategy, Statistic stat)
         {
             if (stat == null || strategy == null || Statistics == null) return null;
 
@@ -120,6 +122,14 @@ namespace Frags.Core.Characters
             }
             
             return null;
+        }
+
+        /// <summary>
+        /// Sets the specified statistic to the given value via the chosen strategy.
+        /// </summary>
+        public Task<bool> SetStatistic(IProgressionStrategy strategy, Statistic stat, int? newValue = null)
+        {
+            return strategy.SetStatistic(this, stat, newValue);
         }
 
         public static int GetLevelFromExperience(int experience)

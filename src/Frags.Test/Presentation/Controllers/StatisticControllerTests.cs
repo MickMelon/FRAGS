@@ -23,7 +23,7 @@ namespace Frags.Test.Presentation.Controllers
 
         #region 
         [Fact]
-        public async Task SetAttributeAsync_ValidInput_ReturnSuccess()
+        public async Task SetStatisticAsync_ValidInput_ReturnSuccess()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -41,13 +41,13 @@ namespace Frags.Test.Presentation.Controllers
             var character = await charProvider.GetActiveCharacterAsync(1);
 
             // Act
-            await controller.SetAttributeAsync(1, "strength", 10);
-            await controller.SetAttributeAsync(1, "perception", 2);
-            await controller.SetAttributeAsync(1, "endurance", 6);
-            await controller.SetAttributeAsync(1, "charisma", 6);
-            await controller.SetAttributeAsync(1, "intelligence", 6);
-            await controller.SetAttributeAsync(1, "agility", 5);
-            await controller.SetAttributeAsync(1, "luck", 5);
+            await controller.SetStatisticAsync(1, "strength", 10);
+            await controller.SetStatisticAsync(1, "perception", 2);
+            await controller.SetStatisticAsync(1, "endurance", 6);
+            await controller.SetStatisticAsync(1, "charisma", 6);
+            await controller.SetStatisticAsync(1, "intelligence", 6);
+            await controller.SetStatisticAsync(1, "agility", 5);
+            await controller.SetStatisticAsync(1, "luck", 5);
 
             // Assert
             Statistic str = await statProvider.GetStatisticAsync("strength"),
@@ -68,7 +68,7 @@ namespace Frags.Test.Presentation.Controllers
         }
 
         [Fact]
-        public async Task SetAttributeAsync_NotEnoughPoints_ReturnNotEnoughPoints()
+        public async Task SetStatisticAsync_NotEnoughPoints_ReturnNotEnoughPoints()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -82,14 +82,14 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            var result = await controller.SetAttributeAsync(1, "luck", 2);
+            var result = await controller.SetStatisticAsync(1, "luck", 2);
 
             // Assert
             Assert.Equal(GenericResult.NotEnoughPoints(), result);
         }
 
         [Fact]
-        public async Task SetAttributeAsync_AboveMaximum_ReturnTooHigh()
+        public async Task SetStatisticAsync_AboveMaximum_ReturnTooHigh()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -103,14 +103,14 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            var result = await controller.SetAttributeAsync(1, "strength", 11);
+            var result = await controller.SetStatisticAsync(1, "strength", 11);
 
             // Assert
             Assert.Equal(GenericResult.ValueTooHigh(), result);
         }
 
         [Fact]
-        public async Task SetAttributeAsync_BelowMinimum_ReturnTooLow()
+        public async Task SetStatisticAsync_BelowMinimum_ReturnTooLow()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -125,14 +125,14 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            var result = await controller.SetAttributeAsync(1, "strength", 0);
+            var result = await controller.SetStatisticAsync(1, "strength", 0);
 
             // Assert
             Assert.Equal(GenericResult.ValueTooLow(), result);
         }
 
         [Fact]
-        public async Task SetAttributeAsync_TooManyAtMax_ReturnTooManyAtMax()
+        public async Task SetStatisticAsync_TooManyAtMax_ReturnTooManyAtMax()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -147,16 +147,16 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            await controller.SetAttributeAsync(1, "strength", 2);
-            await controller.SetAttributeAsync(1, "perception", 2);
-            var result = await controller.SetAttributeAsync(1, "endurance", 2);
+            await controller.SetStatisticAsync(1, "strength", 2);
+            await controller.SetStatisticAsync(1, "perception", 2);
+            var result = await controller.SetStatisticAsync(1, "endurance", 2);
 
             // Assert
             Assert.Equal(StatisticResult.TooManyAtMax(2), result);
         }
 
         [Fact]
-        public async Task SetAttributeAsync_LevelTooHighButAttributesUnset_ReturnSuccess()
+        public async Task SetStatisticAsync_LevelTooHighButAttributesUnset_ReturnSuccess()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -176,14 +176,14 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            var result = await controller.SetAttributeAsync(100, "strength", 5);
+            var result = await controller.SetStatisticAsync(100, "strength", 5);
 
             // Assert
             Assert.Equal(StatisticResult.StatisticSetSucessfully(), result);
         }
 
         [Fact]
-        public async Task SetAttributeAsync_LevelTooHigh_ReturnLevelTooHigh()
+        public async Task SetStatisticAsync_LevelTooHigh_ReturnLevelTooHigh()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -201,24 +201,24 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            await controller.SetAttributeAsync(100, "strength", 10);
-            await controller.SetAttributeAsync(100, "perception", 2);
-            await controller.SetAttributeAsync(100, "endurance", 6);
-            await controller.SetAttributeAsync(100, "charisma", 6);
-            await controller.SetAttributeAsync(100, "intelligence", 6);
-            await controller.SetAttributeAsync(100, "agility", 5);
-            await controller.SetAttributeAsync(100, "luck", 5);
+            await controller.SetStatisticAsync(100, "strength", 10);
+            await controller.SetStatisticAsync(100, "perception", 2);
+            await controller.SetStatisticAsync(100, "endurance", 6);
+            await controller.SetStatisticAsync(100, "charisma", 6);
+            await controller.SetStatisticAsync(100, "intelligence", 6);
+            await controller.SetStatisticAsync(100, "agility", 5);
+            await controller.SetStatisticAsync(100, "luck", 5);
 
             character.Experience = 50000;
             await charProvider.UpdateCharacterAsync(character);
-            var result = await controller.SetAttributeAsync(100, "strength", 4);
+            var result = await controller.SetStatisticAsync(100, "strength", 4);
 
             // Assert
             Assert.Equal(CharacterResult.LevelTooHigh(), result);
         }
 
         [Fact]
-        public async Task SetAttributeAsync_InvalidCharacterId_ReturnCharacterNotFound()
+        public async Task SetStatisticAsync_InvalidCharacterId_ReturnCharacterNotFound()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -228,14 +228,14 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            var result = await controller.SetAttributeAsync(ulong.MaxValue, "strength", 5);
+            var result = await controller.SetStatisticAsync(ulong.MaxValue, "strength", 5);
 
             // Assert
             Assert.Equal(CharacterResult.CharacterNotFound(), result);
         }
 
         [Fact]
-        public async Task SetAttributeAsync_InvalidStatisticName_ReturnStatisticNotFound()
+        public async Task SetStatisticAsync_InvalidStatisticName_ReturnStatisticNotFound()
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
@@ -245,7 +245,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, statOptions);
 
             // Act
-            var result = await controller.SetAttributeAsync(1, "invalid", 5);
+            var result = await controller.SetStatisticAsync(1, "invalid", 5);
 
             // Assert
             Assert.Equal(StatisticResult.StatisticNotFound(), result);

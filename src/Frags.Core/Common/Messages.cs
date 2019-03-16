@@ -19,6 +19,9 @@ namespace Frags.Core.Common
         #endregion
 
         #region Statistics
+        public static readonly string STAT_CREATE_SUCCESS = "Statistic created successfully.";
+        public static readonly string STAT_CREATE_FAILURE = "Statistic creation failed.";
+        public static readonly string STAT_NAME_EXISTS = "Statistic with that name already exists.";
         public static readonly string STAT_NOT_FOUND = "Statistic not found.";
         public static readonly string STAT_SET_SUCCESS = "Statistic set sucessfully.";
         public static readonly string STAT_TOO_MANY_AT_MAX = "Too many statistics were set to their max value. (Limit {0})";

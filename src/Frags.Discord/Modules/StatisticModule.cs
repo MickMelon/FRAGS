@@ -8,15 +8,15 @@ namespace Frags.Discord.Modules
     {
         private readonly StatisticController _statController;
 
-        public StatisticModule()
+        public StatisticModule(StatisticController statController)
         {
-            
+            _statController = statController;
         }
 
         [Command("attrib set")]
         public async Task SetInitialAttributes(string statName, int value)
         {
-            var result = await _statController.SetAttributeAsync(Context.User.Id, statName, value);
+            var result = await _statController.SetStatisticAsync(Context.User.Id, statName, value);
             await ReplyAsync(result.Message);
         }
     }

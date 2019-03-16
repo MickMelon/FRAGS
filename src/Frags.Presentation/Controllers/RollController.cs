@@ -71,7 +71,7 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            double? result = character.RollStatistic(stat, _strategy);
+            double? result = character.RollStatistic( _strategy, stat);
 
             if (result.HasValue)
                 return RollResult.Roll(character.Name, statName, result.Value);
@@ -97,8 +97,8 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            double? callerRoll = caller.RollStatistic(stat, _strategy);
-            double? targetRoll = target.RollStatistic(stat, _strategy);
+            double? callerRoll = caller.RollStatistic( _strategy, stat);
+            double? targetRoll = target.RollStatistic( _strategy, stat);
 
             if (callerRoll.HasValue && targetRoll.HasValue)
                 return RollResult.RollAgainst(caller.Name, target.Name, callerRoll.Value, targetRoll.Value);
