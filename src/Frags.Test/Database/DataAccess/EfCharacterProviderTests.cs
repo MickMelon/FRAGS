@@ -18,7 +18,7 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CreateCharacter_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb1").Options);
             var provider = new EfCharacterProvider(context);
 
             await provider.CreateCharacterAsync("1", 305847674974896128, true, "Melon Head");
@@ -30,7 +30,7 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CharacterStatistics_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb2").Options);
             var provider = new EfCharacterProvider(context);
             var statProvider = new EfStatisticProvider(context);
 
@@ -43,7 +43,7 @@ namespace Frags.Test.Database.DataAccess
             var result = await provider.GetActiveCharacterAsync(userIdentifier);
 
             // Simulate transient dependencies (will fail without this)
-            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb2").Options);
             provider = new EfCharacterProvider(context);
             statProvider = new EfStatisticProvider(context);
 
@@ -57,7 +57,7 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_UpdateCharacter_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb3").Options);
             var provider = new EfCharacterProvider(context);
             
             ulong userIdentifier = 305847674974896128;
@@ -67,7 +67,7 @@ namespace Frags.Test.Database.DataAccess
             context.Dispose();
 
             // Simulate transient dependencies (will fail without this)
-            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb").Options);
+            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb3").Options);
             provider = new EfCharacterProvider(context);
 
             result.Name = newName;

@@ -13,7 +13,7 @@ namespace Frags.Core.Statistics
         /// <summary>
         /// The value associated with the statistic.
         /// </summary>
-        public double Value { get; set; }
+        public int Value { get; set; }
 
         /// <summary>
         /// Determines whether to apply an (optional) bonus
@@ -32,7 +32,7 @@ namespace Frags.Core.Statistics
         /// <param name="val">The value of the associated statistic.</param>
         /// <param name="isProficient">Whether or not to mark this statistic as proficient.</param>
         /// <param name="proficiency">The bonus that is applied if this statistic is marked proficient.</param>
-        public StatisticValue(double val, bool isProficient = false, double proficiency = 0)
+        public StatisticValue(int val, bool isProficient = false, double proficiency = 0)
         {
             Value = val;
             IsProficient = isProficient;

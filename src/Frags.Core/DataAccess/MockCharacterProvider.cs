@@ -51,7 +51,7 @@ namespace Frags.Core.DataAccess
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
-            var dbChar = _characters.Where(c => c.Id.Equals(character.Id)).FirstOrDefault();
+            var dbChar = _characters.Where(c => c.UserIdentifier.Equals(character.UserIdentifier)).FirstOrDefault();
             if (dbChar == null) return;
             
             dbChar = character;

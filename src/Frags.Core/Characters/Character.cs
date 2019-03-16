@@ -59,7 +59,7 @@ namespace Frags.Core.Characters
         /// The character's statistics.
         /// </summary>
         public IDictionary<Statistic, StatisticValue> Statistics { get; set; }
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.
         /// </summary>
@@ -122,7 +122,10 @@ namespace Frags.Core.Characters
             return null;
         }
 
-        public static int GetLevelFromExperience(int experience) =>
-            Convert.ToInt32((Math.Sqrt(experience + 125) / (10 * Math.Sqrt(5))));
+        public static int GetLevelFromExperience(int experience)
+        {
+            if (experience == 0) return 1;
+            return Convert.ToInt32((Math.Sqrt(experience + 125) / (10 * Math.Sqrt(5))));
+        }
     }
 }

@@ -46,7 +46,7 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         /// <remarks>
         /// There's definitely a better way to implement this, namely
-        /// with a separate factory class and all sorts of interfaces to make it
+        /// with a separate factory class and interfaces to make it
         /// dependency injection friendly, just thought it was overkill.
         private IRollStrategy GetStrategy(RollMode mode)
         {

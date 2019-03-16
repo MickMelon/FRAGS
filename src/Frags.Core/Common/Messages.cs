@@ -6,6 +6,8 @@ namespace Frags.Core.Common
         public static readonly string CHAR_NOT_FOUND = "Character not found.";
         public static readonly string CHAR_NAME_EXISTS = "You already have a character with that name.";
         public static readonly string CHAR_CREATE_SUCCESS = "Character created successfully.";
+        public static readonly string CHAR_LEVEL_TOO_LOW = "Character level too low.";
+        public static readonly string CHAR_LEVEL_TOO_HIGH = "Character level too high.";
         #endregion
 
         #region Game
@@ -18,6 +20,15 @@ namespace Frags.Core.Common
 
         #region Statistics
         public static readonly string STAT_NOT_FOUND = "Statistic not found.";
+        public static readonly string STAT_SET_SUCCESS = "Statistic set sucessfully.";
+        public static readonly string STAT_TOO_MANY_AT_MAX = "Too many statistics were set to their max value. (Limit {0})";
+        #endregion
+
+        #region Other
+        public static readonly string INVALID_INPUT = "Input was invalid.";
+        public static readonly string NOT_ENOUGH_POINTS = "Not enough points.";
+        public static readonly string TOO_LOW = "The value was too low.";
+        public static readonly string TOO_HIGH = "The value was too high.";
         #endregion
     }
 }

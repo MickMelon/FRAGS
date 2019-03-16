@@ -1,3 +1,5 @@
+using Frags.Core.Common;
+
 namespace Frags.Presentation.Results
 {
     /// <summary>
@@ -18,5 +20,29 @@ namespace Frags.Presentation.Results
         /// <param name="message">The result message.</param>
         public static GenericResult Generic(string message) =>
             new GenericResult(message);
+
+        /// <summary>
+        /// Used when a command's input is in an invalid format.
+        /// </summary>
+        public static GenericResult InvalidInput() =>
+            new GenericResult(Messages.INVALID_INPUT, false);
+
+        /// <summary>
+        /// Used when a command's input was too low.
+        /// </summary>
+        public static GenericResult NotEnoughPoints() =>
+            new GenericResult(Messages.TOO_LOW, false);
+
+        /// <summary>
+        /// Used when a command's input was too low.
+        /// </summary>
+        public static GenericResult ValueTooLow() =>
+            new GenericResult(Messages.TOO_LOW, false);
+
+        /// <summary>
+        /// Used when a command's input was too high.
+        /// </summary>
+        public static GenericResult ValueTooHigh() =>
+            new GenericResult(Messages.TOO_HIGH, false);
     }
 }

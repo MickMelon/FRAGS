@@ -22,12 +22,17 @@ namespace Frags.Core.DataAccess
         public MockStatisticProvider()
         {
             var str = new Attribute("Strength");
-            var lifting = new Skill(str, "Powerlifting");
-
+            
             _statistics = new List<Statistic>()
             {
                 str,
-                lifting
+                new Attribute("Perception"),
+                new Attribute("Endurance"),
+                new Attribute("Charisma"),
+                new Attribute("Intelligence"),
+                new Attribute("Agility"),
+                new Attribute("Luck"),
+                new Skill(str, "Powerlifting")
             };
 
             id = _statistics.Count + 1;
@@ -53,6 +58,11 @@ namespace Frags.Core.DataAccess
             _statistics.Add(stat);
 
             return await Task.FromResult(stat);
+        }
+
+        public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync()
+        {
+            return await Task.FromResult(_statistics);
         }
 
         public async Task<Statistic> GetStatisticAsync(string name)

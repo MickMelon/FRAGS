@@ -53,5 +53,17 @@ namespace Frags.Presentation.Results
         /// </summary>
         public static CharacterResult CharacterCreatedSuccessfully() =>
             new CharacterResult(Messages.CHAR_CREATE_SUCCESS, true);
+
+        /// <summary>
+        /// Returns a new <see cref="CharacterResult" />.
+        /// </summary>
+        public static CharacterResult LevelTooLow() =>
+            new CharacterResult(Messages.CHAR_LEVEL_TOO_LOW, false);
+
+        /// <summary>
+        /// Returns a new <see cref="CharacterResult" />.
+        /// </summary>
+        public static CharacterResult LevelTooHigh() =>
+            new CharacterResult(Messages.CHAR_LEVEL_TOO_HIGH, false);
     }
 }

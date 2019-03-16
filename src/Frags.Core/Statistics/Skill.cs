@@ -21,5 +21,10 @@ namespace Frags.Core.Statistics
         /// Example: A Persuasion skill might have Charisma as the attibute.
         /// </summary>
         public Attribute Attribute { get; set; }
+
+        /// <summary>
+        /// An optional minimum value to make use of this skill.
+        /// </summary>
+        public int MinimumValue { get; set; }
     }
 }

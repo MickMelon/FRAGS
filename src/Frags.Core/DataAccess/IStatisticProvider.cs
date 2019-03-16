@@ -35,6 +35,12 @@ namespace Frags.Core.DataAccess
         Task<Statistic> GetStatisticAsync(string name);
 
         /// <summary>
+        /// Gets every statistic currently in use.
+        /// </summary>
+        /// <returns>An Enumerable of statistics currently in use.</returns>
+        Task<IEnumerable<Statistic>> GetAllStatisticsAsync();
+
+        /// <summary>
         /// Updates a statistic in the database.
         /// </summary>
         /// <param name="statistic">The statistic to be saved.</param>
