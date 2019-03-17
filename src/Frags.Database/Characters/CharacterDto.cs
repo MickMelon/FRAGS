@@ -14,7 +14,6 @@ namespace Frags.Database.Characters
     /// </summary>
     public class CharacterDto : BaseModel
     {
-        //[Key]
         public string Id { get; set; }
 
         public ulong UserIdentifier { get; set; }
@@ -41,23 +40,6 @@ namespace Frags.Database.Characters
         /// </summary>
         public int Experience { get; set; }
 
-        /// <summary>
-        /// The character's statistics.
-        /// </summary>
-        [JsonIgnore]
-        public IDictionary<Statistic, StatisticValue> Statistics
-        {
-            get
-            {
-                var dict = new Dictionary<Statistic, StatisticValue>();
-
-                foreach (var stat in StatisticMappings)
-                    dict.Add(stat.Statistic, stat.StatisticValue);
-                    
-                return dict;
-            }
-        }
-
-        public IList<StatisticMapping> StatisticMappings { get; set; }
+        public IList<StatisticMapping> Statistics { get; set; }
     }
 }

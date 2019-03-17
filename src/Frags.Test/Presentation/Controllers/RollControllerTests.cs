@@ -24,7 +24,7 @@ namespace Frags.Test.Presentation.Controllers
             var chars = await provider.GetAllCharactersAsync(1);
 
             // Give the new character a Statistic to test
-            chars[0].Statistics = new Dictionary<Statistic, StatisticValue> { { strength, new StatisticValue(5) } };
+            chars[0].SetStatistic(strength, new StatisticValue(5));
 
             await provider.UpdateCharacterAsync(chars[0]);
 
@@ -97,8 +97,8 @@ namespace Frags.Test.Presentation.Controllers
 
             var provider = new MockCharacterProvider();
             // Give characters statistics
-            (await provider.GetAllCharactersAsync(1))[0].Statistics = new Dictionary<Statistic, StatisticValue>{ { strength, new StatisticValue(5) } };
-            (await provider.GetAllCharactersAsync(2))[0].Statistics = new Dictionary<Statistic, StatisticValue>{ { strength, new StatisticValue(5) } };
+            (await provider.GetAllCharactersAsync(1))[0].SetStatistic(strength, new StatisticValue(5));
+            (await provider.GetAllCharactersAsync(2))[0].SetStatistic(strength, new StatisticValue(5));
             
             var controller = new RollController(provider, statProvider, new RollOptions { RollMode = RollMode.Mock });
 

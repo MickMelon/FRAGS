@@ -13,7 +13,7 @@ namespace Frags.Core.Game.Rolling
         {
             int rng = GameRandom.Between(1, 100);
             double maxSuccessRoll;
-            var statValue = character.Statistics[stat].Value;
+            var statValue = character.GetStatistic(stat).Value;
             if (statValue <= 0) return -125;
 
             if (stat is Attribute)

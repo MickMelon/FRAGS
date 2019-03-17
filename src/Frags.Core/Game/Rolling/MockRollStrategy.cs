@@ -8,7 +8,7 @@ namespace Frags.Core.Game.Rolling
         /// </inheritdoc>
         public double? RollStatistic(Statistic stat, Character character)
         {
-            return character.Statistics[stat].Value;
+            return character.GetStatistic(stat).Value;
         }
     }
 }

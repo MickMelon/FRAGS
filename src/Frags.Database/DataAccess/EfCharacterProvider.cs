@@ -5,7 +5,6 @@ using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Database.Characters;
-using Frags.Database.Resolvers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -21,10 +20,8 @@ namespace Frags.Database.DataAccess
             _context = context;
             
             var mapperConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Character, CharacterDto>()
-                    .ForMember(dto => dto.StatisticMappings, opt => opt.MapFrom<StatDictionaryToList>());
-                cfg.CreateMap<CharacterDto, Character>()
-                    .ForMember(poco => poco.Statistics, opt => opt.MapFrom<StatListToDictionary>());
+                cfg.CreateMap<Character, CharacterDto>();
+                cfg.CreateMap<CharacterDto, Character>();
             });
 
             _mapper = new Mapper(mapperConfig);
@@ -41,12 +38,15 @@ namespace Frags.Database.DataAccess
 
             await _context.AddAsync(charDto);
 
-            if (character.Active)
-            {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
 
-                if (user == null)
-                    await _context.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
+            if (user == null)
+            {
+                await _context.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
+            }
+            else
+            {
+                user.ActiveCharacter = charDto;
             }
 
             await _context.SaveChangesAsync();
@@ -67,8 +67,8 @@ namespace Frags.Database.DataAccess
         {
             var character = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Select(usr => usr.ActiveCharacter)
-                    .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.Statistic)
-                    .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.StatisticValue)
+                    .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
+                    .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
                 .FirstOrDefaultAsync();
             
             if (character == null) return null;
@@ -80,8 +80,8 @@ namespace Frags.Database.DataAccess
         public async Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier)
         {
             var charDtos = await _context.Characters.Where(c => c.UserIdentifier == userIdentifier)
-                .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.Statistic)
-                .Include(charDto => charDto.StatisticMappings).ThenInclude(statMap => statMap.StatisticValue)
+                .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
+                .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
                 .ToListAsync();
                 
             return _mapper.Map<List<Character>>(charDtos);
@@ -94,7 +94,12 @@ namespace Frags.Database.DataAccess
             if (await _context.Characters.CountAsync(c => c.Id.Equals(character.Id)) <= 0)
                 return;
             
-            var dbChar = _mapper.Map<CharacterDto>(character);
+            var dbChar = await _context.Characters.Where(x => x.Id.Equals(character.Id))
+                .Include(x => x.Statistics).ThenInclude(y => y.Statistic)
+                .Include(x => x.Statistics).ThenInclude(y => y.StatisticValue)
+            .FirstOrDefaultAsync();
+
+            _mapper.Map<Character, CharacterDto>(character, dbChar);
             _context.Update(dbChar);
 
             if (character.Active)

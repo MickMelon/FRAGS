@@ -28,6 +28,8 @@ namespace Frags.Core.Common
         #endregion
 
         #region Other
+        public static readonly string REQUIRE_ROLE_FAIL = "You must be have the {0} role to use this command.";
+        public static readonly string NOT_IN_GUILD = "You must be in a server to use this command.";
         public static readonly string INVALID_INPUT = "Input was invalid.";
         public static readonly string NOT_ENOUGH_POINTS = "Not enough points.";
         public static readonly string TOO_LOW = "The value was too low.";

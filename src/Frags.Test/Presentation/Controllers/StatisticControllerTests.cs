@@ -21,6 +21,66 @@ namespace Frags.Test.Presentation.Controllers
             this.output = output;
         }
 
+        [Fact]
+        public async Task CreateAttributeAsync_ValidInput_ReturnSuccess()
+        {
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new StatisticOptions());
+
+            var result = await controller.CreateAttributeAsync("Wisdom");
+
+            Assert.Equal(StatisticResult.StatisticCreatedSuccessfully(), result);
+        }
+
+        [Fact]
+        public async Task CreateAttributeAsync_AlreadyExists_ReturnNameAlreadyExists()
+        {
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new StatisticOptions());
+
+            var result = await controller.CreateAttributeAsync("Strength");
+
+            Assert.Equal(StatisticResult.NameAlreadyExists(), result);
+        }
+
+        [Fact]
+        public async Task CreateSkillAsync_ValidInput_ReturnSuccess()
+        {
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new StatisticOptions());
+
+            var result = await controller.CreateSkillAsync("Intimidation", "Strength");
+
+            Assert.Equal(StatisticResult.StatisticCreatedSuccessfully(), result);
+        }
+
+        [Fact]
+        public async Task CreateSkillAsync_AlreadyExists_ReturnNameAlreadyExists()
+        {
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new StatisticOptions());
+
+            var result = await controller.CreateSkillAsync("Powerlifting", "Strength");
+
+            Assert.Equal(StatisticResult.NameAlreadyExists(), result);
+        }
+
+        [Fact]
+        public async Task CreateSkillAsync_InvalidAttributeName_ReturnCreationFailed()
+        {
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new StatisticOptions());
+
+            var result = await controller.CreateSkillAsync("Intimidation", "STR");
+
+            Assert.Equal(StatisticResult.StatisticCreationFailed(), result);
+        }
+
         #region 
         [Fact]
         public async Task SetStatisticAsync_ValidInput_ReturnSuccess()
@@ -58,13 +118,95 @@ namespace Frags.Test.Presentation.Controllers
             agi = await statProvider.GetStatisticAsync("agility"),
             lck = await statProvider.GetStatisticAsync("luck");
 
-            Assert.True(character.Statistics[str].Value.Equals(10) &&
-            character.Statistics[per].Value.Equals(2) &&
-            character.Statistics[end].Value.Equals(6) &&
-            character.Statistics[cha].Value.Equals(6) &&
-            character.Statistics[inte].Value.Equals(6) && 
-            character.Statistics[agi].Value.Equals(5) &&
-            character.Statistics[lck].Value.Equals(5));
+            Assert.True(character.GetStatistic(str).Value.Equals(10) &&
+            character.GetStatistic(per).Value.Equals(2) &&
+            character.GetStatistic(end).Value.Equals(6) &&
+            character.GetStatistic(cha).Value.Equals(6) &&
+            character.GetStatistic(inte).Value.Equals(6) && 
+            character.GetStatistic(agi).Value.Equals(5) &&
+            character.GetStatistic(lck).Value.Equals(5));
+        }
+
+        [Fact]
+        public async Task SetProficiencyAsync_ValidInput_ReturnSuccess()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            
+            var statOptions = new StatisticOptions
+            {
+                InitialAttributeMin = 1,
+                InitialAttributeMax = 10,
+                InitialAttributePoints = 40,
+                InitialAttributesAtMax = 7,
+                InitialAttributesProficient = 1
+            };
+
+            var controller = new StatisticController(charProvider, statProvider, statOptions);
+            var character = await charProvider.GetActiveCharacterAsync(1);
+            Statistic str = await statProvider.GetStatisticAsync("strength");
+            await controller.SetStatisticAsync(1, "strength", 10);
+
+            // Act
+            await controller.SetProficiencyAsync(1, "strength", true);
+
+            // Assert
+            Assert.True(character.GetStatistic(str).IsProficient);
+        }
+
+        [Fact]
+        public async Task SetProficiencyAsync_TooMany_ReturnFailure()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            
+            var statOptions = new StatisticOptions
+            {
+                InitialAttributeMin = 1,
+                InitialAttributeMax = 10,
+                InitialAttributePoints = 40,
+                InitialAttributesAtMax = 7,
+                InitialAttributesProficient = 0
+            };
+
+            var controller = new StatisticController(charProvider, statProvider, statOptions);
+            var character = await charProvider.GetActiveCharacterAsync(1);
+            await controller.SetStatisticAsync(1, "strength", 10);
+
+            // Act
+            var result = await controller.SetProficiencyAsync(1, "strength", true);
+
+            // Assert
+            Assert.Equal(GenericResult.NotEnoughPoints(), result);
+        }
+
+        [Fact]
+        public async Task SetProficiencyAsync_SetFalse_ReturnSuccess()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            
+            var statOptions = new StatisticOptions
+            {
+                InitialAttributeMin = 1,
+                InitialAttributeMax = 10,
+                InitialAttributePoints = 40,
+                InitialAttributesAtMax = 7,
+                InitialAttributesProficient = 0
+            };
+
+            var controller = new StatisticController(charProvider, statProvider, statOptions);
+            var character = await charProvider.GetActiveCharacterAsync(1);
+            await controller.SetStatisticAsync(1, "strength", 10);
+
+            // Act
+            var result = await controller.SetProficiencyAsync(1, "strength", false);
+
+            // Assert
+            Assert.Equal(StatisticResult.StatisticSetSucessfully(), result);
         }
 
         [Fact]

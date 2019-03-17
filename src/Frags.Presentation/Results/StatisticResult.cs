@@ -12,7 +12,7 @@ namespace Frags.Presentation.Results
         /// Returns a new <see cref="CharacterResult" />.
         /// </summary>
         public static StatisticResult NameAlreadyExists() =>
-            new StatisticResult(Messages.CHAR_NAME_EXISTS, false);
+            new StatisticResult(Messages.STAT_NAME_EXISTS, false);
 
         public static StatisticResult StatisticCreatedSuccessfully() =>
             new StatisticResult(Messages.STAT_CREATE_SUCCESS, true);

@@ -2,6 +2,7 @@ namespace Frags.Core.Statistics
 {
     public class StatisticOptions
     {
+        #region Initial Setup
         public int InitialSetupMaxLevel { get; set; } = 1;
 
         public int InitialSkillPoints { get; set; }
@@ -15,5 +16,9 @@ namespace Frags.Core.Statistics
         public int InitialAttributeMin { get; set; }
         public int InitialAttributesAtMax { get; set; }
         public int InitialAttributesProficient { get; set; }
+        #endregion
+
+        public int SkillPointsOnLevelUp { get; set; }
+        public int AttributePointsOnLevelUp { get; set; }
     }
 }

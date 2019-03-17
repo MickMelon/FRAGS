@@ -73,7 +73,7 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         /// <param name="callerId">The user identifier of the caller.</param>
         /// <param name="values">What to set the initial attributes to.</param>
-        public async Task<IResult> SetStatisticAsync(ulong callerId, string statName, int newValue)
+        public async Task<IResult> SetStatisticAsync(ulong callerId, string statName, int? newValue = null)
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
@@ -84,7 +84,35 @@ namespace Frags.Presentation.Controllers
             try
             {
                 // TODO: Find a better way to get an instance of IProgressionStrategy
-                await character.SetStatistic(new GenericProgressionStrategy(_statProvider, _statOptions), statistic, newValue);
+                await character.ProgressStatistic(new GenericProgressionStrategy(_statProvider, _statOptions), statistic, newValue);
+                await _charProvider.UpdateCharacterAsync(character);
+                return StatisticResult.StatisticSetSucessfully();
+            }
+            catch (System.Exception e)
+            {
+                System.Console.WriteLine(e);
+                return GenericResult.Failure(e.Message);
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Used to set a character's proficiencies up.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the caller.</param>
+        /// <param name="values">What to set the initial attributes to.</param>
+        public async Task<IResult> SetProficiencyAsync(ulong callerId, string statName, bool isProficient)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            var statistic = await _statProvider.GetStatisticAsync(statName);
+            if (statistic == null) return StatisticResult.StatisticNotFound();
+
+            try
+            {
+                // TODO: Find a better way to get an instance of IProgressionStrategy
+                await character.SetProficiency(new GenericProgressionStrategy(_statProvider, _statOptions), statistic, isProficient);
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
             }

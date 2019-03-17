@@ -14,6 +14,13 @@ namespace Frags.Test.Database.DataAccess
 {
     public class EfCharacterProviderTests
     {
+        private readonly ITestOutputHelper _output;
+
+        public EfCharacterProviderTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         #region Character Creation Tests
         [Fact]
         public async Task EntityFramework_CreateCharacter_EntityMatchesInput()
@@ -30,7 +37,8 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CharacterStatistics_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb2").Options);
+            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseSqlite("Filename=TestDb2.db").Options);
+            context.Database.EnsureCreated();
             var provider = new EfCharacterProvider(context);
             var statProvider = new EfStatisticProvider(context);
 
@@ -42,12 +50,7 @@ namespace Frags.Test.Database.DataAccess
             await provider.CreateCharacterAsync(id, userIdentifier, true, name);
             var result = await provider.GetActiveCharacterAsync(userIdentifier);
 
-            // Simulate transient dependencies (will fail without this)
-            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb2").Options);
-            provider = new EfCharacterProvider(context);
-            statProvider = new EfStatisticProvider(context);
-
-            result.Statistics.Add(strength, value);
+            result.SetStatistic(strength, value);
             await provider.UpdateCharacterAsync(result);
 
             result = await provider.GetActiveCharacterAsync(userIdentifier);
@@ -64,11 +67,6 @@ namespace Frags.Test.Database.DataAccess
             string oldName = "Melon Head", newName = "Mr. Melon", id = "1";
 
             var result = await provider.CreateCharacterAsync(id, userIdentifier, true, oldName);
-            context.Dispose();
-
-            // Simulate transient dependencies (will fail without this)
-            context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb3").Options);
-            provider = new EfCharacterProvider(context);
 
             result.Name = newName;
             await provider.UpdateCharacterAsync(result);

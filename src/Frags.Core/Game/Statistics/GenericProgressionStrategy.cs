@@ -25,7 +25,15 @@ namespace Frags.Core.Game.Statistics
         public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
         {
             if (!newValue.HasValue) throw new ProgressionException(Messages.INVALID_INPUT);
+            if (character.Level <= _statOptions.InitialSetupMaxLevel || (!await InitialAttributesSet(character) || !await InitialSkillsSet(character)))
+                return await SetInitialStatistic(character, statistic, newValue.Value);
 
+            // Character is above setup level and has their attributes & skills set
+            throw new NotImplementedException();
+        }
+
+        private async Task<bool> SetInitialStatistic(Character character, Statistic statistic, int newValue)
+        {
             int statMin, statMax, statsAtMax, points;
             // This is either a dictionary of all the character's attributes or skills, never both.
             Dictionary<Statistic, StatisticValue> stats;
@@ -38,7 +46,7 @@ namespace Frags.Core.Game.Statistics
                 points = _statOptions.InitialAttributePoints;
                 statsAtMax = _statOptions.InitialAttributesAtMax; 
                 
-                stats = character.Statistics.Where(x => x.Key is Attribute).ToDictionary(x => x.Key, x => x.Value);
+                stats = character.Statistics.Where(x => x.Statistic is Attribute).ToDictionary(x => x.Statistic, x => x.StatisticValue);
 
                 if (character.Level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
@@ -50,7 +58,7 @@ namespace Frags.Core.Game.Statistics
                 points = _statOptions.InitialSkillPoints;
                 statsAtMax = _statOptions.InitialSkillsAtMax;
                 
-                stats = character.Statistics.Where(x => x.Key is Skill).ToDictionary(x => x.Key, x => x.Value);
+                stats = character.Statistics.Where(x => x.Statistic is Skill).ToDictionary(x => x.Statistic, x => x.StatisticValue);
 
                 if (character.Level > _statOptions.InitialSetupMaxLevel && await InitialSkillsSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
@@ -61,14 +69,8 @@ namespace Frags.Core.Game.Statistics
             
             int sum = stats.Sum(x => x.Value.Value);
 
-            StatisticValue currentVal = new StatisticValue(0);
-            // Save the old value for later
-            bool containsStat = false;
-            if (character.Statistics.ContainsKey(statistic))
-            {
-                currentVal = character.Statistics[statistic];
-                containsStat = true;
-            }
+            StatisticValue currentVal = character.GetStatistic(statistic);
+            if (currentVal == null) currentVal = new StatisticValue(0);
 
             // Make sure the character has enough remaining points to do that (we refund the current stat value since we're overwriting it)
             if (points - (sum - currentVal.Value + newValue) < 0) throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
@@ -81,17 +83,41 @@ namespace Frags.Core.Game.Statistics
                     stats.Count(x => x.Value.Value == statMax) + 1 > statsAtMax)
                         throw new ProgressionException(String.Format(Messages.STAT_TOO_MANY_AT_MAX, statsAtMax));
 
-            if (containsStat)
-                character.Statistics[statistic] = new StatisticValue(newValue.Value);
-            else
-                character.Statistics.Add(statistic, new StatisticValue(newValue.Value));
+            character.SetStatistic(statistic, new StatisticValue(newValue));
             
             return true;
         }
 
         public Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)
         {
-            throw new System.NotImplementedException();
+            int alreadySet;
+            if (statistic is Attribute attrib)
+            {
+                alreadySet = character.Statistics.Where(x => x.Statistic is Attribute).Count(x => x.StatisticValue.IsProficient);
+                if (character.Level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialAttributesProficient) 
+                    throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
+
+                if (proficient && alreadySet + 1 > _statOptions.InitialAttributesProficient)
+                    throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
+            }
+            else
+            {
+                alreadySet = character.Statistics.Where(x => x.Statistic is Skill).Count(x => x.StatisticValue.IsProficient);
+                if (character.Level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialSkillsProficient) 
+                    throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
+
+                if (proficient && alreadySet + 1 > _statOptions.InitialSkillsProficient)
+                    throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
+            }
+
+            var statValue = character.GetStatistic(statistic);
+            if (statValue != null)
+            {
+                statValue.IsProficient = proficient;
+                return Task.FromResult(true);
+            }
+
+            throw new ProgressionException(Messages.STAT_NOT_FOUND);
         }
 
         public Task<bool> ResetCharacter(Character character)
@@ -103,7 +129,7 @@ namespace Frags.Core.Game.Statistics
         {
             if (character == null || character.Statistics == null) return false;
 
-            var attribs = character.Statistics.Where(x => x.Key is Attribute).ToDictionary(x => (Attribute)x.Key, x => x.Value);
+            var attribs = character.Statistics.Where(x => x.Statistic is Attribute).ToDictionary(x => (Attribute)x.Statistic, x => x.StatisticValue);
             var sum = attribs.Sum(x => x.Value.Value);
 
             // Character attributes don't match up with database attributes
@@ -118,7 +144,7 @@ namespace Frags.Core.Game.Statistics
         {
             if (character == null || character.Statistics == null) return false;
 
-            var skills = character.Statistics.Where(x => x.Key is Skill).ToDictionary(x => (Skill)x.Key, x => x.Value);
+            var skills = character.Statistics.Where(x => x.Statistic is Skill).ToDictionary(x => (Skill)x.Statistic, x => x.StatisticValue);
             var sum = skills.Sum(x => x.Value.Value);
 
             // Character attributes don't match up with database attributes

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Common;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
+using Frags.Database.Statistics;
 
 namespace Frags.Core.Characters
 {
@@ -56,12 +58,12 @@ namespace Frags.Core.Characters
         /// The character's level calculated from the experience.
         /// </summary>
         public int Level { get => Character.GetLevelFromExperience(Experience); }
-
-        /// <summary>
-        /// The character's statistics.
-        /// </summary>
-        public IDictionary<Statistic, StatisticValue> Statistics { get; set; }
         
+        /// <summary>
+        /// Where the character's statistics are actually stored.
+        /// </summary>
+        public IList<StatisticMapping> Statistics { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.
         /// </summary>
@@ -72,7 +74,7 @@ namespace Frags.Core.Characters
             UserIdentifier = userIdentifier;
             Name = name;
 
-            Statistics = new Dictionary<Statistic, StatisticValue>();
+            Statistics = new List<StatisticMapping>();
         }
 
         /// <summary>
@@ -94,7 +96,7 @@ namespace Frags.Core.Characters
             Description = description;
             Story = story;
 
-            Statistics = new Dictionary<Statistic, StatisticValue>();
+            Statistics = new List<StatisticMapping>();
         }
 
         /// <summary>
@@ -116,7 +118,8 @@ namespace Frags.Core.Characters
         {
             if (stat == null || strategy == null || Statistics == null) return null;
 
-            if (Statistics.TryGetValue(stat, out StatisticValue value))
+            var value = GetStatistic(stat);
+            if (value != null)
             {
                 return strategy.RollStatistic(stat, this);
             }
@@ -124,12 +127,34 @@ namespace Frags.Core.Characters
             return null;
         }
 
+        public StatisticValue GetStatistic(Statistic stat)
+        {
+            return Statistics?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue;
+        }
+
+        public void SetStatistic(Statistic stat, StatisticValue newValue)
+        {
+            var statMap = Statistics.FirstOrDefault(x => x.Statistic.Equals(stat));
+            if (statMap == null) 
+            {
+                Statistics.Add(new StatisticMapping(stat, newValue));
+                return;
+            }
+
+            statMap.StatisticValue = newValue;
+        }
+
         /// <summary>
         /// Sets the specified statistic to the given value via the chosen strategy.
         /// </summary>
-        public Task<bool> SetStatistic(IProgressionStrategy strategy, Statistic stat, int? newValue = null)
+        public Task<bool> ProgressStatistic(IProgressionStrategy strategy, Statistic stat, int? newValue = null)
         {
             return strategy.SetStatistic(this, stat, newValue);
+        }
+
+        public Task<bool> SetProficiency(IProgressionStrategy strategy, Statistic statistic, bool isProficient)
+        {
+            return strategy.SetProficiency(this, statistic, isProficient);
         }
 
         public static int GetLevelFromExperience(int experience)

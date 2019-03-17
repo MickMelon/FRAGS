@@ -40,7 +40,7 @@ namespace Frags.Core.DataAccess
 
         public async Task<Attribute> CreateAttributeAsync(string name)
         {
-            if (GetStatisticAsync(name) != null) throw new ArgumentException("Statistic name was not unique.");
+            if (await GetStatisticAsync(name) != null) throw new ArgumentException("Statistic name was not unique.");
 
             var stat = new Attribute(id++.ToString(), name);
             _statistics.Add(stat);
@@ -49,7 +49,7 @@ namespace Frags.Core.DataAccess
 
         public async Task<Skill> CreateSkillAsync(string name, string attribName)
         {
-            if (GetStatisticAsync(name) != null) throw new ArgumentException("Statistic name was not unique.");
+            if (await GetStatisticAsync(name) != null) throw new ArgumentException("Statistic name was not unique.");
 
             var attrib = _statistics.OfType<Attribute>().FirstOrDefault(x => x.Name.EqualsIgnoreCase(attribName));
             if (attrib == null) return null;

@@ -53,6 +53,7 @@ namespace Frags.Presentation.Controllers
             switch (mode)
             {
                 case RollMode.Mock: return new MockRollStrategy();
+                case RollMode.Frags: return new FragsRollStrategy();
                 default: return null;
             }
         }
