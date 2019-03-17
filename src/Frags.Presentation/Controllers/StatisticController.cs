@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
 using Frags.Presentation.Results;
+using Frags.Presentation.ViewModels;
 
 namespace Frags.Presentation.Controllers
 {
@@ -66,6 +68,25 @@ namespace Frags.Presentation.Controllers
             var result = await _statProvider.CreateSkillAsync(statName, attribName);
             if (result == null) return StatisticResult.StatisticCreationFailed();
             return StatisticResult.StatisticCreatedSuccessfully();
+        }
+
+        /// <summary>
+        /// Gets the caller's active character and returns the result.
+        /// </summary> 
+        /// <param name="callerId">Discord ID of the caller.</param>
+        /// <returns>A new CharacterResult object.</returns>
+        public async Task<IResult> ShowStatisticsAsync(ulong callerId)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+            StringBuilder output = new StringBuilder();
+            foreach (var statMap in character.Statistics)
+            {
+                var stat = StatisticResult.Show(statMap);
+                output.Append(stat.Message + "\n");
+            }
+
+            return GenericResult.Generic(output.ToString());
         }
 
         /// <summary>

@@ -72,10 +72,10 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            double? result = character.RollStatistic( _strategy, stat);
+            string result = _strategy.GetRollMessage(stat, character);
 
-            if (result.HasValue)
-                return RollResult.Roll(character.Name, statName, result.Value);
+            if (!string.IsNullOrEmpty(result))
+                return RollResult.Roll(result);
 
             return RollResult.RollFailed();
         }

@@ -1,4 +1,5 @@
 using Frags.Core.Common;
+using System.Text;
 
 namespace Frags.Presentation.Results
 {
@@ -18,11 +19,9 @@ namespace Frags.Presentation.Results
         /// <summary>
         /// Returns a <see cref="RollResult" />.
         /// </summary>
-        /// <param name="name">The character name.</param>
-        /// <param name="stat">The rolled statistic.</param>
-        /// <param name="rollValue">What the character rolled.</param>
-        public static RollResult Roll(string name, string stat, double rollValue) =>
-            new RollResult($"{name} rolled a {rollValue} in {stat}.");
+        /// <param name="result">The result of the roll.</param>
+        public static RollResult Roll(string result) =>
+            new RollResult(result);
 
         /// <summary>
         /// Returns a <see cref="RollResult" />.

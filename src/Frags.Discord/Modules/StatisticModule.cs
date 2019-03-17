@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Frags.Discord.Modules.Preconditions;
 using Frags.Presentation.Controllers;
@@ -6,7 +7,7 @@ using Frags.Presentation.Controllers;
 namespace Frags.Discord.Modules
 {
     [Group("statistic")]
-    [Alias("stat")]
+    [Alias("stat", "stats")]
     public class StatisticModule : ModuleBase
     {
         private readonly CharacterController _charController;
@@ -37,6 +38,15 @@ namespace Frags.Discord.Modules
         public async Task SetAttributeAsync(string statName, int? newValue = null)
         {
             var result = await _statController.SetStatisticAsync(Context.User.Id, statName, newValue);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("view")]
+        [Alias("show")]
+        public async Task ViewStatisticsAsync(IUser user = null)
+        {
+            user = user ?? Context.User;
+            var result = await _statController.ShowStatisticsAsync(user.Id);
             await ReplyAsync(result.Message);
         }
     }

@@ -1,4 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Frags.Core.Common;
+using Frags.Database.Statistics;
+using Frags.Presentation.ViewModels;
 
 namespace Frags.Presentation.Results
 {
@@ -28,5 +33,24 @@ namespace Frags.Presentation.Results
 
         public static StatisticResult TooManyAtMax(int limit) =>
             new StatisticResult(string.Format(Messages.STAT_TOO_MANY_AT_MAX, limit), false);
+
+        public static IResult Show(StatisticMapping statMap)
+        {
+            var stat = new ShowStatisticViewModel()
+            {
+                Name = statMap.Statistic.Name,
+                Description = statMap.Statistic.Description,
+                Value = statMap.StatisticValue.Value,
+                IsProficient = statMap.StatisticValue.IsProficient,
+                Proficiency = statMap.StatisticValue.Proficiency
+            };
+
+            var message = $"{stat.Name}: {stat.Value}";
+            if (stat.IsProficient)
+                message += "*";
+
+            return new StatisticResult(message,
+                viewModel: stat);
+        }
     }
 }
