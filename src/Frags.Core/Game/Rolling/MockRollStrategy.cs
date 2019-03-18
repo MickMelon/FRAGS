@@ -11,9 +11,9 @@ namespace Frags.Core.Game.Rolling
         }
 
         /// </inheritdoc>
-        public double RollStatistic(Statistic stat, Character character)
+        public double? RollStatistic(Statistic stat, Character character)
         {
-            return character.GetStatistic(stat).Value;
+            return character.GetStatistic(stat)?.Value;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Frags.Core.Game.Rolling
         #endregion
 
         /// </inheritdoc>
-        public double RollStatistic(Statistic stat, Character character)
+        public double? RollStatistic(Statistic stat, Character character)
         {
             int rng = GameRandom.Between(1, 100);
             double maxSuccessRoll;

@@ -13,7 +13,7 @@ namespace Frags.Core.Game.Rolling
         /// Returns a positive or negative number representing 
         /// how good or bad a roll turned out.
         /// </returns>
-        double RollStatistic(Statistic stat, Character character);
+        double? RollStatistic(Statistic stat, Character character);
 
         /// <summary>
         /// Rolls a character's specified statistic
