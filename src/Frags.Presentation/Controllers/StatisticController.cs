@@ -79,7 +79,11 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
-            StringBuilder output = new StringBuilder();
+
+            if (character.Statistics == null || character.Statistics.Count <= 0)
+                return StatisticResult.StatisticNotFound();
+
+            StringBuilder output = new StringBuilder(character.Name + "\n");
             foreach (var statMap in character.Statistics)
             {
                 var stat = StatisticResult.Show(statMap);

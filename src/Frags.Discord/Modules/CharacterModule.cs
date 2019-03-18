@@ -17,10 +17,10 @@ namespace Frags.Discord.Modules
         }
         
         [Command("show")]
-        public async Task ShowCharacterAsync()
+        public async Task ShowCharacterAsync(IUser user = null)
         {
-            ulong discordId = Context.User.Id;
-            var result = await _controller.ShowCharacterAsync(discordId);
+            user = user ?? Context.User;
+            var result = await _controller.ShowCharacterAsync(user.Id);
             
             if (!result.IsSuccess) 
             {
@@ -37,6 +37,15 @@ namespace Frags.Discord.Modules
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.CreateCharacterAsync(discordId, name);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("activate")]
+        [Alias("act")]
+        public async Task ActivateCharacterAsync(string name)
+        {
+            ulong discordId = Context.User.Id;
+            var result = await _controller.ActivateCharacterAsync(discordId, name);
             await ReplyAsync(result.Message);
         }
     }

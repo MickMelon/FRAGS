@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
@@ -36,6 +37,20 @@ namespace Frags.Presentation.Controllers
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
             return CharacterResult.Show(character);
+        }
+
+        public async Task<IResult> ActivateCharacterAsync(ulong callerId, string charName)
+        {
+            var characters = await _provider.GetAllCharactersAsync(callerId);
+
+            var match = characters.FirstOrDefault(x => x.Name.Contains(charName));
+
+            if (match == null) return CharacterResult.CharacterNotFound();
+            if (match.Active) return CharacterResult.CharacterAlreadyActive();
+            match.Active = true;
+
+            await _provider.UpdateCharacterAsync(match);
+            return CharacterResult.CharacterActive();
         }
 
         /// <summary>

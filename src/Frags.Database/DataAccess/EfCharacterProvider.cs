@@ -72,6 +72,7 @@ namespace Frags.Database.DataAccess
                 .FirstOrDefaultAsync();
             
             if (character == null) return null;
+            character.Active = true;
 
             return _mapper.Map<Character>(character);
         }
@@ -83,6 +84,17 @@ namespace Frags.Database.DataAccess
                 .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
                 .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
                 .ToListAsync();
+
+            if (charDtos == null) return null;
+
+            charDtos.ForEach(x => x.Active = false);
+            var activeChar = (await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier))?.ActiveCharacter;
+            if (activeChar != null)
+            {
+                var match = charDtos.FirstOrDefault(x => x.Id.Equals(activeChar.Id));
+                if (match != null)
+                    match.Active = true;
+            }
                 
             return _mapper.Map<List<Character>>(charDtos);
         }
