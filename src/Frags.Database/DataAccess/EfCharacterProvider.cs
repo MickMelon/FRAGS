@@ -44,7 +44,7 @@ namespace Frags.Database.DataAccess
             {
                 await _context.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
             }
-            else
+            else if (character.Active)
             {
                 user.ActiveCharacter = charDto;
             }
