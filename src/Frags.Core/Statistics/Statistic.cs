@@ -28,5 +28,7 @@ namespace Frags.Core.Statistics
             Name = name;
             Description = description;
         }
+
+        protected Statistic() { }
     }
 }

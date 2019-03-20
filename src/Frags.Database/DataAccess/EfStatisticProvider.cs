@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,6 +8,7 @@ using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Statistics;
 using Microsoft.EntityFrameworkCore;
+using Attribute = Frags.Core.Statistics.Attribute;
 
 namespace Frags.Database.DataAccess
 {
@@ -31,7 +33,8 @@ namespace Frags.Database.DataAccess
 
         public async Task<Skill> CreateSkillAsync(string name, string attribName)
         {
-            var attrib = await _context.Attributes.Where(x => x.Name.EqualsIgnoreCase(name)).FirstOrDefaultAsync();
+            var attrib = await _context.Attributes.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(attribName));
+            if (attrib == null) throw new ArgumentNullException("attribName");
 
             var skill = new Skill(attrib, name);
 
@@ -48,7 +51,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<Statistic> GetStatisticAsync(string name)
         {
-            return await _context.Statistics.Where(x => x.Name.EqualsIgnoreCase(name)).FirstOrDefaultAsync();
+            return await _context.Statistics.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
         }
 
         public async Task UpdateStatisticAsync(Statistic statistic)

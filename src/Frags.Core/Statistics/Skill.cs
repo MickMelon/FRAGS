@@ -8,7 +8,7 @@ namespace Frags.Core.Statistics
     /// </summary>
     public class Skill : Statistic
     {
-        private Skill(string id, string name) : base(id, name) { }
+        protected Skill() : base() { }
 
         public Skill(Attribute attribute, string name, string description = "") : base(name, description)
         {
