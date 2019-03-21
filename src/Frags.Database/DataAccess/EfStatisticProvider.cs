@@ -34,7 +34,7 @@ namespace Frags.Database.DataAccess
         public async Task<Skill> CreateSkillAsync(string name, string attribName)
         {
             var attrib = await _context.Attributes.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(attribName));
-            if (attrib == null) throw new ArgumentNullException("attribName");
+            if (attrib == null) return null;
 
             var skill = new Skill(attrib, name);
 
