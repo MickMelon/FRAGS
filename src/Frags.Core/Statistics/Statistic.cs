@@ -18,6 +18,19 @@ namespace Frags.Core.Statistics
         /// </summary>
         public string Name { get; set; }
 
+        public string Aliases { get; set; }
+
+        public string[] AliasesArray
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(Aliases))
+                    return Aliases.Split('/');
+                else
+                    return new string[] { Name };
+            }
+        }
+
         /// <summary>
         /// The statistics's description.
         /// </summary>
