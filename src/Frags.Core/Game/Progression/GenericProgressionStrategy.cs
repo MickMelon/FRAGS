@@ -72,8 +72,11 @@ namespace Frags.Core.Game.Statistics
             StatisticValue currentVal = character.GetStatistic(statistic);
             if (currentVal == null) currentVal = new StatisticValue(0);
 
-            // Make sure the character has enough remaining points to do that (we refund the current stat value since we're overwriting it)
-            if (points - (sum - currentVal.Value + newValue) < 0) throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
+            // Make sure the character has enough remaining points to do that 
+            // (we refund the current stat value since we're overwriting it)
+            var newSum = sum - currentVal.Value + newValue;
+            if (points - (newSum) < 0) 
+                throw new ProgressionException(string.Format(Messages.STAT_NOT_ENOUGH_POINTS, newSum, points));
 
             // Check if they go over the limit for attributes set to the max
             // Example: InitialAttributesAtMax is set to 2 and InitialAttributeMax is set to 10
