@@ -58,6 +58,7 @@ namespace Frags.Core.Game.Rolling
         {
             var result = new StringBuilder();
             var percent = RollStatistic(stat, character);
+            if (percent == null) return null;
 
             if (percent >= 0)
             {
