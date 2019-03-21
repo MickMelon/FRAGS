@@ -31,18 +31,22 @@ namespace Frags.Core.Game.Rolling
         /// </inheritdoc>
         public double? RollStatistic(Statistic stat, Character character)
         {
+            if (character == null || stat == null) return null;
+
             int rng = GameRandom.Between(1, 100);
             double maxSuccessRoll;
-            var statValue = character.GetStatistic(stat).Value;
+
+            int? statValue = character.GetStatistic(stat)?.Value;
+            if (statValue == null) return null;
             if (statValue <= 0) return -125;
 
             if (stat is Attribute)
             {
-                maxSuccessRoll = Math.Round(32.2 * Math.Sqrt(statValue) - 7);
+                maxSuccessRoll = Math.Round(32.2 * Math.Sqrt(statValue.Value) - 7);
             }
             else
             {
-                maxSuccessRoll = Math.Round(10 * Math.Sqrt(statValue) - 0.225 * statValue - 1);
+                maxSuccessRoll = Math.Round(10 * Math.Sqrt(statValue.Value) - 0.225 * statValue.Value - 1);
             }
 
             double resultPercent = (maxSuccessRoll - rng) / maxSuccessRoll;
