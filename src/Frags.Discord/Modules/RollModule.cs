@@ -15,9 +15,9 @@ namespace Frags.Discord.Modules
         }
 
         [Command("roll")]
-        public async Task RollAsync(string stat)
+        public async Task RollAsync(string stat, IUser user = null)
         {
-            ulong discordId = Context.User.Id;
+            ulong discordId = user?.Id ?? Context.User.Id;
             var result = await _controller.RollStatisticAsync(discordId, stat);
             await ReplyAsync(result.Message);
         }
