@@ -45,7 +45,7 @@ namespace Frags.Presentation.Results
                 Proficiency = statMap.StatisticValue.Proficiency
             };
 
-            var message = $"{stat.Name}: {stat.Value}";
+            var message = $"**{stat.Name}:** {stat.Value}";
             if (stat.IsProficient)
                 message += "*";
 
