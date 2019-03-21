@@ -40,6 +40,11 @@ namespace Frags.Database.Characters
         /// </summary>
         public int Experience { get; set; }
 
+        /// <summary>
+        /// The character's current amount of money.
+        /// </summary>
+        public int Money { get; set; }
+
         public IList<StatisticMapping> Statistics { get; set; }
     }
 }

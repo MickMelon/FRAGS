@@ -55,6 +55,11 @@ namespace Frags.Core.Characters
         public int Experience { get; set; }
 
         /// <summary>
+        /// The character's current amount of money.
+        /// </summary>
+        public int Money { get; set; }
+
+        /// <summary>
         /// The character's level calculated from the experience.
         /// </summary>
         public int Level { get => Character.GetLevelFromExperience(Experience); }
@@ -160,7 +165,7 @@ namespace Frags.Core.Characters
         public static int GetLevelFromExperience(int experience)
         {
             if (experience == 0) return 1;
-            return Convert.ToInt32((Math.Sqrt(experience + 125) / (10 * Math.Sqrt(5))));
+            return Convert.ToInt32(Math.Sqrt(experience + 125) / (10 * Math.Sqrt(5)));
         }
     }
 }
