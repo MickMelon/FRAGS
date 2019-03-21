@@ -54,42 +54,40 @@ namespace Frags.Core.Game.Rolling
         {
             var result = new StringBuilder();
             var percent = RollStatistic(stat, character);
-            var charName = character.Name;
-            var roll = stat.Name;
 
             if (percent >= 0)
             {
                 if (percent >= 95)
-                    result.Append(string.Format(ROLL_SUCCESS_5, roll));
+                    result.Append(string.Format(ROLL_SUCCESS_5, stat.Name.ToUpper()));
                 else if (percent >= 80)
-                    result.Append(string.Format(ROLL_SUCCESS_4, roll));
+                    result.Append(string.Format(ROLL_SUCCESS_4, stat.Name.ToUpper()));
                 else if (percent >= 50)
-                    result.Append(string.Format(ROLL_SUCCESS_3, roll));
+                    result.Append(string.Format(ROLL_SUCCESS_3, stat.Name));
                 else if (percent >= 25)
-                    result.Append(string.Format(ROLL_SUCCESS_2, roll));
+                    result.Append(string.Format(ROLL_SUCCESS_2, stat.Name));
                 else if (percent >= 10)
-                    result.Append(string.Format(ROLL_SUCCESS_1, roll));
+                    result.Append(string.Format(ROLL_SUCCESS_1, stat.Name));
                 else
-                    result.Append(string.Format(ROLL_SUCCESS_0, roll));
+                    result.Append(string.Format(ROLL_SUCCESS_0, stat.Name));
 
-                result.Append(string.Format(ROLL_RESULT_SUCCESS, charName, percent));
+                result.Append(string.Format(ROLL_RESULT_SUCCESS, character.Name, percent));
             }
             else
             {
                 if (percent <= -125)
-                    result.Append(string.Format(ROLL_FAILURE_5, roll));
+                    result.Append(string.Format(ROLL_FAILURE_5, stat.Name.ToUpper()));
                 else if (percent <= -80)
-                    result.Append(string.Format(ROLL_FAILURE_4, roll));
+                    result.Append(string.Format(ROLL_FAILURE_4, stat.Name.ToUpper()));
                 else if (percent <= -50)
-                    result.Append(string.Format(ROLL_FAILURE_3, roll));
+                    result.Append(string.Format(ROLL_FAILURE_3, stat.Name));
                 else if (percent <= -25)
-                    result.Append(string.Format(ROLL_FAILURE_2, roll));
+                    result.Append(string.Format(ROLL_FAILURE_2, stat.Name));
                 else if (percent <= -10)
-                    result.Append(string.Format(ROLL_FAILURE_1, roll));
+                    result.Append(string.Format(ROLL_FAILURE_1, stat.Name));
                 else
-                    result.Append(string.Format(ROLL_FAILURE_0, roll));
+                    result.Append(string.Format(ROLL_FAILURE_0, stat.Name));
 
-                result.Append(string.Format(ROLL_RESULT_FAILURE, charName, percent * -1));
+                result.Append(string.Format(ROLL_RESULT_FAILURE, character.Name, percent * -1));
             }
 
             return result.ToString();
