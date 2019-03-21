@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
+using Frags.Core.Common.Exceptions;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
@@ -115,7 +116,9 @@ namespace Frags.Presentation.Controllers
             }
             catch (System.Exception e)
             {
-                System.Console.WriteLine(e);
+                if (!(e is ProgressionException))
+                    System.Console.WriteLine(e);
+
                 return GenericResult.Failure(e.Message);
                 throw e;
             }
