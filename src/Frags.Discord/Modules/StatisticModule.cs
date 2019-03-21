@@ -35,7 +35,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("set")]
-        public async Task SetAttributeAsync(string statName, int? newValue = null)
+        public async Task SetStatisticAsync(string statName, int? newValue = null)
         {
             var result = await _statController.SetStatisticAsync(Context.User.Id, statName, newValue);
             await ReplyAsync(result.Message);
