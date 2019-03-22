@@ -1,9 +1,11 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Game.Statistics;
@@ -13,6 +15,7 @@ using Frags.Database.DataAccess;
 using Frags.Discord.Services;
 using Frags.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -103,31 +106,18 @@ namespace Frags.Discord
                 .AddTransient<RollController>()
                 .AddTransient<StatisticController>();
 
-        private static IServiceCollection AddConfiguredServices(IServiceCollection services) =>
-            services
-                .Configure<StatisticOptions>(x =>
-                    {
-                        x.ProgressionStrategy = "generic";
+        private static IServiceCollection AddConfiguredServices(IServiceCollection services)
+        {
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("Config.json", optional: false, reloadOnChange: true);
+                
+            var jsonConfig = configBuilder.Build();
 
-                        x.InitialSetupMaxLevel = 1;
-
-                        x.InitialAttributeMin = 1;
-                        x.InitialAttributeMax = 10;
-                        x.InitialAttributePoints = 40;
-                        x.InitialAttributesAtMax = 7;
-                        x.InitialAttributesProficient = 0;
-
-                        x.InitialSkillMin = 1;
-                        x.InitialSkillMax = 150;
-                        x.InitialSkillPoints = 58;
-                        x.InitialSkillsAtMax = 13;
-                        x.InitialSkillsProficient = 3;
-                    })
+            return services
+                .Configure<StatisticOptions>(jsonConfig.GetSection("StatisticOptions"))
+                .Configure<RollOptions>(jsonConfig.GetSection("RollOptions"))
                 .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
-                .Configure<RollOptions>(x =>
-                    {
-                        x.RollStrategy = "frags";
-                    })
                 .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value)
                 .AddTransient<IRollStrategy>(provider => 
                 {
@@ -135,8 +125,9 @@ namespace Frags.Discord
                     var config = provider.GetRequiredService<RollOptions>();
 
                     // Case-insensitively search the types in the specified assembly
+                    // TODO: filter types to make sure they inherit from IRollStrategy
                     var type = assembly.ExportedTypes
-                        .Single(x => x.Name.IndexOf(config.RollStrategy, StringComparison.OrdinalIgnoreCase) > -1);
+                        .Single(x => x.Name.EqualsIgnoreCase(config.RollStrategy));
 
                     return (IRollStrategy)Activator.CreateInstance(type);
                 })
@@ -147,7 +138,7 @@ namespace Frags.Discord
 
                     // Case-insensitively search the types in the specified assembly
                     var type = assembly.ExportedTypes
-                        .Single(x => x.Name.IndexOf(config.ProgressionStrategy, StringComparison.OrdinalIgnoreCase) > -1);
+                        .Single(x => x.Name.EqualsIgnoreCase(config.ProgressionStrategy));
 
                     // IStatisticProvider statProvider, StatisticOptions statOptions)
                     return (IProgressionStrategy)Activator.CreateInstance(
@@ -155,6 +146,6 @@ namespace Frags.Discord
                         provider.GetRequiredService<IStatisticProvider>(), 
                         provider.GetRequiredService<StatisticOptions>());
                 });
-                
+        }
     }
 }
