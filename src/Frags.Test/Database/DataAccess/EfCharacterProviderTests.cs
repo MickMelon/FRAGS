@@ -37,8 +37,7 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CharacterStatistics_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseSqlite("Filename=TestDb2.db").Options);
-            context.Database.EnsureCreated();
+            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb2").Options);
             var provider = new EfCharacterProvider(context);
             var statProvider = new EfStatisticProvider(context);
 

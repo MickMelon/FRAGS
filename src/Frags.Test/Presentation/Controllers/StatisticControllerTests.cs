@@ -214,12 +214,15 @@ namespace Frags.Test.Presentation.Controllers
         public async Task SetStatisticAsync_NotEnoughPoints_ReturnNotEnoughPoints()
         {
             // Arrange
+            int points = 1;
+            int luckScore = 2;
+
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
             var statOptions = new StatisticOptions
             {
                 InitialAttributeMax = 10,
-                InitialAttributePoints = 1
+                InitialAttributePoints = points
             };
 
             var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
@@ -229,7 +232,8 @@ namespace Frags.Test.Presentation.Controllers
 
             // Assert
             // TODO: update unit tests to match new result
-            Assert.Equal(GenericResult.NotEnoughPoints(), result);
+            Assert.Equal(GenericResult.Failure(
+                string.Format(Messages.STAT_NOT_ENOUGH_POINTS, luckScore, points)), result);
         }
 
         [Fact]
