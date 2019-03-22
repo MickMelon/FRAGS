@@ -32,30 +32,12 @@ namespace Frags.Presentation.Controllers
         /// Initializes a new instance of the <see cref="RollController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public RollController(ICharacterProvider provider, IStatisticProvider statProvider, RollOptions options)
+        public RollController(ICharacterProvider provider, IStatisticProvider statProvider, IRollStrategy strategy)
         {
             _provider = provider;
             _statProvider = statProvider;
 
-            _strategy = GetStrategy(options.RollMode);
-        }
-
-        /// <summary>
-        /// Used to get an instance of IRollStrategy by reading
-        /// from the Configuartion passed to this instance of RollController.
-        /// </summary>
-        /// <remarks>
-        /// There's definitely a better way to implement this, namely
-        /// with a separate factory class and interfaces to make it
-        /// dependency injection friendly, just thought it was overkill.
-        private IRollStrategy GetStrategy(RollMode mode)
-        {
-            switch (mode)
-            {
-                case RollMode.Mock: return new MockRollStrategy();
-                case RollMode.Frags: return new FragsRollStrategy();
-                default: return null;
-            }
+            _strategy = strategy;
         }
 
         /// <summary>

@@ -25,15 +25,15 @@ namespace Frags.Presentation.Controllers
         private readonly IStatisticProvider _statProvider;
 
         /// <summary>
-        /// Used to validate input when setting initial statistics.
+        /// Used to control how characters are setup and progress.
         /// </summary>
-        private readonly StatisticOptions _statOptions;
+        private readonly IProgressionStrategy _strategy;
 
-        public StatisticController(ICharacterProvider charProvider, IStatisticProvider statProvider, StatisticOptions statOptions)
+        public StatisticController(ICharacterProvider charProvider, IStatisticProvider statProvider, IProgressionStrategy strategy)
         {
             _charProvider = charProvider;
             _statProvider = statProvider;
-            _statOptions = statOptions;
+            _strategy = strategy;
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Frags.Presentation.Controllers
             try
             {
                 // TODO: Find a better way to get an instance of IProgressionStrategy
-                await character.ProgressStatistic(new GenericProgressionStrategy(_statProvider, _statOptions), statistic, newValue);
+                await character.ProgressStatistic(_strategy, statistic, newValue);
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
             }
@@ -147,7 +147,7 @@ namespace Frags.Presentation.Controllers
             try
             {
                 // TODO: Find a better way to get an instance of IProgressionStrategy
-                await character.SetProficiency(new GenericProgressionStrategy(_statProvider, _statOptions), statistic, isProficient);
+                await character.SetProficiency(_strategy, statistic, isProficient);
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
             }

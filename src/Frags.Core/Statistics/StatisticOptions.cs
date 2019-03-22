@@ -2,6 +2,8 @@ namespace Frags.Core.Statistics
 {
     public class StatisticOptions
     {
+        public string ProgressionStrategy { get; set; }
+
         #region Initial Setup
         public int InitialSetupMaxLevel { get; set; } = 1;
 

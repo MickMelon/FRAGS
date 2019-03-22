@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Rolling;
+using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
 using Frags.Database;
 using Frags.Database.DataAccess;
@@ -50,6 +52,16 @@ namespace Frags.Discord
             services = AddDiscordServices(services);
             services = AddDatabaseServices(services);
             services = AddGameServices(services);
+            services = AddConfiguredServices(services);
+
+            // Frags.Core.Game.Rolling.FragsRollStrategy
+            //Console.WriteLine(typeof(FragsRollStrategy).ToString());
+
+            // Frags.Core.Game.Rolling.FragsRollStrategy, Frags.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+            //Console.WriteLine(typeof(FragsRollStrategy).AssemblyQualifiedName);
+            
+            // Frags.Core.Game.Statistics.GenericProgressionStrategy
+            //Console.WriteLine(typeof(GenericProgressionStrategy).ToString());
 
             return services.BuildServiceProvider();
         } 
@@ -89,9 +101,14 @@ namespace Frags.Discord
             services
                 .AddTransient<CharacterController>()
                 .AddTransient<RollController>()
-                .AddTransient<StatisticController>()
+                .AddTransient<StatisticController>();
+
+        private static IServiceCollection AddConfiguredServices(IServiceCollection services) =>
+            services
                 .Configure<StatisticOptions>(x =>
                     {
+                        x.ProgressionStrategy = "generic";
+
                         x.InitialSetupMaxLevel = 1;
 
                         x.InitialAttributeMin = 1;
@@ -109,9 +126,35 @@ namespace Frags.Discord
                 .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
                 .Configure<RollOptions>(x =>
                     {
-                        x.RollMode = RollMode.Frags;
+                        x.RollStrategy = "frags";
                     })
-                .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value);
+                .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value)
+                .AddTransient<IRollStrategy>(provider => 
+                {
+                    var assembly = typeof(IRollStrategy).Assembly;
+                    var config = provider.GetRequiredService<RollOptions>();
+
+                    // Case-insensitively search the types in the specified assembly
+                    var type = assembly.ExportedTypes
+                        .Single(x => x.Name.IndexOf(config.RollStrategy, StringComparison.OrdinalIgnoreCase) > -1);
+
+                    return (IRollStrategy)Activator.CreateInstance(type);
+                })
+                .AddTransient<IProgressionStrategy>(provider => 
+                {
+                    var assembly = typeof(IProgressionStrategy).Assembly;
+                    var config = provider.GetRequiredService<StatisticOptions>();
+
+                    // Case-insensitively search the types in the specified assembly
+                    var type = assembly.ExportedTypes
+                        .Single(x => x.Name.IndexOf(config.ProgressionStrategy, StringComparison.OrdinalIgnoreCase) > -1);
+
+                    // IStatisticProvider statProvider, StatisticOptions statOptions)
+                    return (IProgressionStrategy)Activator.CreateInstance(
+                        type, 
+                        provider.GetRequiredService<IStatisticProvider>(), 
+                        provider.GetRequiredService<StatisticOptions>());
+                });
                 
     }
 }
