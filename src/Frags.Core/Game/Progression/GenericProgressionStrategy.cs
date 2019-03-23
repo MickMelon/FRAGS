@@ -9,7 +9,7 @@ using Frags.Core.DataAccess;
 using Frags.Core.Statistics;
 using Attribute = Frags.Core.Statistics.Attribute;
 
-namespace Frags.Core.Game.Statistics
+namespace Frags.Core.Game.Progression
 {
     public class GenericProgressionStrategy : IProgressionStrategy
     {

@@ -7,8 +7,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
+using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
-using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
 using Frags.Database;
 using Frags.Database.DataAccess;
@@ -56,15 +56,6 @@ namespace Frags.Discord
             services = AddDatabaseServices(services);
             services = AddGameServices(services);
             services = AddConfiguredServices(services);
-
-            // Frags.Core.Game.Rolling.FragsRollStrategy
-            //Console.WriteLine(typeof(FragsRollStrategy).ToString());
-
-            // Frags.Core.Game.Rolling.FragsRollStrategy, Frags.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-            //Console.WriteLine(typeof(FragsRollStrategy).AssemblyQualifiedName);
-            
-            // Frags.Core.Game.Statistics.GenericProgressionStrategy
-            //Console.WriteLine(typeof(GenericProgressionStrategy).ToString());
 
             return services.BuildServiceProvider();
         } 
@@ -119,33 +110,25 @@ namespace Frags.Discord
                 .Configure<RollOptions>(jsonConfig.GetSection("RollOptions"))
                 .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
                 .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value)
-                .AddTransient<IRollStrategy>(provider => 
-                {
-                    var assembly = typeof(IRollStrategy).Assembly;
-                    var config = provider.GetRequiredService<RollOptions>();
+                .AddTransient<FragsRollStrategy>()
+                .AddTransient<MockRollStrategy>()
+                .AddTransient<GenericProgressionStrategy>()
+                .AddTransient(provider =>
+                    ResolveServices<IRollStrategy>(provider, provider.GetRequiredService<RollOptions>().RollStrategy))
+                .AddTransient(provider =>
+                    ResolveServices<IProgressionStrategy>(provider, provider.GetRequiredService<StatisticOptions>().ProgressionStrategy));
+        }
 
-                    // Case-insensitively search the types in the specified assembly
-                    // TODO: filter types to make sure they inherit from IRollStrategy
-                    var type = assembly.ExportedTypes
-                        .Single(x => x.Name.EqualsIgnoreCase(config.RollStrategy));
+        private static T ResolveServices<T>(IServiceProvider provider, string typeName)
+        {
+            var assembly = typeof(T).Assembly;
 
-                    return (IRollStrategy)Activator.CreateInstance(type);
-                })
-                .AddTransient<IProgressionStrategy>(provider => 
-                {
-                    var assembly = typeof(IProgressionStrategy).Assembly;
-                    var config = provider.GetRequiredService<StatisticOptions>();
+            // Case-insensitively search the types in the specified assembly
+            var type = assembly.ExportedTypes
+                .Where(x => typeof(T).IsAssignableFrom(x))
+                .Single(x => x.Name.IndexOf(typeName, StringComparison.OrdinalIgnoreCase) > -1);
 
-                    // Case-insensitively search the types in the specified assembly
-                    var type = assembly.ExportedTypes
-                        .Single(x => x.Name.EqualsIgnoreCase(config.ProgressionStrategy));
-
-                    // IStatisticProvider statProvider, StatisticOptions statOptions)
-                    return (IProgressionStrategy)Activator.CreateInstance(
-                        type, 
-                        provider.GetRequiredService<IStatisticProvider>(), 
-                        provider.GetRequiredService<StatisticOptions>());
-                });
+            return (T)provider.GetRequiredService(type);
         }
     }
 }

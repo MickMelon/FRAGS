@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Common;
+using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
-using Frags.Core.Game.Statistics;
 using Frags.Core.Statistics;
 using Frags.Database.Statistics;
 

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 
-namespace Frags.Core.Game.Statistics
+namespace Frags.Core.Game.Progression
 {
     public interface IProgressionStrategy
     {

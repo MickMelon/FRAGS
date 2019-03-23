@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
-using Frags.Core.Game.Statistics;
+using Frags.Core.Game.Progression;
 using Frags.Core.Statistics;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
