@@ -80,8 +80,8 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            double? callerRoll = caller.RollStatistic( _strategy, stat);
-            double? targetRoll = target.RollStatistic( _strategy, stat);
+            double? callerRoll = _strategy.RollStatistic(stat, caller);
+            double? targetRoll = _strategy.RollStatistic(stat, target);
 
             if (callerRoll.HasValue && targetRoll.HasValue)
                 return RollResult.RollAgainst(caller.Name, target.Name, callerRoll.Value, targetRoll.Value);

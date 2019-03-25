@@ -6,7 +6,6 @@ using Frags.Core.Common;
 using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
-using Frags.Database.Statistics;
 
 namespace Frags.Core.Characters
 {
@@ -58,11 +57,6 @@ namespace Frags.Core.Characters
         /// The character's current amount of money.
         /// </summary>
         public int Money { get; set; }
-
-        /// <summary>
-        /// The character's level calculated from the experience.
-        /// </summary>
-        public int Level { get => Character.GetLevelFromExperience(Experience); }
         
         /// <summary>
         /// Where the character's statistics are actually stored.
@@ -104,38 +98,8 @@ namespace Frags.Core.Characters
             Statistics = new List<StatisticMapping>();
         }
 
-        /// <summary>
-        /// Rolls the specified skill for the character.
-        /// </summary>
-        /// <param name="skill">The skill name.</param>
-        /// <returns>What the character rolled.</returns>
-        public int Roll(string skill)
-        {
-            return GameRandom.D20();
-        }
-
-        /// <summary>
-        /// Rolls the specified statistic for the character.
-        /// </summary>
-        /// <param name="stat">The statistic name.</param>
-        /// <returns>What the character rolled.</returns>
-        public double? RollStatistic(IRollStrategy strategy, Statistic stat)
-        {
-            if (stat == null || strategy == null || Statistics == null) return null;
-
-            var value = GetStatistic(stat);
-            if (value != null)
-            {
-                return strategy.RollStatistic(stat, this);
-            }
-            
-            return null;
-        }
-
-        public StatisticValue GetStatistic(Statistic stat)
-        {
-            return Statistics?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue;
-        }
+        public StatisticValue GetStatistic(Statistic stat) =>
+            Statistics?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue;
 
         public void SetStatistic(Statistic stat, StatisticValue newValue)
         {
@@ -147,25 +111,6 @@ namespace Frags.Core.Characters
             }
 
             statMap.StatisticValue = newValue;
-        }
-
-        /// <summary>
-        /// Sets the specified statistic to the given value via the chosen strategy.
-        /// </summary>
-        public Task<bool> ProgressStatistic(IProgressionStrategy strategy, Statistic stat, int? newValue = null)
-        {
-            return strategy.SetStatistic(this, stat, newValue);
-        }
-
-        public Task<bool> SetProficiency(IProgressionStrategy strategy, Statistic statistic, bool isProficient)
-        {
-            return strategy.SetProficiency(this, statistic, isProficient);
-        }
-
-        public static int GetLevelFromExperience(int experience)
-        {
-            if (experience == 0) return 1;
-            return Convert.ToInt32(Math.Sqrt(experience + 125) / (10 * Math.Sqrt(5)));
         }
     }
 }

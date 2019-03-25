@@ -1,7 +1,4 @@
-using Frags.Core.Characters;
-using Frags.Core.Statistics;
-
-namespace Frags.Database.Statistics
+namespace Frags.Core.Statistics
 {
     public class StatisticMapping
     {

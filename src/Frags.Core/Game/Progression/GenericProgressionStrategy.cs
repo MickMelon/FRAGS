@@ -22,10 +22,17 @@ namespace Frags.Core.Game.Progression
             _statOptions = statOptions;
         }
 
+        public int GetCharacterLevel(Character character)
+        {
+            if (character.Experience == 0) return 1;
+            return Convert.ToInt32(Math.Sqrt(character.Experience + 125) / (10 * Math.Sqrt(5)));
+        }
+
         public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
         {
+            var level = GetCharacterLevel(character);
             if (!newValue.HasValue) throw new ProgressionException(Messages.INVALID_INPUT);
-            if (character.Level <= _statOptions.InitialSetupMaxLevel || (!await InitialAttributesSet(character) || !await InitialSkillsSet(character)))
+            if (level <= _statOptions.InitialSetupMaxLevel || !await InitialAttributesSet(character) || !await InitialSkillsSet(character))
                 return await SetInitialStatistic(character, statistic, newValue.Value);
 
             // Character is above setup level and has their attributes & skills set
@@ -34,7 +41,7 @@ namespace Frags.Core.Game.Progression
 
         private async Task<bool> SetInitialStatistic(Character character, Statistic statistic, int newValue)
         {
-            int statMin, statMax, statsAtMax, points;
+            int statMin, statMax, statsAtMax, points, level = GetCharacterLevel(character);
             // This is either a dictionary of all the character's attributes or skills, never both.
             Dictionary<Statistic, StatisticValue> stats;
 
@@ -48,7 +55,7 @@ namespace Frags.Core.Game.Progression
                 
                 stats = character.Statistics.Where(x => x.Statistic is Attribute).ToDictionary(x => x.Statistic, x => x.StatisticValue);
 
-                if (character.Level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character)) 
+                if (level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
             }
             else
@@ -60,7 +67,7 @@ namespace Frags.Core.Game.Progression
                 
                 stats = character.Statistics.Where(x => x.Statistic is Skill).ToDictionary(x => x.Statistic, x => x.StatisticValue);
 
-                if (character.Level > _statOptions.InitialSetupMaxLevel && await InitialSkillsSet(character)) 
+                if (level > _statOptions.InitialSetupMaxLevel && await InitialSkillsSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
             }
 
@@ -75,7 +82,7 @@ namespace Frags.Core.Game.Progression
             // Make sure the character has enough remaining points to do that 
             // (we refund the current stat value since we're overwriting it)
             var newSum = sum - currentVal.Value + newValue;
-            if (points - (newSum) < 0) 
+            if (points - newSum < 0) 
                 throw new ProgressionException(string.Format(Messages.STAT_NOT_ENOUGH_POINTS, newSum, points));
 
             // Check if they go over the limit for attributes set to the max
@@ -93,11 +100,11 @@ namespace Frags.Core.Game.Progression
 
         public Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)
         {
-            int alreadySet;
+            int alreadySet, level = GetCharacterLevel(character);
             if (statistic is Attribute attrib)
             {
                 alreadySet = character.Statistics.Where(x => x.Statistic is Attribute).Count(x => x.StatisticValue.IsProficient);
-                if (character.Level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialAttributesProficient) 
+                if (level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialAttributesProficient) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
 
                 if (proficient && alreadySet + 1 > _statOptions.InitialAttributesProficient)
@@ -106,7 +113,7 @@ namespace Frags.Core.Game.Progression
             else
             {
                 alreadySet = character.Statistics.Where(x => x.Statistic is Skill).Count(x => x.StatisticValue.IsProficient);
-                if (character.Level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialSkillsProficient) 
+                if (level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialSkillsProficient) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
 
                 if (proficient && alreadySet + 1 > _statOptions.InitialSkillsProficient)

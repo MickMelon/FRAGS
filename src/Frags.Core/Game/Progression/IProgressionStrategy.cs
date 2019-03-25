@@ -7,6 +7,13 @@ namespace Frags.Core.Game.Progression
     public interface IProgressionStrategy
     {
         /// <summary>
+        /// Gets the character's level.
+        /// </summary>
+        /// <param name="character">The character to calculate the level for.</param>
+        /// <returns>An integer representing the character's level.</returns>
+        int GetCharacterLevel(Character character);
+
+        /// <summary>
         /// Sets the value of one of the character's statistics.
         /// </summary>
         /// <param name="character">The character to set the statistic value to.</param>

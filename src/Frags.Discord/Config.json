@@ -1,25 +1,28 @@
 {
-    "StatisticOptions":
-    {
-        "ProgressionStrategy": "GenericProgressionStrategy",
+  "StatisticOptions": {
+    "ProgressionStrategy": "GenericProgressionStrategy",
 
-        "InitialSetupMaxLevel": 1,
+    "InitialSetupMaxLevel": 1,
 
-        "InitialAttributeMin": 1,
-        "InitialAttributeMax": 10,
-        "InitialAttributePoints": 40,
-        "InitialAttributesAtMax": 7,
-        "InitialAttributesProficient": 3,
+    "InitialAttributeMin": 1,
+    "InitialAttributeMax": 10,
+    "InitialAttributePoints": 40,
+    "InitialAttributesAtMax": 7,
+    "InitialAttributesProficient": 3,
 
-        "InitialSkillMin": 1,
-        "InitialSkillMax": 150,
-        "InitialSkillPoints": 58,
-        "InitialSkillsAtMax": 13,
-        "InitialSkillsProficient": 3
-    },
+    "InitialSkillMin": 1,
+    "InitialSkillMax": 150,
+    "InitialSkillPoints": 58,
+    "InitialSkillsAtMax": 13,
+    "InitialSkillsProficient": 3,
 
-    "RollOptions":
-    {
-        "RollStrategy": "FragsRollStrategy"
-    }
+    "ExpMessageLengthDivisor": 5,
+    "ExpEnabledChannels": [
+      462432825539297280
+    ]
+  },
+
+  "RollOptions": {
+    "RollStrategy": "FragsRollStrategy"
+  }
 }

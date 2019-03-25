@@ -116,8 +116,7 @@ namespace Frags.Presentation.Controllers
 
             try
             {
-                // TODO: Find a better way to get an instance of IProgressionStrategy
-                await character.ProgressStatistic(_strategy, statistic, newValue);
+                await _strategy.SetStatistic(character, statistic, newValue);
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
             }
@@ -146,8 +145,7 @@ namespace Frags.Presentation.Controllers
 
             try
             {
-                // TODO: Find a better way to get an instance of IProgressionStrategy
-                await character.SetProficiency(_strategy, statistic, isProficient);
+                await _strategy.SetProficiency(character, statistic, isProficient);
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
             }

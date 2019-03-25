@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Frags.Core.Common;
-using Frags.Database.Statistics;
+using Frags.Core.Statistics;
 using Frags.Presentation.ViewModels;
 
 namespace Frags.Presentation.Results

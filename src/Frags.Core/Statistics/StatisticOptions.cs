@@ -22,5 +22,8 @@ namespace Frags.Core.Statistics
 
         public int SkillPointsOnLevelUp { get; set; }
         public int AttributePointsOnLevelUp { get; set; }
+
+        public int ExpMessageLengthDivisor { get; set; }
+        public ulong[] ExpEnabledChannels { get; set; }
     }
 }

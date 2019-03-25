@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Frags.Presentation.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Frags.Discord.Services
@@ -12,14 +13,16 @@ namespace Frags.Discord.Services
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
+        private readonly CharacterController _charController;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
 
-        private readonly static Dictionary<ulong, IServiceScope> ServiceScopes = new Dictionary<ulong, IServiceScope>();
+        private readonly static Dictionary<ulong, IServiceScope> _serviceScopes = new Dictionary<ulong, IServiceScope>();
 
-        public CommandHandler(IServiceProvider services, CommandService commands, DiscordSocketClient client)
+        public CommandHandler(IServiceProvider services, CharacterController charController, CommandService commands, DiscordSocketClient client)
         {
             _commands = commands;
+            _charController = charController;
             _services = services;
             _client = client;
         }
@@ -35,7 +38,7 @@ namespace Frags.Discord.Services
 
         private Task OnCommandExecuted(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
-            ServiceScopes[context.Message.Id].Dispose();
+            _serviceScopes[context.Message.Id].Dispose();
             return Task.CompletedTask;
         }
 
@@ -49,11 +52,14 @@ namespace Frags.Discord.Services
             if (!(message.HasCharPrefix('!', ref argPos) || 
                 message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
+            {
+                _ = _charController.GiveExperienceAsync(message.Author.Id, message.Channel.Id, message.Content);
                 return;
+            }
 
             var context = new SocketCommandContext(_client, message);
             var scope = _services.CreateScope();
-            ServiceScopes.Add(context.Message.Id, scope);
+            _serviceScopes.Add(context.Message.Id, scope);
 
             await _commands.ExecuteAsync(
                 context: context, 

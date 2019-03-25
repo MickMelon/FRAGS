@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Frags.Core.Characters;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
+using Frags.Core.Statistics;
 using Frags.Presentation.Results;
 
 namespace Frags.Presentation.Controllers
@@ -19,12 +20,18 @@ namespace Frags.Presentation.Controllers
         private readonly ICharacterProvider _provider;
 
         /// <summary>
+        /// Used to calculate experience points given.
+        /// </summary>
+        private readonly StatisticOptions _statOptions;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider)
+        public CharacterController(ICharacterProvider provider, StatisticOptions statOptions)
         {
             _provider = provider;
+            _statOptions = statOptions;
         }
 
         /// <summary>
@@ -43,7 +50,7 @@ namespace Frags.Presentation.Controllers
         {
             var characters = await _provider.GetAllCharactersAsync(callerId);
 
-            var match = characters.FirstOrDefault(x => x.Name.Contains(charName));
+            var match = characters.FirstOrDefault(x => x.Name.ContainsIgnoreCase(charName));
 
             if (match == null) return CharacterResult.CharacterNotFound();
             if (match.Active) return CharacterResult.CharacterAlreadyActive();
@@ -67,6 +74,20 @@ namespace Frags.Presentation.Controllers
 
             await _provider.CreateCharacterAsync(callerId, name);
             return CharacterResult.CharacterCreatedSuccessfully();
+        }
+
+        public async Task GiveExperienceAsync(ulong callerId, ulong channelId, string message)
+        {
+            var character = await _provider.GetActiveCharacterAsync(callerId);
+            if (character == null) return;
+
+            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return;
+            if (string.IsNullOrWhiteSpace(message)) return;
+
+            character.Experience += 
+                message.Count(x => !Char.IsWhiteSpace(x)) / _statOptions.ExpMessageLengthDivisor;
+
+            await _provider.UpdateCharacterAsync(character);
         }
     }
 }
