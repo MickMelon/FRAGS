@@ -90,6 +90,57 @@ namespace Frags.Test.Presentation.Controllers
             // Assert
             Assert.Equal(CharacterResult.CharacterCreatedSuccessfully(), result);
         }
+
+        [Fact]
+        public async Task GiveExperienceAsync_ValidInput_ExperienceEqualsFive()
+        {
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider,
+            new StatisticOptions
+            {
+                ExpEnabledChannels = new ulong[] { 1 },
+                ExpMessageLengthDivisor = 1
+            });
+
+            await controller.GiveExperienceAsync(1, 1, "12345");
+            var character = await provider.GetActiveCharacterAsync(1);
+
+            Assert.True(character.Experience == 5);
+        }
+
+        [Fact]
+        public async Task GiveExperienceAsync_MessageIsWhitespace_ExperienceEqualsZero()
+        {
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider,
+            new StatisticOptions
+            {
+                ExpEnabledChannels = new ulong[] { 1 },
+                ExpMessageLengthDivisor = 1
+            });
+
+            await controller.GiveExperienceAsync(1, 1, "               ");
+            var character = await provider.GetActiveCharacterAsync(1);
+
+            Assert.True(character.Experience == 0);
+        }
+
+        [Fact]
+        public async Task GiveExperienceAsync_NotInEnabledChannel_ExperienceEqualsZero()
+        {
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider,
+            new StatisticOptions
+            {
+                ExpEnabledChannels = new ulong[] { 1 },
+                ExpMessageLengthDivisor = 1
+            });
+
+            await controller.GiveExperienceAsync(1, 2, "12345");
+            var character = await provider.GetActiveCharacterAsync(1);
+
+            Assert.True(character.Experience == 0);
+        }
         #endregion
     }
 }
