@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
+using Frags.Core.Statistics;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels;
@@ -17,7 +18,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, new StatisticOptions());
             var dbChar = await provider.GetActiveCharacterAsync(1);
 
             // Act
@@ -37,7 +38,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, new StatisticOptions());
 
             // Act
             var result = await controller.ShowCharacterAsync(0);
@@ -53,7 +54,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, new StatisticOptions());
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c");
@@ -67,7 +68,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, new StatisticOptions());
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c1"); // Existing
@@ -81,7 +82,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, new StatisticOptions());
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c2"); // Existing
