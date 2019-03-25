@@ -76,6 +76,12 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.CharacterCreatedSuccessfully();
         }
 
+        /// <summary>
+        /// Gives experience points to a character determined by configuration.
+        /// </summary>
+        /// <param name="callerId">Discord ID of the caller.</param>
+        /// <param name="channelId">Channel ID of where the message orignated from.</param>
+        /// <param name="message">Message to calculate experience points from.</param>
         public async Task GiveExperienceAsync(ulong callerId, ulong channelId, string message)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
