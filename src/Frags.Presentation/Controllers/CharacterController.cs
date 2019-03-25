@@ -46,6 +46,12 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.Show(character);
         }
 
+        /// <summary>
+        /// Gets the caller's specified character by name, sets it as active, and updates it.
+        /// </summary>
+        /// <param name="callerId">Discord ID of the caller.</param>
+        /// <param name="charName">The name of the character to set as active.</param>
+        /// <returns>A new CharacterResult object.</returns>
         public async Task<IResult> ActivateCharacterAsync(ulong callerId, string charName)
         {
             var characters = await _provider.GetAllCharactersAsync(callerId);
