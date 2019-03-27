@@ -27,5 +27,10 @@ namespace Frags.Presentation.ViewModels
         /// The character's level.
         /// </summary>
         public int Level { get; set; }
+
+        /// <summary>
+        /// The character's experience points.
+        /// </summary>
+        public object Experience { get; set; }
     }
 }

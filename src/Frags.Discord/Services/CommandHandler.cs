@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -32,7 +33,10 @@ namespace Frags.Discord.Services
             await _commands.AddModulesAsync(
                 assembly: Assembly.GetEntryAssembly(), 
                 services: _services);
+
+            #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
             _client.MessageReceived += async (msg) => _ = Task.Run(() => HandleCommandAsync(msg));
+            #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
             _commands.CommandExecuted += OnCommandExecuted;
         }
 
@@ -44,17 +48,23 @@ namespace Frags.Discord.Services
 
         private async Task HandleCommandAsync(SocketMessage msg)
         {
-            var message = msg as SocketUserMessage;
-            if (message == null) return;
+            if (!(msg is SocketUserMessage message)) return;
 
             int argPos = 0;
 
-            if (!(message.HasCharPrefix('!', ref argPos) || 
+            if (!(message.HasCharPrefix('!', ref argPos) ||
                 message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
             {
                 if (!message.Author.IsBot)
-                    await _charController.GiveExperienceAsync(message.Author.Id, message.Channel.Id, message.Content);
-                    
+                {
+                    bool leveledUp = await _charController.GiveExperienceAsync(message.Author.Id, message.Channel.Id, message.Content);
+
+                    if (leveledUp)
+                    {
+                        await msg.Author.SendMessageAsync("Level up!");
+                    }
+                }
+
                 return;
             }
 

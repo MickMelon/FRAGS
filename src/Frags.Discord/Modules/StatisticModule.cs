@@ -47,6 +47,13 @@ namespace Frags.Discord.Modules
         {
             user = user ?? Context.User;
             var result = await _statController.ShowStatisticsAsync(user.Id);
+
+            if (!result.IsSuccess)
+            {
+                await ReplyAsync(result.Message);
+                return;
+            }
+
             EmbedBuilder eb = new EmbedBuilder();
             eb.WithDescription(result.Message);
             await ReplyAsync(embed: eb.Build());

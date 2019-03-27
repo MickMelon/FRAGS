@@ -28,7 +28,8 @@ namespace Frags.Presentation.Results
                     Name = character.Name,
                     Story = character.Story,
                     Description = character.Description,
-                    Level = level
+                    Level = level,
+                    Experience = character.Experience
                 });        
 
         /// <summary>

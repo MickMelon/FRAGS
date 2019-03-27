@@ -31,8 +31,15 @@ namespace Frags.Discord.Modules
                 return;
             }            
 
-            var view = (ShowCharacterViewModel) result.ViewModel;            
-            await ReplyAsync($"{view.Name} | {view.Description} | {view.Story} | {view.Level}");
+            var view = (ShowCharacterViewModel) result.ViewModel;
+            var embed = new EmbedBuilder();
+            embed.WithTitle(view.Name);
+            embed.WithDescription($"**Description:** {view.Description}\n" +
+                $"**Story:** {view.Story}\n" +
+                $"**Level:** {view.Level}\n" +
+                $"**Experience:** {view.Experience}");
+            
+            await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
         }  
 
         [Command("create")]

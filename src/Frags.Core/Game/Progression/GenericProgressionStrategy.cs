@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
@@ -25,7 +26,7 @@ namespace Frags.Core.Game.Progression
         public int GetCharacterLevel(Character character)
         {
             if (character.Experience == 0) return 1;
-            var level = Convert.ToInt32(Math.Sqrt(character.Experience + 125) / (10 * Math.Sqrt(5)));
+            int level = Convert.ToInt32(Math.Sqrt(character.Experience + 125) / (10 * Math.Sqrt(5)));
             return level;
         }
 
@@ -198,31 +199,29 @@ namespace Frags.Core.Game.Progression
             return true;
         }
 
-        public async Task<bool> AddExperience(Character character, ulong channelId, string message)
+        public Task<bool> AddExperience(Character character, ulong channelId, string message)
         {
-            var origLevel = GetCharacterLevel(character);
+            int origLevel = GetCharacterLevel(character);
 
-            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return false;
-            if (string.IsNullOrWhiteSpace(message)) return false;
+            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return Task.FromResult(false);
+            if (string.IsNullOrWhiteSpace(message)) return Task.FromResult(false);
 
-            character.Experience += 
-                message.Count(x => !Char.IsWhiteSpace(x)) / _statOptions.ExpMessageLengthDivisor;
+            character.Experience += message.Length;
 
-            var newLevel = GetCharacterLevel(character);
-            var difference = newLevel - origLevel;
+            int newLevel = GetCharacterLevel(character);
+            int difference = newLevel - origLevel;
             if (difference >= 1)
             {
                 OnLevelUp(character, difference);
-                return true;
+                return Task.FromResult(true);
             }
-                
-            await Task.CompletedTask;
-            return false;
+
+            return Task.FromResult(false);
         }
 
-        private void OnLevelUp(Character character, int levels)
+        private void OnLevelUp(Character character, int timesLeveledUp)
         {
-            for (int i = 1; i <= levels; levels++)
+            for (int levelUp = 1; levelUp <= timesLeveledUp; levelUp++)
             {
                 character.SkillPoints += _statOptions.SkillPointsOnLevelUp;
                 character.AttributePoints += _statOptions.AttributePointsOnLevelUp;

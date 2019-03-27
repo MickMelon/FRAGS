@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
@@ -95,7 +96,7 @@ namespace Frags.Presentation.Controllers
             if (character == null) return false;
 
             bool result = await _progStrategy.AddExperience(character, channelId, message);
-            await _provider.UpdateCharacterAsync(character);
+            _ = _provider.UpdateCharacterAsync(character);
             return result;
         }
     }
