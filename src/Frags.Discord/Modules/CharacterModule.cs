@@ -32,7 +32,7 @@ namespace Frags.Discord.Modules
             }            
 
             var view = (ShowCharacterViewModel) result.ViewModel;            
-            await ReplyAsync($"{view.Name} | {view.Description} | {view.Story}");
+            await ReplyAsync($"{view.Name} | {view.Description} | {view.Story} | {view.Level}");
         }  
 
         [Command("create")]

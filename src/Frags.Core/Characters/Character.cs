@@ -53,6 +53,10 @@ namespace Frags.Core.Characters
         /// </summary>
         public int Experience { get; set; }
 
+        public int AttributePoints { get; set; }
+        
+        public int SkillPoints { get; set; }
+
         /// <summary>
         /// The character's current amount of money.
         /// </summary>
@@ -98,9 +102,20 @@ namespace Frags.Core.Characters
             Statistics = new List<StatisticMapping>();
         }
 
+        /// <summary>
+        /// Retrives the specified StatisticValue from the character's Statistics if it exists.
+        /// </summary>
+        /// <param name="stat">The statistic to retrieve.</param>
+        /// <returns>A StatisticValue associated with the specified Statistic.</returns>
         public StatisticValue GetStatistic(Statistic stat) =>
             Statistics?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue;
 
+        /// <summary>
+        /// Sets the specified Statistic to the given StatisticValue if it exists.
+        /// Otherwise, add a new StatisticMapping entry to the list.
+        /// </summary>
+        /// <param name="stat">The statistic to set.</param>
+        /// <param name="newValue">The StatisticValue to associate with the Statistic.</param>
         public void SetStatistic(Statistic stat, StatisticValue newValue)
         {
             var statMap = Statistics.FirstOrDefault(x => x.Statistic.Equals(stat));

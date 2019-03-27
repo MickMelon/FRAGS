@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Frags.Core.Characters;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
+using Frags.Core.Game.Progression;
 using Frags.Core.Statistics;
 using Frags.Presentation.Results;
 
@@ -22,16 +23,16 @@ namespace Frags.Presentation.Controllers
         /// <summary>
         /// Used to calculate experience points given.
         /// </summary>
-        private readonly StatisticOptions _statOptions;
+        private readonly IProgressionStrategy _progStrategy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider, StatisticOptions statOptions)
+        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy)
         {
             _provider = provider;
-            _statOptions = statOptions;
+            _progStrategy = progStrategy;
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
-            return CharacterResult.Show(character);
+            return CharacterResult.Show(character, _progStrategy.GetCharacterLevel(character));
         }
 
         /// <summary>
@@ -88,18 +89,14 @@ namespace Frags.Presentation.Controllers
         /// <param name="callerId">Discord ID of the caller.</param>
         /// <param name="channelId">Channel ID of where the message orignated from.</param>
         /// <param name="message">Message to calculate experience points from.</param>
-        public async Task GiveExperienceAsync(ulong callerId, ulong channelId, string message)
+        public async Task<bool> GiveExperienceAsync(ulong callerId, ulong channelId, string message)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
-            if (character == null) return;
+            if (character == null) return false;
 
-            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return;
-            if (string.IsNullOrWhiteSpace(message)) return;
-
-            character.Experience += 
-                message.Count(x => !Char.IsWhiteSpace(x)) / _statOptions.ExpMessageLengthDivisor;
-
+            bool result = await _progStrategy.AddExperience(character, channelId, message);
             await _provider.UpdateCharacterAsync(character);
+            return result;
         }
     }
 }

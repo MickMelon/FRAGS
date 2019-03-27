@@ -25,7 +25,8 @@ namespace Frags.Core.Game.Progression
         public int GetCharacterLevel(Character character)
         {
             if (character.Experience == 0) return 1;
-            return Convert.ToInt32(Math.Sqrt(character.Experience + 125) / (10 * Math.Sqrt(5)));
+            var level = Convert.ToInt32(Math.Sqrt(character.Experience + 125) / (10 * Math.Sqrt(5)));
+            return level;
         }
 
         public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
@@ -36,14 +37,45 @@ namespace Frags.Core.Game.Progression
                 return await SetInitialStatistic(character, statistic, newValue.Value);
 
             // Character is above setup level and has their attributes & skills set
-            throw new NotImplementedException();
+            if (statistic is Attribute attribute)
+            {
+                if (newValue <= character.AttributePoints)
+                {
+                    var value = character.GetStatistic(attribute);
+                    value.Value += newValue.Value;
+                    character.SetStatistic(attribute, value);
+                }
+                else
+                {
+                    throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
+                }
+
+                return true;
+            }
+            else if (statistic is Skill skill)
+            {
+                if (newValue <= character.SkillPoints)
+                {
+                    var value = character.GetStatistic(skill);
+                    value.Value += newValue.Value;
+                    character.SetStatistic(skill, value);
+                }
+                else
+                {
+                    throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         private async Task<bool> SetInitialStatistic(Character character, Statistic statistic, int newValue)
         {
             int statMin, statMax, statsAtMax, points, level = GetCharacterLevel(character);
-            // This is either a dictionary of all the character's attributes or skills, never both.
-            Dictionary<Statistic, StatisticValue> stats;
+            // This is either an array of all the character's attributes or skills, never both.
+            int[] stats;
 
             // Set variables
             if (statistic is Attribute attrib)
@@ -53,7 +85,7 @@ namespace Frags.Core.Game.Progression
                 points = _statOptions.InitialAttributePoints;
                 statsAtMax = _statOptions.InitialAttributesAtMax; 
                 
-                stats = character.Statistics.Where(x => x.Statistic is Attribute).ToDictionary(x => x.Statistic, x => x.StatisticValue);
+                stats = character.Statistics.Where(x => x.Statistic is Attribute).Select(x => x.StatisticValue.Value).ToArray();
 
                 if (level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
@@ -65,7 +97,7 @@ namespace Frags.Core.Game.Progression
                 points = _statOptions.InitialSkillPoints;
                 statsAtMax = _statOptions.InitialSkillsAtMax;
                 
-                stats = character.Statistics.Where(x => x.Statistic is Skill).ToDictionary(x => x.Statistic, x => x.StatisticValue);
+                stats = character.Statistics.Where(x => x.Statistic is Skill).Select(x => x.StatisticValue.Value).ToArray();
 
                 if (level > _statOptions.InitialSetupMaxLevel && await InitialSkillsSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
@@ -74,7 +106,7 @@ namespace Frags.Core.Game.Progression
             if (newValue < statMin) throw new ProgressionException(Messages.TOO_LOW);
             if (newValue > statMax) throw new ProgressionException(Messages.TOO_HIGH);
             
-            int sum = stats.Sum(x => x.Value.Value);
+            int sum = stats.Sum(x => x);
 
             StatisticValue currentVal = character.GetStatistic(statistic);
             if (currentVal == null) currentVal = new StatisticValue(0);
@@ -90,10 +122,11 @@ namespace Frags.Core.Game.Progression
             // If we already have 2 attributes with a value of 10 and we try to set a third, disallow it.
             if (statsAtMax > 0 &&
                 newValue == statMax &&
-                    stats.Count(x => x.Value.Value == statMax) + 1 > statsAtMax)
+                    stats.Count(x => x == statMax) + 1 > statsAtMax)
                         throw new ProgressionException(String.Format(Messages.STAT_TOO_MANY_AT_MAX, statsAtMax));
 
-            character.SetStatistic(statistic, new StatisticValue(newValue));
+            currentVal.Value = newValue;
+            character.SetStatistic(statistic, currentVal);
             
             return true;
         }
@@ -163,6 +196,37 @@ namespace Frags.Core.Game.Progression
             if (sum < _statOptions.InitialSkillPoints) return false;
             
             return true;
+        }
+
+        public async Task<bool> AddExperience(Character character, ulong channelId, string message)
+        {
+            var origLevel = GetCharacterLevel(character);
+
+            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return false;
+            if (string.IsNullOrWhiteSpace(message)) return false;
+
+            character.Experience += 
+                message.Count(x => !Char.IsWhiteSpace(x)) / _statOptions.ExpMessageLengthDivisor;
+
+            var newLevel = GetCharacterLevel(character);
+            var difference = newLevel - origLevel;
+            if (difference >= 1)
+            {
+                OnLevelUp(character, difference);
+                return true;
+            }
+                
+            await Task.CompletedTask;
+            return false;
+        }
+
+        private void OnLevelUp(Character character, int levels)
+        {
+            for (int i = 1; i <= levels; levels++)
+            {
+                character.SkillPoints += _statOptions.SkillPointsOnLevelUp;
+                character.AttributePoints += _statOptions.AttributePointsOnLevelUp;
+            }
         }
     }
 }

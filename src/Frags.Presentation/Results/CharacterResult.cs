@@ -21,13 +21,14 @@ namespace Frags.Presentation.Results
         /// Returns a new <see cref="CharacterResult" />.
         /// </summary>
         /// <param name="character">The character to show.</param>
-        public static IResult Show(Character character) =>
+        public static IResult Show(Character character, int level) =>
             new CharacterResult($"{character.Name}: {character.Id}", 
                 viewModel: new ShowCharacterViewModel()
                 {
                     Name = character.Name,
                     Story = character.Story,
-                    Description = character.Description
+                    Description = character.Description,
+                    Level = level
                 });        
 
         /// <summary>

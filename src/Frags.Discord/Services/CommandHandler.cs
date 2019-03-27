@@ -32,7 +32,7 @@ namespace Frags.Discord.Services
             await _commands.AddModulesAsync(
                 assembly: Assembly.GetEntryAssembly(), 
                 services: _services);
-            _client.MessageReceived += HandleCommandAsync;
+            _client.MessageReceived += async (msg) => _ = Task.Run(() => HandleCommandAsync(msg));
             _commands.CommandExecuted += OnCommandExecuted;
         }
 
@@ -50,10 +50,11 @@ namespace Frags.Discord.Services
             int argPos = 0;
 
             if (!(message.HasCharPrefix('!', ref argPos) || 
-                message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
+                message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
             {
-                _ = _charController.GiveExperienceAsync(message.Author.Id, message.Channel.Id, message.Content);
+                if (!message.Author.IsBot)
+                    await _charController.GiveExperienceAsync(message.Author.Id, message.Channel.Id, message.Content);
+                    
                 return;
             }
 

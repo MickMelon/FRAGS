@@ -44,6 +44,10 @@ namespace Frags.Database.Characters
         /// </summary>
         public int Money { get; set; }
 
+        public int AttributePoints { get; set; }
+        
+        public int SkillPoints { get; set; }
+
         public IList<StatisticMapping> Statistics { get; set; }
     }
 }

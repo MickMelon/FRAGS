@@ -16,10 +16,12 @@
     "InitialSkillsAtMax": 13,
     "InitialSkillsProficient": 3,
 
-    "ExpMessageLengthDivisor": 5,
+    "ExpMessageLengthDivisor": 1,
     "ExpEnabledChannels": [
       462432825539297280
-    ]
+    ],
+    "SkillPointsOnLevelUp": 10,
+    "AttributePointsOnLevelUp": 10
   },
 
   "RollOptions": {

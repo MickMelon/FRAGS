@@ -22,5 +22,10 @@ namespace Frags.Presentation.ViewModels
         /// The character's story.
         /// </summary>
         public string Story { get; set; }
+
+        /// <summary>
+        /// The character's level.
+        /// </summary>
+        public int Level { get; set; }
     }
 }
