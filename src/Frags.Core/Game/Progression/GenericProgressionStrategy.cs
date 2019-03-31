@@ -40,11 +40,12 @@ namespace Frags.Core.Game.Progression
             // Character is above setup level and has their attributes & skills set
             if (statistic is Attribute attribute)
             {
-                if (newValue <= character.AttributePoints)
+                var current = character.GetStatistic(attribute);
+                if (character.AttributePoints + current.Value - newValue.Value >= 0)
                 {
-                    var value = character.GetStatistic(attribute);
-                    value.Value += newValue.Value;
-                    character.SetStatistic(attribute, value);
+                    current.Value += newValue.Value;
+                    character.AttributePoints -= newValue.Value;
+                    character.SetStatistic(attribute, current);
                 }
                 else
                 {
@@ -55,11 +56,12 @@ namespace Frags.Core.Game.Progression
             }
             else if (statistic is Skill skill)
             {
-                if (newValue <= character.SkillPoints)
+                var current = character.GetStatistic(skill);
+                if (character.SkillPoints + current.Value - newValue.Value >= 0)
                 {
-                    var value = character.GetStatistic(skill);
-                    value.Value += newValue.Value;
-                    character.SetStatistic(skill, value);
+                    current.Value += newValue.Value;
+                    character.SkillPoints -= newValue.Value;
+                    character.SetStatistic(skill, current);
                 }
                 else
                 {
