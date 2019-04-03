@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -100,7 +101,7 @@ namespace Frags.Discord
         private static IServiceCollection AddConfiguredServices(IServiceCollection services)
         {
             var configBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
                 .AddJsonFile("Config.json", optional: false, reloadOnChange: true);
                 
             var jsonConfig = configBuilder.Build();
@@ -126,7 +127,7 @@ namespace Frags.Discord
             // Case-insensitively search the types in the specified assembly
             var type = assembly.ExportedTypes
                 .Where(x => typeof(T).IsAssignableFrom(x))
-                .Single(x => x.Name.IndexOf(typeName, StringComparison.OrdinalIgnoreCase) > -1);
+                .Single(x => x.Name.ContainsIgnoreCase(typeName));
 
             return (T)provider.GetRequiredService(type);
         }
