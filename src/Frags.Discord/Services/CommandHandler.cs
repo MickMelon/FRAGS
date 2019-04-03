@@ -17,15 +17,21 @@ namespace Frags.Discord.Services
         private readonly CharacterController _charController;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
+        private readonly GeneralOptions _options;
 
         private readonly static Dictionary<ulong, IServiceScope> _serviceScopes = new Dictionary<ulong, IServiceScope>();
 
-        public CommandHandler(IServiceProvider services, CharacterController charController, CommandService commands, DiscordSocketClient client)
+        public CommandHandler(IServiceProvider services,
+            CharacterController charController,
+            CommandService commands,
+            DiscordSocketClient client,
+            GeneralOptions options)
         {
             _commands = commands;
             _charController = charController;
             _services = services;
             _client = client;
+            _options = options;
         }
 
         public async Task InitializeAsync()
@@ -52,7 +58,7 @@ namespace Frags.Discord.Services
 
             int argPos = 0;
 
-            if (!(message.HasCharPrefix('!', ref argPos) ||
+            if (!(message.HasCharPrefix(_options.CommandPrefix, ref argPos) ||
                 message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
             {
                 if (!message.Author.IsBot)

@@ -1,4 +1,8 @@
 {
+  "GeneralOptions": {
+    "CommandPrefix": "!"
+  },
+
   "StatisticOptions": {
     "ProgressionStrategy": "GenericProgressionStrategy",
 

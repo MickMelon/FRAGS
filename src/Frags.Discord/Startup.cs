@@ -107,10 +107,12 @@ namespace Frags.Discord
             var jsonConfig = configBuilder.Build();
 
             return services
-                .Configure<StatisticOptions>(jsonConfig.GetSection("StatisticOptions"))
-                .Configure<RollOptions>(jsonConfig.GetSection("RollOptions"))
-                .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
+                .Configure<GeneralOptions>(jsonConfig.GetSection(nameof(GeneralOptions)))
+                .Configure<RollOptions>(jsonConfig.GetSection(nameof(RollOptions)))
+                .Configure<StatisticOptions>(jsonConfig.GetSection(nameof(StatisticOptions)))
+                .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<GeneralOptions>>().Value)
                 .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value)
+                .AddTransient(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
                 .AddTransient<FragsRollStrategy>()
                 .AddTransient<MockRollStrategy>()
                 .AddTransient<GenericProgressionStrategy>()
