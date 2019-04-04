@@ -19,7 +19,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null);
+            var controller = new CharacterController(provider, new MockProgressionStrategy());
             var dbChar = await provider.GetActiveCharacterAsync(1);
 
             // Act
