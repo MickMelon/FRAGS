@@ -4,7 +4,7 @@ using Discord;
 using Discord.Commands;
 using Frags.Discord.Modules.Preconditions;
 using Frags.Presentation.Controllers;
-using Frags.Presentation.ViewModels;
+using Frags.Presentation.ViewModels.Statistics;
 
 namespace Frags.Discord.Modules
 {
