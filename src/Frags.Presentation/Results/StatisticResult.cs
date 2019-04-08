@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Frags.Core.Common;
 using Frags.Core.Statistics;
-using Frags.Presentation.ViewModels;
+using Frags.Presentation.ViewModels.Statistics;
 using Attribute = Frags.Core.Statistics.Attribute;
 
 namespace Frags.Presentation.Results

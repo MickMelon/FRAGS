@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Frags.Presentation.ViewModels
+namespace Frags.Presentation.ViewModels.Statistics
 {
     [ViewModel]
     public class ShowStatisticListViewModel

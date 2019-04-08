@@ -1,6 +1,6 @@
 using Frags.Core.Characters;
 using Frags.Presentation.Attributes;
-using Frags.Presentation.ViewModels;
+using Frags.Presentation.ViewModels.Characters;
 using Xunit;
 
 namespace Frags.Test.Presentation.Attributes

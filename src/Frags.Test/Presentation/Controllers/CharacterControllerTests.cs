@@ -6,7 +6,7 @@ using Frags.Core.Game.Progression;
 using Frags.Core.Statistics;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
-using Frags.Presentation.ViewModels;
+using Frags.Presentation.ViewModels.Characters;
 using Xunit;
 
 namespace Frags.Test.Presentation.Controllers

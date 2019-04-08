@@ -1,6 +1,6 @@
 using Frags.Presentation.Attributes;
 
-namespace Frags.Presentation.ViewModels
+namespace Frags.Presentation.ViewModels.Statistics
 {
     /// <summary>
     /// The ViewModel used for showing a statistic.

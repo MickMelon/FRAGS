@@ -6,7 +6,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Frags.Core.Statistics;
 using Frags.Presentation.Controllers;
-using Frags.Presentation.ViewModels;
+using Frags.Presentation.ViewModels.Characters;
 
 namespace Frags.Discord.Modules
 {
