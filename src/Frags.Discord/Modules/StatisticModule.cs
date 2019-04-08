@@ -1,8 +1,10 @@
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Frags.Discord.Modules.Preconditions;
 using Frags.Presentation.Controllers;
+using Frags.Presentation.ViewModels;
 
 namespace Frags.Discord.Modules
 {
@@ -54,8 +56,30 @@ namespace Frags.Discord.Modules
                 return;
             }
 
+            StringBuilder output = new StringBuilder();
+            var viewModel = (ShowStatisticListViewModel)result.ViewModel;
+            
+            foreach (var attrib in viewModel.Statistics.Keys)
+            {
+                // "Strength: 5" or "Strength: N/A"
+                output.Append($"__**{attrib.Name}: {attrib.Value?.ToString() ?? "N/A"}**__\n");
+
+                // Loop through associated skills with attribute
+                foreach (var skill in viewModel.Statistics[attrib])
+                {
+                    // "Powerlifting: 50" or "Powerlifting: N/A"
+                    output.Append($"**{skill.Name}:** {skill.Value?.ToString() ?? "N/A"}");
+
+                    if (skill.IsProficient.HasValue && skill.IsProficient.Value)
+                        output.Append("*");
+
+                    output.Append("\n");
+                }
+                output.Append("\n");
+            }
+
             EmbedBuilder eb = new EmbedBuilder();
-            eb.WithDescription(result.Message);
+            eb.WithDescription(output.ToString());
             await ReplyAsync(embed: eb.Build());
         }
     }

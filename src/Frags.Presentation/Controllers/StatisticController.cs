@@ -84,21 +84,7 @@ namespace Frags.Presentation.Controllers
             if (character.Statistics == null || character.Statistics.Count <= 0)
                 return StatisticResult.StatisticNotFound();
 
-            StringBuilder output = new StringBuilder("**Name:** " + character.Name + "\n");
-
-            foreach (var attribute in (await _statProvider.GetAllStatisticsAsync()).OfType<Attribute>())
-            {
-                // "Strength: 5" or "Strength: N/A"
-                output.Append($"__**{attribute.Name}: {character.GetStatistic(attribute)?.Value.ToString() ?? "N/A"}**__\n");
-                // Loop through associated skills with attribute
-                foreach (var skill in character.Statistics.Where(x => x.Statistic is Skill sk && sk.Attribute.Equals(attribute)).OrderBy(x => x.Statistic.Name))
-                {
-                    output.Append($"{StatisticResult.Show(skill).Message}\n");
-                }
-                output.Append("\n");
-            }
-
-            return GenericResult.Generic(output.ToString());
+            return StatisticResult.ShowList(character.Statistics);
         }
 
         /// <summary>

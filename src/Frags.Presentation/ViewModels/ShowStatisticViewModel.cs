@@ -6,8 +6,20 @@ namespace Frags.Presentation.ViewModels
     /// The ViewModel used for showing a statistic.
     /// </summary>
     [ViewModel]
-    public class ShowStatisticViewModel
+    public abstract class ShowStatisticViewModel
     {
+        public ShowStatisticViewModel(string name, string desc, string[] aliases, int? value, bool? isProf, double? prof)
+        {
+            Name = name;
+            Description = desc;
+            Aliases = aliases;
+            Value = value;
+            IsProficient = isProf;
+            Proficiency = prof;
+        }
+
+        public ShowStatisticViewModel() { }
+
         /// <summary>
         /// The statistic's name.
         /// </summary>
@@ -19,18 +31,23 @@ namespace Frags.Presentation.ViewModels
         public string Description { get; set; }
 
         /// <summary>
+        /// The statistic's aliases.
+        /// </summary>
+        public string[] Aliases { get; set; }
+
+        /// <summary>
         /// The statistic's current value.
         /// </summary>
-        public int Value { get; set; }
+        public int? Value { get; set; }
 
         /// <summary>
         /// The statistic's proficient status.
         /// </summary>
-        public bool IsProficient { get; set; }
+        public bool? IsProficient { get; set; }
 
         /// <summary>
         /// The statistic's proficiency bonus.
         /// </summary>
-        public double Proficiency { get; set; }
+        public double? Proficiency { get; set; }
     }
 }

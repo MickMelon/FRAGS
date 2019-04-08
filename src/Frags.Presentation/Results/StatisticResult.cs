@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Frags.Core.Common;
 using Frags.Core.Statistics;
 using Frags.Presentation.ViewModels;
+using Attribute = Frags.Core.Statistics.Attribute;
 
 namespace Frags.Presentation.Results
 {
@@ -36,21 +38,45 @@ namespace Frags.Presentation.Results
 
         public static IResult Show(StatisticMapping statMap)
         {
-            var stat = new ShowStatisticViewModel()
+            ShowStatisticViewModel stat = null;
+            if (statMap.Statistic is Attribute attrib)
             {
-                Name = statMap.Statistic.Name,
-                Description = statMap.Statistic.Description,
-                Value = statMap.StatisticValue.Value,
-                IsProficient = statMap.StatisticValue.IsProficient,
-                Proficiency = statMap.StatisticValue.Proficiency
-            };
+                stat = new ShowAttributeViewModel(attrib.Name, attrib.Description, attrib.AliasesArray, statMap?.StatisticValue.Value,
+                    statMap?.StatisticValue.IsProficient, statMap?.StatisticValue.Proficiency);
+            }
+            else if (statMap.Statistic is Skill s)
+            {
+                var attribViewModel = new ShowAttributeViewModel(s.Attribute.Name, s.Attribute.Description, s.Attribute.AliasesArray, null, null, null);
 
-            var message = $"**{stat.Name}:** {stat.Value}";
-            if (stat.IsProficient)
+                stat = new ShowSkillViewModel(s.Name, s.Description, s.AliasesArray, statMap?.StatisticValue.Value,
+                    statMap?.StatisticValue.IsProficient, statMap?.StatisticValue.Proficiency, s.MinimumValue, attribViewModel);
+            }
+
+            var message = $"**{stat.Name}:** {stat.Value?.ToString() ?? "N/A"}";
+            if (stat.IsProficient.HasValue && stat.IsProficient.Value)
                 message += "*";
 
             return new StatisticResult(message,
                 viewModel: stat);
+        }
+
+        public static IResult ShowList(IEnumerable<StatisticMapping> statMaps)
+        {
+            var result = new ShowStatisticListViewModel();
+
+            // Get a list of view models from the enumerable
+            var stats = new List<ShowStatisticViewModel>();
+            foreach (var statMap in statMaps)
+                stats.Add((ShowStatisticViewModel)Show(statMap).ViewModel);
+
+            foreach (var attribute in stats.OfType<ShowAttributeViewModel>())
+            {
+                var skills = stats.OfType<ShowSkillViewModel>().Where(x => x.Attribute.Name.Equals(attribute.Name)).ToList();
+                result.Statistics.Add(attribute, skills);
+            }
+
+            return new StatisticResult($"{statMaps.Count()} Statistics found",
+                viewModel: result);
         }
     }
 }
