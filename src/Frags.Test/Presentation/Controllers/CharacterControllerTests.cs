@@ -91,7 +91,101 @@ namespace Frags.Test.Presentation.Controllers
             // Assert
             Assert.Equal(CharacterResult.CharacterCreatedSuccessfully(), result);
         }
+        #endregion
 
+        #region SetStory & SetDescription Tests
+        [Fact]
+        public async Task SetDescription_ValidInput_ReturnSuccess()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy());
+
+            // Act
+            var result = await controller.SetCharacterDescriptionAsync(1, "description"); // Existing
+            var character = await controller.ShowCharacterAsync(1);
+
+            // Assert
+            Assert.True(CharacterResult.CharacterUpdatedSuccessfully().Equals(result) &&
+                ((ShowCharacterViewModel)character.ViewModel).Description.Equals("description"));
+        }
+
+        [Fact]
+        public async Task SetDescription_InvalidCharacter_ReturnCharacterNotFound()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy());
+
+            // Act
+            var result = await controller.SetCharacterDescriptionAsync(1000, "description");
+
+            // Assert
+            Assert.True(CharacterResult.CharacterNotFound().Equals(result));
+        }
+
+        [Fact]
+        public async Task SetDescription_NullInput_ReturnInvalidInput()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy());
+
+            // Act
+            var result = await controller.SetCharacterDescriptionAsync(1, null); // Existing
+            var character = await controller.ShowCharacterAsync(1);
+
+            // Assert
+            Assert.True(GenericResult.InvalidInput().Equals(result));
+        }
+
+        [Fact]
+        public async Task SetStory_ValidInput_ReturnSuccess()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy());
+
+            // Act
+            var result = await controller.SetCharacterStoryAsync(1, "story"); // Existing
+            var character = await controller.ShowCharacterAsync(1);
+
+            // Assert
+            Assert.True(CharacterResult.CharacterUpdatedSuccessfully().Equals(result) &&
+                ((ShowCharacterViewModel)character.ViewModel).Story.Equals("story"));
+        }
+
+        [Fact]
+        public async Task SetStory_InvalidCharacter_ReturnCharacterNotFound()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy());
+
+            // Act
+            var result = await controller.SetCharacterStoryAsync(1000, "description");
+
+            // Assert
+            Assert.True(CharacterResult.CharacterNotFound().Equals(result));
+        }
+
+        [Fact]
+        public async Task SetStory_NullInput_ReturnInvalidInput()
+        {
+            // Arrange
+            var provider = new MockCharacterProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy());
+
+            // Act
+            var result = await controller.SetCharacterStoryAsync(1, null); // Existing
+            var character = await controller.ShowCharacterAsync(1);
+
+            // Assert
+            Assert.True(GenericResult.InvalidInput().Equals(result));
+        }
+        #endregion
+
+        #region GiveExperienceAsync Tests
         [Fact]
         public async Task GiveExperienceAsync_ValidInput_ExperienceEqualsFive()
         {

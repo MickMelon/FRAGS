@@ -50,6 +50,23 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("description")]
+        [Alias("desc")]
+        public async Task SetCharacterDescriptionAsync(string desc)
+        {
+            ulong discordId = Context.User.Id;
+            var result = await _controller.SetCharacterDescriptionAsync(discordId, desc);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("story")]
+        public async Task SetCharacterStoryAsync(string story)
+        {
+            ulong discordId = Context.User.Id;
+            var result = await _controller.SetCharacterStoryAsync(discordId, story);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("activate")]
         [Alias("act")]
         public async Task ActivateCharacterAsync(string name)

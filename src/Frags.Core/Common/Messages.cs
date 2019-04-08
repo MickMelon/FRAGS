@@ -6,6 +6,7 @@ namespace Frags.Core.Common
         public static readonly string CHAR_NOT_FOUND = "Character not found.";
         public static readonly string CHAR_NAME_EXISTS = "You already have a character with that name.";
         public static readonly string CHAR_CREATE_SUCCESS = "Character created successfully.";
+        public static readonly string CHAR_UPDATE_SUCCESS = "Character updated successfully.";
         public static readonly string CHAR_ACTIVE = "Character activated successfully.";
         public static readonly string CHAR_ALREADY_ACTIVE = "Character is already active.";
         public static readonly string CHAR_LEVEL_TOO_LOW = "Character level too low.";

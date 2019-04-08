@@ -85,6 +85,42 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
+        /// Gets the caller's specified character by name, sets its description, and updates it.
+        /// </summary>
+        /// <param name="callerId">Discord ID of the caller.</param>
+        /// <param name="desc">The new description of the character.</param>
+        /// <returns>A new CharacterResult object.</returns>
+        public async Task<IResult> SetCharacterDescriptionAsync(ulong callerId, string desc)
+        {
+            if (string.IsNullOrEmpty(desc)) return GenericResult.InvalidInput();
+
+            var character = await _provider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+            character.Description = desc;
+
+            await _provider.UpdateCharacterAsync(character);
+            return CharacterResult.CharacterUpdatedSuccessfully();
+        }
+
+        /// <summary>
+        /// Gets the caller's specified character by name, sets its story, and updates it.
+        /// </summary>
+        /// <param name="callerId">Discord ID of the caller.</param>
+        /// <param name="story">The new story of the character.</param>
+        /// <returns>A new CharacterResult object.</returns>
+        public async Task<IResult> SetCharacterStoryAsync(ulong callerId, string story)
+        {
+            if (string.IsNullOrEmpty(story)) return GenericResult.InvalidInput();
+
+            var character = await _provider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+            character.Story = story;
+
+            await _provider.UpdateCharacterAsync(character);
+            return CharacterResult.CharacterUpdatedSuccessfully();
+        }
+
+        /// <summary>
         /// Gives experience points to a character determined by configuration.
         /// </summary>
         /// <param name="callerId">Discord ID of the caller.</param>

@@ -1,3 +1,4 @@
+using System;
 using Frags.Core.Characters;
 using Frags.Core.Common;
 using Frags.Presentation.ViewModels.Characters;
@@ -78,5 +79,11 @@ namespace Frags.Presentation.Results
         /// </summary>
         public static CharacterResult LevelTooHigh() =>
             new CharacterResult(Messages.CHAR_LEVEL_TOO_HIGH, false);
+
+        /// <summary>
+        /// Returns a new <see cref="CharacterResult" />.
+        /// </summary>
+        public static CharacterResult CharacterUpdatedSuccessfully() =>
+            new CharacterResult(Messages.CHAR_UPDATE_SUCCESS, true);
     }
 }
