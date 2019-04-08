@@ -30,7 +30,10 @@ namespace Frags.Presentation.Controllers
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy)
+        /// <param name="progStrategy">
+        /// The optional IProgressionStrategy to use. If null, ShowCharacterAsync will return -1 as the level.
+        /// </param>
+        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy = null)
         {
             _provider = provider;
             _progStrategy = progStrategy;
@@ -40,12 +43,17 @@ namespace Frags.Presentation.Controllers
         /// Gets the caller's active character and returns the result.
         /// </summary> 
         /// <param name="callerId">Discord ID of the caller.</param>
-        /// <returns>A new CharacterResult object.</returns>
+        /// <returns>A new CharacterResult object. Character level will be -1 if an instance of IProgressionStrategy is not provided.</returns>
         public async Task<IResult> ShowCharacterAsync(ulong callerId)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
-            return CharacterResult.Show(character, _progStrategy.GetCharacterLevel(character));
+
+            int charLevel = -1;
+            if (_progStrategy != null)
+                charLevel = _progStrategy.GetCharacterLevel(character);
+
+            return CharacterResult.Show(character, charLevel);
         }
 
         /// <summary>
