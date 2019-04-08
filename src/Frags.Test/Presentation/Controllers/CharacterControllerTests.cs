@@ -39,7 +39,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, null);
 
             // Act
             var result = await controller.ShowCharacterAsync(0);
@@ -55,7 +55,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, null);
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c");
@@ -69,7 +69,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, null);
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c1"); // Existing
@@ -83,7 +83,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider);
+            var controller = new CharacterController(provider, null);
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c2"); // Existing
