@@ -44,6 +44,12 @@ namespace Frags.Database.DataAccess
             return skill;
         }
 
+        public async Task DeleteStatisticAsync(Statistic statistic)
+        {
+            _context.Remove(statistic);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync()
         {
             return await _context.Statistics.ToListAsync();

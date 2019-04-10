@@ -12,6 +12,7 @@ using Frags.Presentation.ViewModels;
 
 namespace Frags.Presentation.Controllers
 {
+    // TODO: separate IProgressionStrategy bits out into CharacterController?
     public class StatisticController
     {
         /// <summary>
@@ -69,6 +70,22 @@ namespace Frags.Presentation.Controllers
             var result = await _statProvider.CreateSkillAsync(statName, attribName);
             if (result == null) return StatisticResult.StatisticCreationFailed();
             return StatisticResult.StatisticCreatedSuccessfully();
+        }
+
+        /// <summary>
+        /// Deletes a statistic in the database.
+        /// </summary>
+        /// <param name="statName">The name for the new skill.</param>
+        /// A result detailing if the operation was successful or why it failed.
+        /// </returns>
+        public async Task<IResult> DeleteStatisticAsync(string statName)
+        {
+            var statistic = await _statProvider.GetStatisticAsync(statName);
+            if (statistic == null)
+                return StatisticResult.StatisticNotFound();
+
+            await _statProvider.DeleteStatisticAsync(statistic);
+            return StatisticResult.StatisticDeletedSuccessfully();
         }
 
         /// <summary>

@@ -28,6 +28,13 @@ namespace Frags.Core.DataAccess
         Task<Skill> CreateSkillAsync(string name, string attribName);
 
         /// <summary>
+        /// Deletes a statistic from the database. 
+        /// This method should also remove any and all StatisticMapping's that reference it.
+        /// </summary>
+        /// <param name="statistic">The statistic to delete.</param>
+        Task DeleteStatisticAsync(Statistic statistic);
+
+        /// <summary>
         /// Gets the statistic with the matching name.
         /// </summary>
         /// <param name="name">Statistics's name.</param>

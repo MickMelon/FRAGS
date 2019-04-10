@@ -24,6 +24,7 @@ namespace Frags.Core.Common
         #region Statistics
         public static readonly string STAT_CREATE_SUCCESS = "Statistic created successfully.";
         public static readonly string STAT_CREATE_FAILURE = "Statistic creation failed.";
+        public static readonly string STAT_DELETE_SUCCESS = "Statistic deleted successfully.";
         public static readonly string STAT_NAME_EXISTS = "Statistic with that name already exists.";
         public static readonly string STAT_NOT_FOUND = "Statistic not found.";
         public static readonly string STAT_SET_SUCCESS = "Statistic set sucessfully.";

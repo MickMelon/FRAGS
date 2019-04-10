@@ -29,7 +29,10 @@ namespace Frags.Database
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Ignore<IDictionary<Statistic, StatisticValue>>();
+            builder.Entity<StatisticMapping>()
+                .HasOne(x => x.Statistic)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Frags.Test.Presentation.Controllers
             this.output = output;
         }
 
+        #region CreateAttribute & CreateStatistic Tests
         [Fact]
         public async Task CreateAttributeAsync_ValidInput_ReturnSuccess()
         {
@@ -81,8 +82,9 @@ namespace Frags.Test.Presentation.Controllers
 
             Assert.Equal(StatisticResult.StatisticCreationFailed(), result);
         }
+        #endregion
 
-        #region 
+        #region SetStatistic & SetProficiency Tests
         [Fact]
         public async Task SetStatisticAsync_ValidInput_ReturnSuccess()
         {
@@ -397,6 +399,54 @@ namespace Frags.Test.Presentation.Controllers
 
             // Assert
             Assert.Equal(StatisticResult.StatisticNotFound(), result);
+        }
+        #endregion
+
+        #region DeleteStatistic Tests
+        
+        [Fact]
+        public async Task DeleteStatistic_ValidInput_ReturnSuccess()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()));
+
+            // Act
+            var result = await controller.DeleteStatisticAsync("strength");
+
+            // Assert
+            Assert.Equal(result, StatisticResult.StatisticDeletedSuccessfully());
+        }
+
+        [Fact]
+        public async Task DeleteStatistic_InvalidStatName_ReturnNotFound()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()));
+
+            // Act
+            var result = await controller.DeleteStatisticAsync("bacon");
+
+            // Assert
+            Assert.Equal(result, StatisticResult.StatisticNotFound());
+        }
+
+        [Fact]
+        public async Task DeleteStatistic_NullStatName_ReturnNotFound()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()));
+
+            // Act
+            var result = await controller.DeleteStatisticAsync(null);
+
+            // Assert
+            Assert.Equal(result, StatisticResult.StatisticNotFound());
         }
         #endregion
     }

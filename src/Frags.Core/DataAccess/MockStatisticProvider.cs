@@ -60,6 +60,12 @@ namespace Frags.Core.DataAccess
             return await Task.FromResult(stat);
         }
 
+        public Task DeleteStatisticAsync(Statistic statistic)
+        {
+            _statistics.Remove(statistic);
+            return Task.CompletedTask;
+        }
+
         public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync()
         {
             return await Task.FromResult(_statistics);

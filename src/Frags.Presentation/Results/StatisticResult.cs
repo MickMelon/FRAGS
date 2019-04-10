@@ -24,6 +24,9 @@ namespace Frags.Presentation.Results
         public static StatisticResult StatisticCreatedSuccessfully() =>
             new StatisticResult(Messages.STAT_CREATE_SUCCESS, true);
 
+        public static StatisticResult StatisticDeletedSuccessfully() =>
+            new StatisticResult(Messages.STAT_DELETE_SUCCESS, true);
+
         public static StatisticResult StatisticCreationFailed() =>
             new StatisticResult(Messages.STAT_CREATE_FAILURE, false);
 
