@@ -10,14 +10,13 @@ namespace Frags.Discord.Modules
 {
     [Group("statistic")]
     [Alias("stat", "stats")]
+    [RequireRole("FragsAdmin")]
     public class StatisticModule : ModuleBase
     {
-        private readonly CharacterController _charController;
         private readonly StatisticController _statController;
 
-        public StatisticModule(CharacterController charController, StatisticController statController)
+        public StatisticModule(StatisticController statController)
         {
-            _charController = charController;
             _statController = statController;
         }
 
@@ -36,6 +35,23 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("delete")]
+        public async Task SetStatisticAsync(string statName)
+        {
+            var result = await _statController.DeleteStatisticAsync(statName);
+            await ReplyAsync(result.Message);
+        }
+    }
+
+    public class StatisticCharacterModule : ModuleBase
+    {
+        private readonly StatisticController _statController;
+
+        public StatisticCharacterModule(StatisticController statController)
+        {
+            _statController = statController;
+        }
+
         [Command("set")]
         public async Task SetStatisticAsync(string statName, int? newValue = null)
         {
@@ -43,8 +59,8 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
-        [Command("view")]
-        [Alias("show")]
+        [Command("show statistics")]
+        [Alias("show stat", "show stats")]
         public async Task ViewStatisticsAsync(IUser user = null)
         {
             user = user ?? Context.User;

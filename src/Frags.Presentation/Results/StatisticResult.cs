@@ -42,6 +42,7 @@ namespace Frags.Presentation.Results
         public static IResult Show(StatisticMapping statMap)
         {
             ShowStatisticViewModel stat = null;
+
             if (statMap.Statistic is Attribute attrib)
             {
                 stat = new ShowAttributeViewModel(attrib.Name, attrib.Description, attrib.AliasesArray, statMap?.StatisticValue.Value,
@@ -53,6 +54,10 @@ namespace Frags.Presentation.Results
 
                 stat = new ShowSkillViewModel(s.Name, s.Description, s.AliasesArray, statMap?.StatisticValue.Value,
                     statMap?.StatisticValue.IsProficient, statMap?.StatisticValue.Proficiency, s.MinimumValue, attribViewModel);
+            }
+            else
+            {
+                return StatisticResult.StatisticNotFound();
             }
 
             var message = $"**{stat.Name}:** {stat.Value?.ToString() ?? "N/A"}";
@@ -70,7 +75,12 @@ namespace Frags.Presentation.Results
             // Get a list of view models from the enumerable
             var stats = new List<ShowStatisticViewModel>();
             foreach (var statMap in statMaps)
-                stats.Add((ShowStatisticViewModel)Show(statMap).ViewModel);
+            {
+                var viewModel = (ShowStatisticViewModel)Show(statMap).ViewModel;
+
+                if (viewModel != null)
+                    stats.Add(viewModel);
+            }
 
             foreach (var attribute in stats.OfType<ShowAttributeViewModel>())
             {
