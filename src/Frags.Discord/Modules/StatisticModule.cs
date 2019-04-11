@@ -20,6 +20,12 @@ namespace Frags.Discord.Modules
             _statController = statController;
         }
 
+        [Command("seed")]
+        public async Task SeedDatabaseAsync()
+        {
+            await Services.SeedService.Seed(_statController);
+        }
+
         [Command("create attribute")]
         [Alias("create attrib")]
         public async Task CreateAttributeAsync(string statName)
@@ -78,6 +84,14 @@ namespace Frags.Discord.Modules
         public async Task SetStatisticAsync(string statName, int? newValue = null)
         {
             var result = await _statController.SetStatisticAsync(Context.User.Id, statName, newValue);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("proficiency")]
+        [Alias("proficient", "prof")]
+        public async Task SetProficiencyAsync(string statName, bool prof = true)
+        {
+            var result = await _statController.SetProficiencyAsync(Context.User.Id, statName, prof);
             await ReplyAsync(result.Message);
         }
 
