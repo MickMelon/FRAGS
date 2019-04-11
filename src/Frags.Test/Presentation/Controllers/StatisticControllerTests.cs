@@ -433,21 +433,6 @@ namespace Frags.Test.Presentation.Controllers
             // Assert
             Assert.Equal(result, StatisticResult.StatisticNotFound());
         }
-
-        [Fact]
-        public async Task DeleteStatistic_NullStatName_ReturnNotFound()
-        {
-            // Arrange
-            var charProvider = new MockCharacterProvider();
-            var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()));
-
-            // Act
-            var result = await controller.DeleteStatisticAsync(null);
-
-            // Assert
-            Assert.Equal(result, StatisticResult.StatisticNotFound());
-        }
         #endregion
     }
 }

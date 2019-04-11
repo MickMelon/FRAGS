@@ -35,6 +35,28 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("alias")]
+        public async Task AddAliasAsync(string statName, string alias)
+        {
+            var result = await _statController.AddAliasAsync(statName, alias);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("alias clear")]
+        [Alias("clearalias", "clearaliases")]
+        public async Task ClearAliasesAsync(string statName)
+        {
+            var result = await _statController.ClearAliasesAsync(statName);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("rename")]
+        public async Task RenameStatisticAsync(string statName, string newName)
+        {
+            var result = await _statController.RenameStatisticAsync(statName, newName);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("delete")]
         public async Task SetStatisticAsync(string statName)
         {

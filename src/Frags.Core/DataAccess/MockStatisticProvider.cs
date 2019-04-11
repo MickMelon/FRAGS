@@ -73,7 +73,7 @@ namespace Frags.Core.DataAccess
 
         public async Task<Statistic> GetStatisticAsync(string name)
         {
-            return await Task.FromResult(_statistics.FirstOrDefault(x => x.Name.EqualsIgnoreCase(name)));
+            return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
         }
 
         public async Task UpdateStatisticAsync(Statistic statistic)

@@ -73,6 +73,64 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
+        /// Renames an already existing statistic.
+        /// </summary>
+        /// <param name="statName">The name of the statistic to rename.</param>
+        /// <param name="newName">The new name of the statistic.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        /// <remarks>This method will also clear its aliases.</remarks>
+        public async Task<IResult> RenameStatisticAsync(string statName, string newName)
+        {
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            if (await _statProvider.GetStatisticAsync(newName) != null)
+                return StatisticResult.NameAlreadyExists();
+
+            stat.Name = newName;
+            stat.Aliases = newName + "/";
+            await _statProvider.UpdateStatisticAsync(stat);
+
+            return StatisticResult.StatisticUpdatedSucessfully();
+        }
+
+        /// <summary>
+        /// Adds an alias to an already existing statistic.
+        /// </summary>
+        /// <param name="statName">The name of the statistic to add an alias to.</param>
+        /// <param name="alias">The new alias to add.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        public async Task<IResult> AddAliasAsync(string statName, string alias)
+        {
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            if (await _statProvider.GetStatisticAsync(alias) != null)
+                return StatisticResult.NameAlreadyExists();
+
+            stat.Aliases += alias + "/";
+            await _statProvider.UpdateStatisticAsync(stat);
+
+            return StatisticResult.StatisticUpdatedSucessfully();
+        }
+
+        /// <summary>
+        /// Clears the aliases of an already existing statistic.
+        /// </summary>
+        /// <param name="statName">The name of the statistic to add an alias to.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        public async Task<IResult> ClearAliasesAsync(string statName)
+        {
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            stat.Aliases = stat.Name + "/";
+            await _statProvider.UpdateStatisticAsync(stat);
+            
+            return StatisticResult.StatisticUpdatedSucessfully();
+        }
+
+        /// <summary>
         /// Deletes a statistic in the database.
         /// </summary>
         /// <param name="statName">The name for the new skill.</param>

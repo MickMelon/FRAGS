@@ -35,9 +35,9 @@ namespace Frags.Core.DataAccess
         Task DeleteStatisticAsync(Statistic statistic);
 
         /// <summary>
-        /// Gets the statistic with the matching name.
+        /// Gets the statistic with the matching name or one of its aliases.
         /// </summary>
-        /// <param name="name">Statistics's name.</param>
+        /// <param name="name">Statistics's name or alias.</param>
         /// <returns>The matching statistic or null if none.</returns>
         Task<Statistic> GetStatisticAsync(string name);
 

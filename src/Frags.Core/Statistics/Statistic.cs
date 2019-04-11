@@ -39,6 +39,7 @@ namespace Frags.Core.Statistics
         protected Statistic(string name, string description = "")
         {
             Name = name;
+            Aliases = name + "/";
             Description = description;
         }
 
