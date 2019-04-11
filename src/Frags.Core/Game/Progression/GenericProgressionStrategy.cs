@@ -30,8 +30,19 @@ namespace Frags.Core.Game.Progression
             return level;
         }
 
+        private async Task InitializeStatistics(Character character)
+        {
+            foreach (var stat in await _statProvider.GetAllStatisticsAsync())
+            {
+                if (character.GetStatistic(stat) == null)
+                    character.SetStatistic(stat, new StatisticValue(0));
+            }
+        }
+
         public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
         {
+            await InitializeStatistics(character);
+
             var level = GetCharacterLevel(character);
             if (!newValue.HasValue) throw new ProgressionException(Messages.INVALID_INPUT);
             if (level <= _statOptions.InitialSetupMaxLevel || !await InitialAttributesSet(character) || !await InitialSkillsSet(character))
@@ -60,6 +71,8 @@ namespace Frags.Core.Game.Progression
                 if (character.SkillPoints + current.Value - newValue.Value >= 0)
                 {
                     current.Value += newValue.Value;
+                    if (current.IsProficient) current.Value += newValue.Value;
+                    
                     character.SkillPoints -= newValue.Value;
                     character.SetStatistic(skill, current);
                 }
@@ -156,14 +169,8 @@ namespace Frags.Core.Game.Progression
                     throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
             }
 
-            var statValue = character.GetStatistic(statistic);
-            if (statValue != null)
-            {
-                statValue.IsProficient = proficient;
-                return Task.FromResult(true);
-            }
-
-            throw new ProgressionException(Messages.STAT_NOT_FOUND);
+            character.GetStatistic(statistic).IsProficient = proficient;
+            return Task.FromResult(true);
         }
 
         public Task<bool> ResetCharacter(Character character)
@@ -180,6 +187,8 @@ namespace Frags.Core.Game.Progression
 
             // Character attributes don't match up with database attributes
             if (attribs.Count != (await _statProvider.GetAllStatisticsAsync()).OfType<Attribute>().Count()) return false;
+            // Not all attributes are above or equal their minimum vaulue
+            if (attribs.Any(x => x.Value.Value < _statOptions.InitialAttributeMin)) return false;
             // Character has not set their initial attribute values
             if (sum < _statOptions.InitialAttributePoints) return false;
             
@@ -195,6 +204,8 @@ namespace Frags.Core.Game.Progression
 
             // Character attributes don't match up with database attributes
             if (skills.Count != (await _statProvider.GetAllStatisticsAsync()).OfType<Skill>().Count()) return false;
+            // Not all attributes are above or equal their minimum vaulue
+            if (skills.Any(x => x.Value.Value < _statOptions.InitialSkillMin)) return false;
             // Character has not set their initial attribute values
             if (sum < _statOptions.InitialSkillPoints) return false;
             
