@@ -17,7 +17,7 @@ namespace Frags.Test.Database.DataAccess
     {
         #region Statistic Creation Tests
         [Fact]
-        public async Task EntityFramework_CreateStatistic_EntityMatchesInput()
+        public async Task CreateStatistic_ValidInput_EntityMatchesInput()
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("CreateStatistic_EntityMatchesInput").Options);
             var provider = new EfStatisticProvider(context);
@@ -29,7 +29,7 @@ namespace Frags.Test.Database.DataAccess
         }
 
         [Fact]
-        public async Task EntityFramework_GetAllStatistics_EntityMatchesInput()
+        public async Task GetAllStatistics_ValidInput_EntityMatchesInput()
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("GetAllStatistics_EntityMatchesInput").Options);
             var statProvider = new EfStatisticProvider(context);
@@ -43,7 +43,7 @@ namespace Frags.Test.Database.DataAccess
         }
 
         [Fact]
-        public async Task EntityFramework_UpdateStatistic_EntityMatchesInput()
+        public async Task UpdateStatistic_ValidInput_EntityMatchesInput()
         {
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("UpdateStatistic_EntityMatchesInput").Options);
             var provider = new EfStatisticProvider(context);
