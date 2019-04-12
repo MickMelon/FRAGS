@@ -7,6 +7,8 @@ namespace Frags.Core.Effects
 {
     public class Effect
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
 
