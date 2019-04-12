@@ -182,11 +182,19 @@ namespace Frags.Core.Game.Progression
 
         public Task<bool> ResetCharacter(Character character)
         {
-            foreach (var stat in character.Statistics)
-                stat.StatisticValue = new StatisticValue(0);
-
             var level = GetCharacterLevel(character);
             if (level <= 1) return Task.FromResult(false);
+
+            foreach (var stat in character.Statistics)
+            {
+                if (stat.Statistic is Attribute)
+                    stat.StatisticValue = new StatisticValue(_statOptions.InitialAttributeMin);
+                if (stat.Statistic is Skill)
+                    stat.StatisticValue = new StatisticValue(_statOptions.InitialSkillMin);
+            }
+
+            character.AttributePoints += _statOptions.InitialAttributePoints;
+            character.SkillPoints += _statOptions.InitialSkillPoints;
 
             OnLevelUp(character, level - 1);
 
