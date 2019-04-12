@@ -1,6 +1,8 @@
 using System;
 using Frags.Core.Characters;
 using Frags.Core.Common;
+using Frags.Core.Effects;
+using Frags.Presentation.ViewModels.Effects;
 
 namespace Frags.Presentation.Results
 {
@@ -25,6 +27,9 @@ namespace Frags.Presentation.Results
         public static EffectResult EffectAdded() =>
             new EffectResult(Messages.EFFECT_ADDED, true);
 
+        public static EffectResult EffectRemoved() =>
+            new EffectResult(Messages.EFFECT_REMOVED, true);
+
         public static EffectResult EffectAlreadyAdded() =>
             new EffectResult(Messages.EFFECT_ALREADY_ADDED, false);
 
@@ -34,9 +39,22 @@ namespace Frags.Presentation.Results
         public static EffectResult EffectNotFound() =>
             new EffectResult(Messages.EFFECT_NOT_FOUND, false);
 
+        public static EffectResult Show(Effect effect)
+        {
+            var viewModel = new ShowEffectViewModel(effect.Name, effect.Description, effect.StatisticEffects);
+            return new EffectResult(viewModel.Name, true, viewModel);
+        }
+
         public static EffectResult ShowCharacterEffects(Character character)
         {
-            throw new NotImplementedException();
+            var viewModel = new ShowCharacterEffectsViewModel();
+            foreach (var effect in character.EffectMappings)
+            {
+                // Take the ViewModel from Show() and put them in a list
+                viewModel.Effects.Add((ShowEffectViewModel)Show(effect.Effect).ViewModel);
+            }
+
+            return new EffectResult(character.Name + "'s Effects", true, viewModel);
         }
     }
 }

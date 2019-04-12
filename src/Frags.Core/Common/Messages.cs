@@ -37,12 +37,13 @@ namespace Frags.Core.Common
 
         #region Effects
         public static readonly string EFFECT_CREATE_SUCCESS = "Effect created successfully.";
-        public static readonly string EFFECT_UPDATE_SUCCESS = "Effect updated successfully.";
         public static readonly string EFFECT_CREATE_FAILURE = "Effect creation failed.";
+        public static readonly string EFFECT_UPDATE_SUCCESS = "Effect updated successfully.";
         public static readonly string EFFECT_DELETE_SUCCESS = "Effect deleted successfully.";
         public static readonly string EFFECT_NAME_EXISTS = "Effect with that name already exists.";
         public static readonly string EFFECT_NOT_FOUND = "Effect not found.";
         public static readonly string EFFECT_ADDED = "Effect added sucessfully.";
+        public static readonly string EFFECT_REMOVED = "Effect removed sucessfully.";
         public static readonly string EFFECT_ALREADY_ADDED = "Effect is already added.";
         #endregion
 

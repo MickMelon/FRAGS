@@ -51,19 +51,36 @@ namespace Frags.Presentation.Controllers
         /// <summary>
         /// Renames an already existing Effect.
         /// </summary>
-        /// <param name="statName">The name of the Effect to rename.</param>
+        /// <param name="effectName">The name of the Effect to rename.</param>
         /// <param name="newName">The new name of the Effect.</param>
         /// <returns>A result detailing if the operation was successful or why it failed.</returns>
         /// <remarks>This method will also clear its aliases.</remarks>
-        public async Task<IResult> RenameEffectAsync(string statName, string newName)
+        public async Task<IResult> RenameEffectAsync(string effectName, string newName)
         {
-            var stat = await _effectProvider.GetEffectAsync(statName);
+            var stat = await _effectProvider.GetEffectAsync(effectName);
             if (stat == null) return EffectResult.EffectNotFound();
 
             if (await _effectProvider.GetEffectAsync(newName) != null)
                 return EffectResult.NameAlreadyExists();
 
             stat.Name = newName;
+            await _effectProvider.UpdateEffectAsync(stat);
+
+            return EffectResult.EffectUpdatedSucessfully();
+        }
+
+        /// <summary>
+        /// Sets an effect's description.
+        /// </summary>
+        /// <param name="effectName">The name of the effect to set the description to.</param>
+        /// <param name="desc">The new description of the effect.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        public async Task<IResult> SetDescriptionAsync(string effectName, string desc)
+        {
+            var stat = await _effectProvider.GetEffectAsync(effectName);
+            if (stat == null) return EffectResult.EffectNotFound();
+
+            stat.Description = desc;
             await _effectProvider.UpdateEffectAsync(stat);
 
             return EffectResult.EffectUpdatedSucessfully();
@@ -119,6 +136,30 @@ namespace Frags.Presentation.Controllers
 
             character.EffectMappings.Add(new EffectMapping { Effect = effect, Character = character });
             return EffectResult.EffectAdded();
+        }
+
+        /// <summary>
+        /// Used to remove an effect from a character.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the caller.</param>
+        /// <param name="effectName">The name of the effect to remove from the character.</param>
+        public async Task<IResult> RemoveEffectAsync(ulong callerId, string effectName)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            var effect = await _effectProvider.GetEffectAsync(effectName);
+            if (effect == null) return EffectResult.EffectNotFound();
+
+            var match = character.EffectMappings.FirstOrDefault(x => x.Effect.Equals(effect));
+
+            if (match == null)
+                return EffectResult.EffectNotFound();
+
+            character.EffectMappings.Remove(match);
+            await _charProvider.UpdateCharacterAsync(character);
+
+            return EffectResult.EffectRemoved();
         }
     }
 }
