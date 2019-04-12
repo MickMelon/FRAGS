@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -70,6 +71,17 @@ namespace Frags.Presentation.Controllers
             var result = await _statProvider.CreateSkillAsync(statName, attribName);
             if (result == null) return StatisticResult.StatisticCreationFailed();
             return StatisticResult.StatisticCreatedSuccessfully();
+        }
+
+        public async Task<IResult> ResetStatisticsAsync(ulong id)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(id);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            bool result = await _strategy.ResetCharacter(character);
+            if (!result) return CharacterResult.LevelTooLow();
+
+            return StatisticResult.Reset();
         }
 
         /// <summary>

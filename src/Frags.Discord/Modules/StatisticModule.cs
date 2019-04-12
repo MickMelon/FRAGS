@@ -89,6 +89,14 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("reset")]
+        [RequireRole("FragsAdmin")]
+        public async Task ResetCharacterAsync(IUser user)
+        {
+            var result = await _statController.ResetStatisticsAsync(user.Id);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("proficiency")]
         [Alias("proficient", "prof")]
         public async Task SetProficiencyAsync(string statName, bool prof = true)

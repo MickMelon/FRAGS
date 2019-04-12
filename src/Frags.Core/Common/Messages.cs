@@ -30,7 +30,8 @@ namespace Frags.Core.Common
         public static readonly string STAT_NOT_FOUND = "Statistic not found.";
         public static readonly string STAT_SET_SUCCESS = "Statistic set sucessfully.";
         public static readonly string STAT_TOO_MANY_AT_MAX = "Too many statistics were set to their max value. (Limit {0})";
-        
+        public static readonly string STAT_RESET = "Statistics reset.";
+
         public static readonly string STAT_NOT_ENOUGH_POINTS = "Not enough points to set that statistic. Attempted: {0}/{1}.";
         #endregion
 
