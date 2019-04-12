@@ -199,8 +199,8 @@ namespace Frags.Core.Game.Progression
                     stat.StatisticValue = new StatisticValue(_statOptions.InitialSkillMin);
             }
 
-            character.AttributePoints += _statOptions.InitialAttributePoints;
-            character.SkillPoints += _statOptions.InitialSkillPoints;
+            character.AttributePoints = _statOptions.InitialAttributePoints;
+            character.SkillPoints = _statOptions.InitialSkillPoints;
 
             OnLevelUp(character, level - 1);
 
