@@ -35,7 +35,12 @@ namespace Frags.Core.Game.Progression
             foreach (var stat in await _statProvider.GetAllStatisticsAsync())
             {
                 if (character.GetStatistic(stat) == null)
-                    character.SetStatistic(stat, new StatisticValue(0));
+                {
+                    if (stat is Attribute)
+                        character.SetStatistic(stat, new StatisticValue(_statOptions.InitialAttributeMin));
+                    if (stat is Skill)
+                        character.SetStatistic(stat, new StatisticValue(_statOptions.InitialSkillMin));
+                }
             }
         }
 

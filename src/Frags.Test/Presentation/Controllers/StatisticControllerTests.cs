@@ -326,7 +326,7 @@ namespace Frags.Test.Presentation.Controllers
             var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
 
             // Act
-            var result = await controller.SetStatisticAsync(100, "strength", 5);
+            var result = await controller.SetStatisticAsync(100, "strength", 3);
 
             // Assert
             Assert.Equal(StatisticResult.StatisticSetSucessfully(), result);
