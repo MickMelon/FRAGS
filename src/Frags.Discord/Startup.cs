@@ -87,6 +87,7 @@ namespace Frags.Discord
             services
                 .AddDbContext<RpgContext>(opt => opt.UseInMemoryDatabase("TestDb"), contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
                 .AddTransient<ICharacterProvider, EfCharacterProvider>()
+                .AddTransient<IEffectProvider, EfEffectProvider>()
                 .AddTransient<IStatisticProvider, EfStatisticProvider>();
 
         /// <summary>
@@ -95,6 +96,7 @@ namespace Frags.Discord
         private static IServiceCollection AddGameServices(IServiceCollection services) =>
             services
                 .AddTransient<CharacterController>()
+                .AddTransient<EffectController>()
                 .AddTransient<RollController>()
                 .AddTransient<StatisticController>();
 

@@ -69,6 +69,9 @@ namespace Frags.Database.DataAccess
                 .Select(usr => usr.ActiveCharacter)
                     .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
                     .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
+                    .Include(charDto => charDto.EffectMappings)
+                        .ThenInclude(effectMap => effectMap.Effect)
+                            .ThenInclude(effect => effect.StatisticEffects)
                 .FirstOrDefaultAsync();
             
             if (character == null) return null;
@@ -83,6 +86,9 @@ namespace Frags.Database.DataAccess
             var charDtos = await _context.Characters.Where(c => c.UserIdentifier == userIdentifier)
                 .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
                 .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
+                .Include(charDto => charDto.EffectMappings)
+                        .ThenInclude(effectMap => effectMap.Effect)
+                            .ThenInclude(effect => effect.StatisticEffects)
                 .ToListAsync();
 
             if (charDtos == null) return null;
@@ -109,6 +115,9 @@ namespace Frags.Database.DataAccess
             var dbChar = await _context.Characters.Where(x => x.Id.Equals(character.Id))
                 .Include(x => x.Statistics).ThenInclude(y => y.Statistic)
                 .Include(x => x.Statistics).ThenInclude(y => y.StatisticValue)
+                .Include(charDto => charDto.EffectMappings)
+                        .ThenInclude(effectMap => effectMap.Effect)
+                            .ThenInclude(effect => effect.StatisticEffects)
             .FirstOrDefaultAsync();
 
             _mapper.Map<Character, CharacterDto>(character, dbChar);

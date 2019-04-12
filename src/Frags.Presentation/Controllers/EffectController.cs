@@ -131,10 +131,15 @@ namespace Frags.Presentation.Controllers
             var effect = await _effectProvider.GetEffectAsync(effectName);
             if (effect == null) return EffectResult.EffectNotFound();
 
+            if (character.EffectMappings == null)
+                character.EffectMappings = new List<EffectMapping>();
+
             if (character.EffectMappings.Count(x => x.Effect.Equals(effect)) > 0)
                 return EffectResult.EffectAlreadyAdded();
 
             character.EffectMappings.Add(new EffectMapping { Effect = effect, Character = character });
+            await _charProvider.UpdateCharacterAsync(character);
+            
             return EffectResult.EffectAdded();
         }
 

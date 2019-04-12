@@ -25,6 +25,8 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        // TODO: add ability to actually set StatisticEffects
+
         [Command("description")]
         public async Task SetEffectDescriptionAsync(string effectName, [Remainder]string desc)
         {
@@ -90,7 +92,7 @@ namespace Frags.Discord.Modules
             
             foreach (var effect in viewModel.Effects)
             {
-                output.Append($"__**{effect.Name}:**__: {effect.Description}\n");
+                output.Append($"__**{effect.Name}:**__ {effect.Description}\n");
 
                 foreach (var statEffect in effect.StatisticEffects)
                     output.Append($"{statEffect.Statistic.Name}: {statEffect.StatisticValue.Value}\n");

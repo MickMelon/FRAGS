@@ -8,6 +8,6 @@ namespace Frags.Presentation.ViewModels.Effects
     [ViewModel]
     public class ShowCharacterEffectsViewModel
     {
-        public ICollection<ShowEffectViewModel> Effects { get; set; }
+        public List<ShowEffectViewModel> Effects { get; set; } = new List<ShowEffectViewModel>();
     }
 }

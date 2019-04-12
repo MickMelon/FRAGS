@@ -84,6 +84,7 @@ namespace Frags.Core.Characters
             Name = name;
 
             Statistics = new List<StatisticMapping>();
+            EffectMappings = new List<EffectMapping>();
         }
 
         /// <summary>
@@ -106,6 +107,7 @@ namespace Frags.Core.Characters
             Story = story;
 
             Statistics = new List<StatisticMapping>();
+            EffectMappings = new List<EffectMapping>();
         }
 
         /// <summary>
