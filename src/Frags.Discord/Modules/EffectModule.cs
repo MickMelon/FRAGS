@@ -21,7 +21,7 @@ namespace Frags.Discord.Modules
         [Command("create")]
         public async Task CreateEffectAsync(string effectName)
         {
-            var result = await _controller.CreateEffectAsync(effectName);
+            var result = await _controller.CreateEffectAsync(Context.User.Id, effectName);
             await ReplyAsync(result.Message);
         }
 

@@ -39,6 +39,9 @@ namespace Frags.Presentation.Results
         public static EffectResult EffectNotFound() =>
             new EffectResult(Messages.EFFECT_NOT_FOUND, false);
 
+        public static EffectResult TooManyEffects() =>
+            new EffectResult(Messages.EFFECT_TOO_MANY, false);
+
         public static EffectResult Show(Effect effect)
         {
             var viewModel = new ShowEffectViewModel(effect.Name, effect.Description, effect.StatisticEffects);

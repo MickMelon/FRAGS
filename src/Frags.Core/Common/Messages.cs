@@ -11,6 +11,7 @@ namespace Frags.Core.Common
         public static readonly string CHAR_ALREADY_ACTIVE = "Character is already active.";
         public static readonly string CHAR_LEVEL_TOO_LOW = "Character level too low.";
         public static readonly string CHAR_LEVEL_TOO_HIGH = "Character level too high.";
+        public static readonly string CHAR_TOO_MANY = "You have reached the limit of characters.";
         #endregion
 
         #region Game
@@ -45,6 +46,7 @@ namespace Frags.Core.Common
         public static readonly string EFFECT_ADDED = "Effect added sucessfully.";
         public static readonly string EFFECT_REMOVED = "Effect removed sucessfully.";
         public static readonly string EFFECT_ALREADY_ADDED = "Effect is already added.";
+        public static readonly string EFFECT_TOO_MANY = "You have reached the limit of effects.";
         #endregion
 
         #region Other

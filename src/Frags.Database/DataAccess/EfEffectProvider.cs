@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
@@ -41,9 +42,19 @@ namespace Frags.Database.DataAccess
         public async Task<Effect> GetEffectAsync(string name)
         {
             return await _context.Effects
+                .Where(x => x.Name.EqualsIgnoreCase(name))
                 .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
                 .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<Effect>> GetUserEffectsAsync(ulong userId)
+        {
+            return await _context.Effects
+                .Where(x => x.OwnerUserIdentifier == userId)
+                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
+                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
+                .ToListAsync();
         }
 
         public async Task UpdateEffectAsync(Effect effect)

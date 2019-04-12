@@ -28,13 +28,20 @@ namespace Frags.Presentation.Controllers
 
         private readonly IStatisticProvider _statProvider;
 
+        /// <summary>
+        /// Used to determine the limit of effects for one user.
+        /// </summary>
+        private readonly GeneralOptions _options;
+
         public EffectController(ICharacterProvider charProvider, 
             IEffectProvider effectProvider, 
-            IStatisticProvider statProvider)
+            IStatisticProvider statProvider,
+            GeneralOptions options)
         {
             _charProvider = charProvider;
             _effectProvider = effectProvider;
             _statProvider = statProvider;
+            _options = options;
         }
 
         /// <summary>
@@ -44,10 +51,13 @@ namespace Frags.Presentation.Controllers
         /// <returns>
         /// A result detailing if the operation was successful or why it failed.
         /// </returns>
-        public async Task<IResult> CreateEffectAsync(string effectName)
+        public async Task<IResult> CreateEffectAsync(ulong callerId, string effectName)
         {
             if (await _effectProvider.GetEffectAsync(effectName) != null)
                 return EffectResult.NameAlreadyExists();
+
+            if ((await _effectProvider.GetUserEffectsAsync(callerId)).Count() >= _options.EffectsLimit)
+                return EffectResult.TooManyEffects();
 
             var result = await _effectProvider.CreateEffectAsync(effectName);
             if (result == null) return EffectResult.EffectCreationFailed();

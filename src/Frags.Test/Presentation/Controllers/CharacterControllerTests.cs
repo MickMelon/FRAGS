@@ -19,7 +19,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy());
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
             var dbChar = await provider.GetActiveCharacterAsync(1);
 
             // Act
@@ -39,7 +39,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null);
+            var controller = new CharacterController(provider, null, new GeneralOptions());
 
             // Act
             var result = await controller.ShowCharacterAsync(0);
@@ -55,7 +55,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null);
+            var controller = new CharacterController(provider, null, new GeneralOptions());
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c");
@@ -69,7 +69,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null);
+            var controller = new CharacterController(provider, null, new GeneralOptions());
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c1"); // Existing
@@ -83,7 +83,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null);
+            var controller = new CharacterController(provider, null, new GeneralOptions());
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c2"); // Existing
@@ -99,7 +99,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy());
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
 
             // Act
             var result = await controller.SetCharacterDescriptionAsync(1, "description"); // Existing
@@ -115,7 +115,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy());
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
 
             // Act
             var result = await controller.SetCharacterDescriptionAsync(1000, "description");
@@ -129,7 +129,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy());
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
 
             // Act
             var result = await controller.SetCharacterDescriptionAsync(1, null); // Existing
@@ -144,7 +144,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy());
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
 
             // Act
             var result = await controller.SetCharacterStoryAsync(1, "story"); // Existing
@@ -160,7 +160,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy());
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
 
             // Act
             var result = await controller.SetCharacterStoryAsync(1000, "description");
@@ -174,7 +174,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy());
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
 
             // Act
             var result = await controller.SetCharacterStoryAsync(1, null); // Existing
@@ -197,7 +197,7 @@ namespace Frags.Test.Presentation.Controllers
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
-            var controller = new CharacterController(provider, strategy);
+            var controller = new CharacterController(provider, strategy, new GeneralOptions());
 
             await controller.GiveExperienceAsync(1, 1, "12345");
             var character = await provider.GetActiveCharacterAsync(1);
@@ -216,7 +216,7 @@ namespace Frags.Test.Presentation.Controllers
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
-            var controller = new CharacterController(provider, strategy);
+            var controller = new CharacterController(provider, strategy, new GeneralOptions());
 
             await controller.GiveExperienceAsync(1, 1, "               ");
             var character = await provider.GetActiveCharacterAsync(1);
@@ -235,7 +235,7 @@ namespace Frags.Test.Presentation.Controllers
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
-            var controller = new CharacterController(provider, strategy);
+            var controller = new CharacterController(provider, strategy, new GeneralOptions());
 
             await controller.GiveExperienceAsync(1, 2, "12345");
             var character = await provider.GetActiveCharacterAsync(1);

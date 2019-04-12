@@ -27,13 +27,19 @@ namespace Frags.Presentation.Controllers
         private readonly IProgressionStrategy _progStrategy;
 
         /// <summary>
+        /// Used to determine the character limit;
+        /// </summary>
+        private readonly GeneralOptions _options;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy)
+        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options)
         {
             _provider = provider;
             _progStrategy = progStrategy;
+            _options = options;
         }
 
         /// <summary>
@@ -77,6 +83,8 @@ namespace Frags.Presentation.Controllers
         public async Task<IResult> CreateCharacterAsync(ulong callerId, string name)
         {
             var characters = await _provider.GetAllCharactersAsync(callerId);
+            if (characters.Count >= _options.CharacterLimit) return CharacterResult.TooManyCharacters();
+
             var existing = characters.Where(c => c.Name.EqualsIgnoreCase(name)).FirstOrDefault();
             if (existing != null) return CharacterResult.NameAlreadyExists();
 

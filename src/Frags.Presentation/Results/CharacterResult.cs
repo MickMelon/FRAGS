@@ -85,5 +85,11 @@ namespace Frags.Presentation.Results
         /// </summary>
         public static CharacterResult CharacterUpdatedSuccessfully() =>
             new CharacterResult(Messages.CHAR_UPDATE_SUCCESS, true);
+
+        /// <summary>
+        /// Returns a new <see cref="CharacterResult" />.
+        /// </summary>
+        public static CharacterResult TooManyCharacters() =>
+            new CharacterResult(Messages.CHAR_TOO_MANY, false);
     }
 }

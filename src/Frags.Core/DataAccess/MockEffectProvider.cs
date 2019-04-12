@@ -35,6 +35,11 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_effects.FirstOrDefault(x => x.Name.EqualsIgnoreCase(name)));
         }
 
+        public Task<IEnumerable<Effect>> GetUserEffectsAsync(ulong userId)
+        {
+            return Task.FromResult<IEnumerable<Effect>>(_effects.Where(x => x.OwnerUserIdentifier == userId).ToList());
+        }
+
         public Task UpdateEffectAsync(Effect effect)
         {
             _effects[_effects.FindIndex(x => x.Id.Equals(effect.Id))] = effect;
