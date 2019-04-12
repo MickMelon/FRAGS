@@ -23,7 +23,9 @@ namespace Frags.Discord.Modules
         [Command("seed")]
         public async Task SeedDatabaseAsync()
         {
+            await ReplyAsync("Beginning to seed the database.");
             await Services.SeedService.Seed(_statController);
+            await ReplyAsync("Completed seeding the database.");
         }
 
         [Command("create attribute")]
