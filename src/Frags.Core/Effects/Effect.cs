@@ -7,6 +7,12 @@ namespace Frags.Core.Effects
 {
     public class Effect
     {
+        public Effect()
+        {
+            StatisticEffects = new List<StatisticMapping>();
+            EffectMappings = new List<EffectMapping>();
+        }
+
         public string Id { get; set; }
 
         public string Name { get; set; }
