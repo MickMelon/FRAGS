@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Frags.Core.Characters;
 using Frags.Core.Common;
 using Frags.Core.Statistics;
 using Frags.Presentation.ViewModels.Statistics;
@@ -74,13 +75,15 @@ namespace Frags.Presentation.Results
                 viewModel: stat);
         }
 
-        public static IResult ShowList(IEnumerable<StatisticMapping> statMaps)
+        public static IResult ShowCharacter(Character character)
         {
-            var result = new ShowStatisticListViewModel();
+            var result = new ShowCharacterStatisticsViewModel();
+            result.AttributePoints = character.AttributePoints;
+            result.SkillPoints = character.SkillPoints;
 
-            // Get a list of view models from the enumerable
+            // Get a list of view models using Show()
             var stats = new List<ShowStatisticViewModel>();
-            foreach (var statMap in statMaps)
+            foreach (var statMap in character.Statistics)
             {
                 var viewModel = (ShowStatisticViewModel)Show(statMap).ViewModel;
 
@@ -94,7 +97,7 @@ namespace Frags.Presentation.Results
                 result.Statistics.Add(attribute, skills);
             }
 
-            return new StatisticResult($"{statMaps.Count()} Statistics found",
+            return new StatisticResult($"{character.Statistics.Count()} Statistics found",
                 viewModel: result);
         }
     }

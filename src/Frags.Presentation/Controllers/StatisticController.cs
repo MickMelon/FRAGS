@@ -171,7 +171,7 @@ namespace Frags.Presentation.Controllers
             if (character.Statistics == null || character.Statistics.Count <= 0)
                 return StatisticResult.StatisticNotFound();
 
-            return StatisticResult.ShowList(character.Statistics);
+            return StatisticResult.ShowCharacter(character);
         }
 
         /// <summary>

@@ -119,17 +119,17 @@ namespace Frags.Discord.Modules
             }
 
             StringBuilder output = new StringBuilder();
-            var viewModel = (ShowStatisticListViewModel)result.ViewModel;
+            var viewModel = (ShowCharacterStatisticsViewModel)result.ViewModel;
             
             foreach (var attrib in viewModel.Statistics.Keys)
             {
-                // "Strength: 5" or "Strength: N/A"
+                // Example: "Strength: 5" or "Strength: N/A"
                 output.Append($"__**{attrib.Name}: {attrib.Value?.ToString() ?? "N/A"}**__\n");
 
                 // Loop through associated skills with attribute
                 foreach (var skill in viewModel.Statistics[attrib])
                 {
-                    // "Powerlifting: 50" or "Powerlifting: N/A"
+                    // Example: "Powerlifting: 50" or "Powerlifting: N/A"
                     output.Append($"**{skill.Name}:** {skill.Value?.ToString() ?? "N/A"}");
 
                     if (skill.IsProficient.HasValue && skill.IsProficient.Value)
@@ -139,6 +139,12 @@ namespace Frags.Discord.Modules
                 }
                 output.Append("\n");
             }
+
+            if (viewModel.AttributePoints > 0)
+                output.Append($"*You have {viewModel.AttributePoints} attribute points left to spend!*\n");
+
+            if (viewModel.SkillPoints > 0)
+                output.Append($"*You have {viewModel.SkillPoints} skill points left to spend!*\n");
 
             EmbedBuilder eb = new EmbedBuilder();
             eb.WithDescription(output.ToString());
