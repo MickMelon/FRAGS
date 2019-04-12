@@ -32,12 +32,18 @@ namespace Frags.Database.DataAccess
 
         public async Task<IEnumerable<Effect>> GetAllEffectsAsync()
         {
-            return await _context.Effects.ToListAsync();
+            return await _context.Effects
+                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
+                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
+                .ToListAsync();
         }
 
         public async Task<Effect> GetEffectAsync(string name)
         {
-            return await _context.Effects.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
+            return await _context.Effects
+                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
+                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
+                .FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
         }
 
         public async Task UpdateEffectAsync(Effect effect)

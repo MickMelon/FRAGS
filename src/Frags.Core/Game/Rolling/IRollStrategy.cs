@@ -13,7 +13,7 @@ namespace Frags.Core.Game.Rolling
         /// Returns a positive or negative number representing 
         /// how good or bad a roll turned out.
         /// </returns>
-        double? RollStatistic(Statistic stat, Character character);
+        double? RollStatistic(Statistic stat, Character character, bool useEffects = false);
 
         /// <summary>
         /// Rolls a character's specified statistic
@@ -23,6 +23,6 @@ namespace Frags.Core.Game.Rolling
         /// Returns a string representing how good or bad a roll turned out.
         /// The returned string will be sent to the View.
         /// </returns>
-        string GetRollMessage(Statistic stat, Character character);
+        string GetRollMessage(Statistic stat, Character character, bool useEffects = false);
     }
 }

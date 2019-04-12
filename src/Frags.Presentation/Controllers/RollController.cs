@@ -46,7 +46,7 @@ namespace Frags.Presentation.Controllers
         /// <param name="callerId">Discord ID of the caller.</param>
         /// <param name="statName">The statistic name.</param>
         /// <returns>The result of the roll.</returns>
-        public async Task<IResult> RollStatisticAsync(ulong callerId, string statName)
+        public async Task<IResult> RollStatisticAsync(ulong callerId, string statName, bool useEffects = false)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
@@ -54,7 +54,7 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            string result = _strategy.GetRollMessage(stat, character);
+            string result = _strategy.GetRollMessage(stat, character, useEffects);
 
             if (!string.IsNullOrEmpty(result))
                 return RollResult.Roll(result);
@@ -69,7 +69,7 @@ namespace Frags.Presentation.Controllers
         /// <param name="targetId">Discord ID of the target.</param>
         /// <param name="statName">The statistic name.</param>
         /// <returns>The result of the roll.</returns>
-        public async Task<IResult> RollStatisticAgainstAsync(ulong callerId, ulong targetId, string statName)
+        public async Task<IResult> RollStatisticAgainstAsync(ulong callerId, ulong targetId, string statName, bool useEffects = false)
         {
             var caller = await _provider.GetActiveCharacterAsync(callerId);
             if (caller == null) return CharacterResult.CharacterNotFound();
@@ -80,8 +80,8 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            double? callerRoll = _strategy.RollStatistic(stat, caller);
-            double? targetRoll = _strategy.RollStatistic(stat, target);
+            double? callerRoll = _strategy.RollStatistic(stat, caller, useEffects);
+            double? targetRoll = _strategy.RollStatistic(stat, target, useEffects);
 
             if (callerRoll.HasValue && targetRoll.HasValue)
                 return RollResult.RollAgainst(caller.Name, target.Name, callerRoll.Value, targetRoll.Value);

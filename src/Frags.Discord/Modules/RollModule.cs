@@ -22,12 +22,29 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("broll")]
+        public async Task EffectsRollAsync(string stat, IUser user = null)
+        {
+            ulong discordId = user?.Id ?? Context.User.Id;
+            var result = await _controller.RollStatisticAsync(discordId, stat, true);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("rollagainst")]
         public async Task RollAgainstAsync(IUser targetUser, string stat)
         {
             ulong discordId = Context.User.Id;
             ulong targetDiscordId = targetUser.Id;
             var result = await _controller.RollStatisticAgainstAsync(discordId, targetDiscordId, stat);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("brollagainst")]
+        public async Task EffectsRollAgainstAsync(IUser targetUser, string stat)
+        {
+            ulong discordId = Context.User.Id;
+            ulong targetDiscordId = targetUser.Id;
+            var result = await _controller.RollStatisticAgainstAsync(discordId, targetDiscordId, stat, true);
             await ReplyAsync(result.Message);
         }
     }

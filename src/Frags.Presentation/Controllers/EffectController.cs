@@ -10,6 +10,7 @@ using Frags.Core.Game.Progression;
 using Frags.Core.Effects;
 using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels;
+using Frags.Core.Statistics;
 
 namespace Frags.Presentation.Controllers
 {
@@ -25,10 +26,15 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly IEffectProvider _effectProvider;
 
-        public EffectController(ICharacterProvider charProvider, IEffectProvider statProvider)
+        private readonly IStatisticProvider _statProvider;
+
+        public EffectController(ICharacterProvider charProvider, 
+            IEffectProvider effectProvider, 
+            IStatisticProvider statProvider)
         {
             _charProvider = charProvider;
-            _effectProvider = statProvider;
+            _effectProvider = effectProvider;
+            _statProvider = statProvider;
         }
 
         /// <summary>
@@ -46,6 +52,34 @@ namespace Frags.Presentation.Controllers
             var result = await _effectProvider.CreateEffectAsync(effectName);
             if (result == null) return EffectResult.EffectCreationFailed();
             return EffectResult.EffectCreatedSuccessfully();
+        }
+
+        /// <summary>
+        /// Sets the statistic effects of the specified effect.
+        /// </summary>
+        /// <param name="effectName">The name of the effect to set the value to.</param>
+        /// <param name="statName">The name of the statistic to associate the value with.</param>
+        /// <param name="value">The value to add (or subtract) to the statistic.</param>
+        /// <returns>
+        /// A result detailing if the operation was successful or why it failed.
+        /// </returns>
+        public async Task<IResult> SetStatisticEffectAsync(string effectName, string statName, int value)
+        {
+            var effect = await _effectProvider.GetEffectAsync(effectName);
+            if (effect == null) return EffectResult.EffectNotFound();
+
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            var match = effect.StatisticEffects.FirstOrDefault(x => x.Statistic.Equals(stat));
+
+            if (match == null)
+                effect.StatisticEffects.Add(new StatisticMapping(stat, new StatisticValue(value)));
+            else
+                match.StatisticValue.Value = value;
+
+            await _effectProvider.UpdateEffectAsync(effect);
+            return EffectResult.EffectUpdatedSucessfully();
         }
 
         /// <summary>

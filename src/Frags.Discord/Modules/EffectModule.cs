@@ -25,9 +25,15 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
-        // TODO: add ability to actually set StatisticEffects
+        [Command("set")]
+        public async Task SetStatisticEffectAsync(string effectName, string statName, int value)
+        {
+            var result = await _controller.SetStatisticEffectAsync(effectName, statName, value);
+            await ReplyAsync(result.Message);
+        }
 
         [Command("description")]
+        [Alias("desc")]
         public async Task SetEffectDescriptionAsync(string effectName, [Remainder]string desc)
         {
             var result = await _controller.SetDescriptionAsync(effectName, desc);
@@ -95,7 +101,12 @@ namespace Frags.Discord.Modules
                 output.Append($"__**{effect.Name}:**__ {effect.Description}\n");
 
                 foreach (var statEffect in effect.StatisticEffects)
+                {
+                    if (statEffect.StatisticValue.Value == 0)
+                        continue;
+
                     output.Append($"{statEffect.Statistic.Name}: {statEffect.StatisticValue.Value}\n");
+                }
 
                 output.Append("\n");
             }

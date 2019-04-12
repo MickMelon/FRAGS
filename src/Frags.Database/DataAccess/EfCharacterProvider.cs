@@ -65,6 +65,7 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
         {
+            // hope you packed your holy water
             var character = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Select(usr => usr.ActiveCharacter)
                     .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
@@ -72,6 +73,11 @@ namespace Frags.Database.DataAccess
                     .Include(charDto => charDto.EffectMappings)
                         .ThenInclude(effectMap => effectMap.Effect)
                             .ThenInclude(effect => effect.StatisticEffects)
+                                .ThenInclude(statMap => statMap.Statistic)
+                    .Include(charDto => charDto.EffectMappings)
+                        .ThenInclude(effectMap => effectMap.Effect)
+                            .ThenInclude(effect => effect.StatisticEffects)
+                                .ThenInclude(statMap => statMap.StatisticValue)
                 .FirstOrDefaultAsync();
             
             if (character == null) return null;
@@ -85,10 +91,15 @@ namespace Frags.Database.DataAccess
         {
             var charDtos = await _context.Characters.Where(c => c.UserIdentifier == userIdentifier)
                 .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
-                .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
-                .Include(charDto => charDto.EffectMappings)
+                    .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
+                    .Include(charDto => charDto.EffectMappings)
                         .ThenInclude(effectMap => effectMap.Effect)
                             .ThenInclude(effect => effect.StatisticEffects)
+                                .ThenInclude(statMap => statMap.Statistic)
+                    .Include(charDto => charDto.EffectMappings)
+                        .ThenInclude(effectMap => effectMap.Effect)
+                            .ThenInclude(effect => effect.StatisticEffects)
+                                .ThenInclude(statMap => statMap.StatisticValue)
                 .ToListAsync();
 
             if (charDtos == null) return null;

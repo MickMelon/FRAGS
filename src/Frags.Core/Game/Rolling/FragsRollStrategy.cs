@@ -29,14 +29,14 @@ namespace Frags.Core.Game.Rolling
         #endregion
 
         /// </inheritdoc>
-        public double? RollStatistic(Statistic stat, Character character)
+        public double? RollStatistic(Statistic stat, Character character, bool useEffects = false)
         {
             if (character == null || stat == null) return null;
 
             int rng = GameRandom.Between(1, 100);
             double maxSuccessRoll;
 
-            int? statValue = character.GetStatistic(stat)?.Value;
+            int? statValue = character.GetStatistic(stat, useEffects)?.Value;
             if (statValue == null) return null;
             if (statValue <= 0) return -125;
 
@@ -54,10 +54,10 @@ namespace Frags.Core.Game.Rolling
             return Math.Round(resultPercent * 100.0, 1);
         }
 
-        public string GetRollMessage(Statistic stat, Character character)
+        public string GetRollMessage(Statistic stat, Character character, bool useEffects = false)
         {
             var result = new StringBuilder();
-            var percent = RollStatistic(stat, character);
+            var percent = RollStatistic(stat, character, useEffects);
             if (percent == null) return null;
 
             if (percent >= 0)

@@ -19,7 +19,7 @@ namespace Frags.Core.Characters
         /// The character's unique identifier.
         /// </summary>
         public string Id { get; private set; }
-        
+
         /// <summary>
         /// The unique identifier of the user that owns the character.
         /// </summary>
@@ -48,25 +48,47 @@ namespace Frags.Core.Characters
         /// The character's story.
         /// </summary>
         public string Story { get; set; }
-        
+
         /// <summary>
         /// The character's current experience.
         /// </summary>
         public int Experience { get; set; }
 
         public int AttributePoints { get; set; }
-        
+
         public int SkillPoints { get; set; }
 
         /// <summary>
         /// The character's current amount of money.
         /// </summary>
         public int Money { get; set; }
-        
+
         /// <summary>
         /// Where the character's statistics are actually stored.
         /// </summary>
         public IList<StatisticMapping> Statistics { get; set; }
+
+        /// <summary>
+        /// Clones the character's statistics and applies their current effects to it.
+        /// </summary>
+        /// <returns>A new statistic list with values reflecting their applied effects.</returns>
+        public IList<StatisticMapping> GetEffectiveStatistics()
+        {
+            var effectiveStats = CloneStatistics();
+
+            foreach (var effect in EffectMappings.Select(x => x.Effect))
+            {
+                foreach (var statEffect in effect.StatisticEffects)
+                {
+                    var match = effectiveStats.FirstOrDefault(x => x.Statistic.Equals(statEffect.Statistic));
+
+                    if (match != null)
+                        match.StatisticValue.Value += statEffect.StatisticValue.Value;
+                }
+            }
+
+            return effectiveStats;
+        }
 
         /// <summary>
         /// A list of which Effects are currently applied to this character.
@@ -115,7 +137,8 @@ namespace Frags.Core.Characters
         /// </summary>
         /// <param name="stat">The statistic to retrieve.</param>
         /// <returns>A StatisticValue associated with the specified Statistic.</returns>
-        public StatisticValue GetStatistic(Statistic stat) =>
+        public StatisticValue GetStatistic(Statistic stat, bool useEffects = false) =>
+            useEffects ? GetEffectiveStatistics()?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue :
             Statistics?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue;
 
         /// <summary>
@@ -134,6 +157,20 @@ namespace Frags.Core.Characters
             }
 
             statMap.StatisticValue = newValue;
+        }
+
+        /// <summary>
+        /// Deep clones the character's current statistics.
+        /// </summary>
+        /// <returns>A new list containing clones of the character's statistics.</returns>
+        private List<StatisticMapping> CloneStatistics()
+        {
+            var newStats = new List<StatisticMapping>();
+
+            foreach (var stat in Statistics)
+                newStats.Add(new StatisticMapping(stat.Statistic, stat.StatisticValue));
+
+            return newStats;
         }
     }
 }
