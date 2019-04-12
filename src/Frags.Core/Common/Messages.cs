@@ -35,6 +35,17 @@ namespace Frags.Core.Common
         public static readonly string STAT_NOT_ENOUGH_POINTS = "Not enough points to set that statistic. Attempted: {0}/{1}.";
         #endregion
 
+        #region Effects
+        public static readonly string EFFECT_CREATE_SUCCESS = "Effect created successfully.";
+        public static readonly string EFFECT_UPDATE_SUCCESS = "Effect updated successfully.";
+        public static readonly string EFFECT_CREATE_FAILURE = "Effect creation failed.";
+        public static readonly string EFFECT_DELETE_SUCCESS = "Effect deleted successfully.";
+        public static readonly string EFFECT_NAME_EXISTS = "Effect with that name already exists.";
+        public static readonly string EFFECT_NOT_FOUND = "Effect not found.";
+        public static readonly string EFFECT_ADDED = "Effect added sucessfully.";
+        public static readonly string EFFECT_ALREADY_ADDED = "Effect is already added.";
+        #endregion
+
         #region Other
         public static readonly string REQUIRE_ROLE_FAIL = "You must be have the {0} role to use this command.";
         public static readonly string NOT_IN_GUILD = "You must be in a server to use this command.";
