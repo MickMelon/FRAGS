@@ -52,6 +52,7 @@ namespace Frags.Core.Game.Progression
             if (statistic is Attribute attribute)
             {
                 var current = character.GetStatistic(attribute);
+                if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
                 if (character.AttributePoints + current.Value - newValue.Value >= 0)
                 {
                     current.Value += newValue.Value;
@@ -68,6 +69,7 @@ namespace Frags.Core.Game.Progression
             else if (statistic is Skill skill)
             {
                 var current = character.GetStatistic(skill);
+                if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
                 if (character.SkillPoints + current.Value - newValue.Value >= 0)
                 {
                     current.Value += newValue.Value;
@@ -175,7 +177,15 @@ namespace Frags.Core.Game.Progression
 
         public Task<bool> ResetCharacter(Character character)
         {
-            throw new System.NotImplementedException();
+            foreach (var stat in character.Statistics)
+                stat.StatisticValue = new StatisticValue(0);
+
+            var level = GetCharacterLevel(character);
+            if (level <= 1) return Task.FromResult(false);
+
+            OnLevelUp(character, level - 1);
+
+            return Task.FromResult(true);
         }
 
         private async Task<bool> InitialAttributesSet(Character character)

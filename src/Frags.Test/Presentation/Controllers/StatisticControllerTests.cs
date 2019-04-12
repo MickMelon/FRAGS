@@ -373,6 +373,44 @@ namespace Frags.Test.Presentation.Controllers
         }
 
         [Fact]
+        public async Task SetStatisticAsync_NewValueLowerThanCurrent_ReturnInvalidInput()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var character = await charProvider.CreateCharacterAsync(100, "TooHigh");
+
+            var statProvider = new MockStatisticProvider();
+            var statOptions = new StatisticOptions
+            {
+                InitialAttributeMin = 1,
+                InitialAttributeMax = 10,
+                InitialAttributePoints = 40,
+                InitialSetupMaxLevel = 1,
+                AttributePointsOnLevelUp = 0
+            };
+
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+
+            // Act
+            // Set initial special
+            await controller.SetStatisticAsync(100, "strength", 10);
+            await controller.SetStatisticAsync(100, "perception", 2);
+            await controller.SetStatisticAsync(100, "endurance", 6);
+            await controller.SetStatisticAsync(100, "charisma", 6);
+            await controller.SetStatisticAsync(100, "intelligence", 6);
+            await controller.SetStatisticAsync(100, "agility", 5);
+            await controller.SetStatisticAsync(100, "luck", 5);
+
+            character.Experience = 50000;
+            await charProvider.UpdateCharacterAsync(character);
+            // Attempt to set special lower than current value
+            var result = await controller.SetStatisticAsync(100, "strength", 4);
+
+            // Assert
+            Assert.Equal(Messages.INVALID_INPUT, result.Message);
+        }
+
+        [Fact]
         public async Task SetStatisticAsync_InvalidCharacterId_ReturnCharacterNotFound()
         {
             // Arrange
