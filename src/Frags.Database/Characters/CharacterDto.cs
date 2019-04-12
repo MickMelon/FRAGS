@@ -1,6 +1,6 @@
 using Frags.Core.Common;
+using Frags.Core.Effects;
 using Frags.Core.Statistics;
-using Frags.Core.Statistics.Effects;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

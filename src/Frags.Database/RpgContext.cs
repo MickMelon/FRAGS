@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Frags.Core.Effects;
 using Frags.Core.Statistics;
-using Frags.Core.Statistics.Effects;
 using Frags.Database.Characters;
 using Microsoft.EntityFrameworkCore;
 

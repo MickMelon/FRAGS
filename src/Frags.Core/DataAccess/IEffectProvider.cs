@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Frags.Core.Statistics.Effects;
+using Frags.Core.Effects;
 
 namespace Frags.Core.DataAccess
 {

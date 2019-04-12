@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Common;
+using Frags.Core.Effects;
 using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
-using Frags.Core.Statistics.Effects;
 
 namespace Frags.Core.Characters
 {

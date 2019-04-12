@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Frags.Core.Statistics.Effects
+namespace Frags.Core.Effects
 {
     public class EffectMapping
     {

@@ -7,7 +7,7 @@ using Frags.Core.Characters;
 using Frags.Core.Common.Exceptions;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Progression;
-using Frags.Core.Statistics.Effects;
+using Frags.Core.Effects;
 using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels;
 
