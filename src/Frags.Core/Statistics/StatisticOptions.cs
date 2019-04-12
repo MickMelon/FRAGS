@@ -23,6 +23,9 @@ namespace Frags.Core.Statistics
         public int SkillPointsOnLevelUp { get; set; }
         public int AttributePointsOnLevelUp { get; set; }
 
+        public double ProficientAttributeMultiplier { get; set; }
+        public double ProficientSkillMultiplier { get; set; }
+
         public int ExpMessageLengthDivisor { get; set; }
         public ulong[] ExpEnabledChannels { get; set; }
     }

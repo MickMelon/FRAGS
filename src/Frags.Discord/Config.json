@@ -24,8 +24,12 @@
     "ExpEnabledChannels": [
       462432825539297280
     ],
+
     "SkillPointsOnLevelUp": 10,
-    "AttributePointsOnLevelUp": 10
+    "AttributePointsOnLevelUp": 10,
+
+    "ProficientAttributeMultiplier": 2,
+    "ProficientSkillMultiplier": 2
   },
 
   "RollOptions": {
