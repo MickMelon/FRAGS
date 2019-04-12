@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Frags.Core.Statistics;
+using Frags.Core.Statistics.Effects;
 using Frags.Database.Characters;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace Frags.Database
     {
         public DbSet<Attribute> Attributes { get; set; }
         public DbSet<CharacterDto> Characters { get; set; }
+        public DbSet<Effect> Effects { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<Statistic> Statistics { get; set; }
         public DbSet<User> Users { get; set; }
@@ -33,6 +35,19 @@ namespace Frags.Database
                 .HasOne(x => x.Statistic)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<EffectMapping>()
+                .HasKey(ec => new { ec.EffectId, ec.CharacterId });
+
+            builder.Entity<EffectMapping>()
+                .HasOne(ec => ec.Effect)
+                .WithMany(e => e.EffectMappings)
+                .HasForeignKey(ec => ec.EffectId);
+
+            builder.Entity<EffectMapping>()
+                .HasOne(ec => ec.Character)
+                .WithMany(c => c.EffectMappings)
+                .HasForeignKey(ec => ec.CharacterId);
         }
     }
 }

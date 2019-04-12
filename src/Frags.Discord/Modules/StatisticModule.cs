@@ -106,7 +106,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("show statistics")]
-        [Alias("show stat", "show stats")]
+        [Alias("show stat", "show stats", "statistics show", "stats show", "stat show")]
         public async Task ViewStatisticsAsync(IUser user = null)
         {
             user = user ?? Context.User;
@@ -125,6 +125,9 @@ namespace Frags.Discord.Modules
             {
                 // Example: "Strength: 5" or "Strength: N/A"
                 output.Append($"__**{attrib.Name}: {attrib.Value?.ToString() ?? "N/A"}**__\n");
+
+                if (attrib.IsProficient.HasValue && attrib.IsProficient.Value)
+                    output.Append("*");
 
                 // Loop through associated skills with attribute
                 foreach (var skill in viewModel.Statistics[attrib])

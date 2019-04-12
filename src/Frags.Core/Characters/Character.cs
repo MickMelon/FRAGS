@@ -6,6 +6,7 @@ using Frags.Core.Common;
 using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
+using Frags.Core.Statistics.Effects;
 
 namespace Frags.Core.Characters
 {
@@ -66,6 +67,11 @@ namespace Frags.Core.Characters
         /// Where the character's statistics are actually stored.
         /// </summary>
         public IList<StatisticMapping> Statistics { get; set; }
+
+        /// <summary>
+        /// A list of which Effects are currently applied to this character.
+        /// </summary>
+        public virtual IList<EffectMapping> EffectMappings { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.

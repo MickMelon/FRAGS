@@ -30,7 +30,7 @@ namespace Frags.Core.Game.Progression
             return level;
         }
 
-        private async Task InitializeStatistics(Character character)
+        protected async Task InitializeStatistics(Character character)
         {
             foreach (var stat in await _statProvider.GetAllStatisticsAsync())
             {

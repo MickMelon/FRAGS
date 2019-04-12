@@ -1,5 +1,6 @@
 using Frags.Core.Common;
 using Frags.Core.Statistics;
+using Frags.Core.Statistics.Effects;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -49,5 +50,7 @@ namespace Frags.Database.Characters
         public int SkillPoints { get; set; }
 
         public IList<StatisticMapping> Statistics { get; set; }
+
+        public virtual IList<EffectMapping> EffectMappings { get; set; }
     }
 }
