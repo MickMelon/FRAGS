@@ -345,12 +345,16 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributeMin = 1,
                 InitialAttributeMax = 10,
                 InitialAttributePoints = 40,
-                InitialSetupMaxLevel = 1
+                InitialSkillPoints = 1,
+                InitialSetupMaxLevel = 1,
+                AttributePointsOnLevelUp = 0
             };
 
             var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
 
             // Act
+
+            // Set initial special
             await controller.SetStatisticAsync(100, "strength", 10);
             await controller.SetStatisticAsync(100, "perception", 2);
             await controller.SetStatisticAsync(100, "endurance", 6);
@@ -361,6 +365,7 @@ namespace Frags.Test.Presentation.Controllers
 
             character.Experience = 50000;
             await charProvider.UpdateCharacterAsync(character);
+            // Attempt to set initial special again after going past InitialSetupMaxLevel
             var result = await controller.SetStatisticAsync(100, "strength", 4);
 
             // Assert

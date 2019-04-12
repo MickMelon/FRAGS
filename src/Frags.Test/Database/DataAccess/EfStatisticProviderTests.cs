@@ -52,6 +52,7 @@ namespace Frags.Test.Database.DataAccess
             var result = await provider.GetStatisticAsync("Strength");
 
             result.Name = "STR";
+            result.Aliases = "STR" + "/";
             await provider.UpdateStatisticAsync(result);
 
             Assert.NotNull(await provider.GetStatisticAsync("STR"));
