@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frags.Database.Migrations
 {
     [DbContext(typeof(RpgContext))]
-    [Migration("20190317161250_Initial")]
+    [Migration("20190415172210_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,6 +22,8 @@ namespace Frags.Database.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Aliases");
+
                     b.Property<string>("Description");
 
                     b.Property<string>("Discriminator")
@@ -34,6 +36,32 @@ namespace Frags.Database.Migrations
                     b.ToTable("Statistics");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Statistic");
+                });
+
+            modelBuilder.Entity("Frags.Core.Statistics.StatisticMapping", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CharacterDtoId");
+
+                    b.Property<string>("EffectDtoId");
+
+                    b.Property<string>("StatisticId");
+
+                    b.Property<string>("StatisticValueId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacterDtoId");
+
+                    b.HasIndex("EffectDtoId");
+
+                    b.HasIndex("StatisticId");
+
+                    b.HasIndex("StatisticValueId");
+
+                    b.ToTable("StatisticMapping");
                 });
 
             modelBuilder.Entity("Frags.Core.Statistics.StatisticValue", b =>
@@ -59,11 +87,17 @@ namespace Frags.Database.Migrations
 
                     b.Property<bool>("Active");
 
+                    b.Property<int>("AttributePoints");
+
                     b.Property<string>("Description");
 
                     b.Property<int>("Experience");
 
+                    b.Property<int>("Money");
+
                     b.Property<string>("Name");
+
+                    b.Property<int>("SkillPoints");
 
                     b.Property<string>("Story");
 
@@ -90,26 +124,33 @@ namespace Frags.Database.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Frags.Database.Statistics.StatisticMapping", b =>
+            modelBuilder.Entity("Frags.Database.Effects.EffectDto", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("CharacterDtoId");
+                    b.Property<string>("Description");
 
-                    b.Property<string>("StatisticId");
+                    b.Property<string>("Name");
 
-                    b.Property<string>("StatisticValueId");
+                    b.Property<ulong>("OwnerUserIdentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CharacterDtoId");
+                    b.ToTable("Effects");
+                });
 
-                    b.HasIndex("StatisticId");
+            modelBuilder.Entity("Frags.Database.Effects.EffectMapping", b =>
+                {
+                    b.Property<string>("EffectId");
 
-                    b.HasIndex("StatisticValueId");
+                    b.Property<string>("CharacterId");
 
-                    b.ToTable("StatisticMapping");
+                    b.HasKey("EffectId", "CharacterId");
+
+                    b.HasIndex("CharacterId");
+
+                    b.ToTable("EffectMapping");
                 });
 
             modelBuilder.Entity("Frags.Core.Statistics.Attribute", b =>
@@ -132,6 +173,26 @@ namespace Frags.Database.Migrations
                     b.HasDiscriminator().HasValue("Skill");
                 });
 
+            modelBuilder.Entity("Frags.Core.Statistics.StatisticMapping", b =>
+                {
+                    b.HasOne("Frags.Database.Characters.CharacterDto")
+                        .WithMany("Statistics")
+                        .HasForeignKey("CharacterDtoId");
+
+                    b.HasOne("Frags.Database.Effects.EffectDto")
+                        .WithMany("StatisticEffects")
+                        .HasForeignKey("EffectDtoId");
+
+                    b.HasOne("Frags.Core.Statistics.Statistic", "Statistic")
+                        .WithMany()
+                        .HasForeignKey("StatisticId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Frags.Core.Statistics.StatisticValue", "StatisticValue")
+                        .WithMany()
+                        .HasForeignKey("StatisticValueId");
+                });
+
             modelBuilder.Entity("Frags.Database.Characters.User", b =>
                 {
                     b.HasOne("Frags.Database.Characters.CharacterDto", "ActiveCharacter")
@@ -139,19 +200,17 @@ namespace Frags.Database.Migrations
                         .HasForeignKey("ActiveCharacterId");
                 });
 
-            modelBuilder.Entity("Frags.Database.Statistics.StatisticMapping", b =>
+            modelBuilder.Entity("Frags.Database.Effects.EffectMapping", b =>
                 {
-                    b.HasOne("Frags.Database.Characters.CharacterDto")
-                        .WithMany("Statistics")
-                        .HasForeignKey("CharacterDtoId");
+                    b.HasOne("Frags.Database.Characters.CharacterDto", "Character")
+                        .WithMany("EffectMappings")
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Frags.Core.Statistics.Statistic", "Statistic")
-                        .WithMany()
-                        .HasForeignKey("StatisticId");
-
-                    b.HasOne("Frags.Core.Statistics.StatisticValue", "StatisticValue")
-                        .WithMany()
-                        .HasForeignKey("StatisticValueId");
+                    b.HasOne("Frags.Database.Effects.EffectDto", "Effect")
+                        .WithMany("EffectMappings")
+                        .HasForeignKey("EffectId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Frags.Core.Statistics.Skill", b =>

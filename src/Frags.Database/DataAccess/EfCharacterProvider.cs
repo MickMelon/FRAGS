@@ -78,7 +78,9 @@ namespace Frags.Database.DataAccess
             if (character == null) return null;
             character.Active = true;
 
-            return _mapper.Map<Character>(character);
+            var mapped = _mapper.Map<Character>(character);
+            mapped.Effects = _mapper.Map<List<Effect>>(character.EffectMappings.Select(x => x.Effect).ToList());
+            return mapped;
         }
 
         /// <inheritdoc/>
@@ -98,8 +100,9 @@ namespace Frags.Database.DataAccess
                 if (match != null)
                     match.Active = true;
             }
-                
-            return _mapper.Map<List<Character>>(charDtos);
+            // TODO: populate effects
+            var mappedList = _mapper.Map<List<Character>>(charDtos);
+            return mappedList;
         }
 
         /// <inheritdoc/>
@@ -116,11 +119,14 @@ namespace Frags.Database.DataAccess
             _mapper.Map<Character, CharacterDto>(character, dbChar);
             foreach (var effect in character.Effects)
             {
+                if (dbChar.EffectMappings == null) 
+                    dbChar.EffectMappings = new List<EffectMapping>();
+
                 dbChar.EffectMappings.Clear();
                 var effectDto = _mapper.Map<EffectDto>(effect);
                 dbChar.EffectMappings.Add(new EffectMapping { Effect = effectDto, Character = dbChar });
             }
-            
+
             _context.Update(dbChar);
 
             if (character.Active)

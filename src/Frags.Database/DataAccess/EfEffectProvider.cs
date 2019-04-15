@@ -24,6 +24,8 @@ namespace Frags.Database.DataAccess
                 cfg.CreateMap<Effect, EffectDto>();
                 cfg.CreateMap<EffectDto, Effect>();
             });
+            
+            _mapper = new Mapper(mapperConfig);
         }
 
         public async Task<Effect> CreateEffectAsync(string name)

@@ -16,11 +16,28 @@ namespace Frags.Database.Migrations
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Story = table.Column<string>(nullable: true),
-                    Experience = table.Column<int>(nullable: false)
+                    Experience = table.Column<int>(nullable: false),
+                    Money = table.Column<int>(nullable: false),
+                    AttributePoints = table.Column<int>(nullable: false),
+                    SkillPoints = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Characters", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Effects",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    OwnerUserIdentifier = table.Column<ulong>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Effects", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -29,6 +46,7 @@ namespace Frags.Database.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: true),
+                    Aliases = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false),
                     AttributeId = table.Column<string>(nullable: true),
@@ -79,13 +97,38 @@ namespace Frags.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EffectMapping",
+                columns: table => new
+                {
+                    CharacterId = table.Column<string>(nullable: false),
+                    EffectId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EffectMapping", x => new { x.EffectId, x.CharacterId });
+                    table.ForeignKey(
+                        name: "FK_EffectMapping_Characters_CharacterId",
+                        column: x => x.CharacterId,
+                        principalTable: "Characters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EffectMapping_Effects_EffectId",
+                        column: x => x.EffectId,
+                        principalTable: "Effects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StatisticMapping",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     StatisticId = table.Column<string>(nullable: true),
                     StatisticValueId = table.Column<string>(nullable: true),
-                    CharacterDtoId = table.Column<string>(nullable: true)
+                    CharacterDtoId = table.Column<string>(nullable: true),
+                    EffectDtoId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -97,11 +140,17 @@ namespace Frags.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_StatisticMapping_Effects_EffectDtoId",
+                        column: x => x.EffectDtoId,
+                        principalTable: "Effects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_StatisticMapping_Statistics_StatisticId",
                         column: x => x.StatisticId,
                         principalTable: "Statistics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_StatisticMapping_StatisticValue_StatisticValueId",
                         column: x => x.StatisticValueId,
@@ -111,9 +160,19 @@ namespace Frags.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_EffectMapping_CharacterId",
+                table: "EffectMapping",
+                column: "CharacterId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StatisticMapping_CharacterDtoId",
                 table: "StatisticMapping",
                 column: "CharacterDtoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StatisticMapping_EffectDtoId",
+                table: "StatisticMapping",
+                column: "EffectDtoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StatisticMapping_StatisticId",
@@ -139,10 +198,16 @@ namespace Frags.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "EffectMapping");
+
+            migrationBuilder.DropTable(
                 name: "StatisticMapping");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Effects");
 
             migrationBuilder.DropTable(
                 name: "Statistics");
