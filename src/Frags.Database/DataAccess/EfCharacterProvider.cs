@@ -69,17 +69,16 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
         {
-            // hope you packed your holy water
-            var character = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
+            var dto = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Select(usr => usr.ActiveCharacter)
                 .Include(_context.GetIncludePaths(typeof(CharacterDto)))
                 .FirstOrDefaultAsync();
             
-            if (character == null) return null;
-            character.Active = true;
+            if (dto == null) return null;
+            dto.Active = true;
 
-            var mapped = _mapper.Map<Character>(character);
-            mapped.Effects = _mapper.Map<List<Effect>>(character.EffectMappings.Select(x => x.Effect).ToList());
+            var mapped = _mapper.Map<Character>(dto);
+            mapped.Effects = _mapper.Map<List<Effect>>(dto.EffectMappings.Select(x => x.Effect).ToList());
             return mapped;
         }
 
@@ -100,8 +99,15 @@ namespace Frags.Database.DataAccess
                 if (match != null)
                     match.Active = true;
             }
-            // TODO: populate effects
-            var mappedList = _mapper.Map<List<Character>>(charDtos);
+
+            var mappedList = new List<Character>();
+            foreach (var dto in charDtos)
+            {
+                var mapped = _mapper.Map<Character>(dto);
+                mapped.Effects = _mapper.Map<List<Effect>>(dto.EffectMappings.Select(x => x.Effect).ToList());
+                mappedList.Add(mapped);
+            }
+
             return mappedList;
         }
 
