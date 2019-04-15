@@ -51,10 +51,10 @@ namespace Frags.Presentation.Results
         public static EffectResult ShowCharacterEffects(Character character)
         {
             var viewModel = new ShowCharacterEffectsViewModel();
-            foreach (var effect in character.EffectMappings)
+            foreach (var effect in character.Effects)
             {
                 // Take the ViewModel from Show() and put them in a list
-                viewModel.Effects.Add((ShowEffectViewModel)Show(effect.Effect).ViewModel);
+                viewModel.Effects.Add((ShowEffectViewModel)Show(effect).ViewModel);
             }
 
             return new EffectResult(character.Name + "'s Effects", true, viewModel);

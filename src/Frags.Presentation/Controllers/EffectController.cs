@@ -156,7 +156,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            if (character.EffectMappings == null || character.EffectMappings.Count <= 0)
+            if (character.Effects == null || character.Effects.Count <= 0)
                 return EffectResult.EffectNotFound();
 
             return EffectResult.ShowCharacterEffects(character);
@@ -175,13 +175,13 @@ namespace Frags.Presentation.Controllers
             var effect = await _effectProvider.GetEffectAsync(effectName);
             if (effect == null) return EffectResult.EffectNotFound();
 
-            if (character.EffectMappings == null)
-                character.EffectMappings = new List<EffectMapping>();
+            if (character.Effects == null)
+                character.Effects = new List<Effect>();
 
-            if (character.EffectMappings.Count(x => x.Effect.Equals(effect)) > 0)
+            if (character.Effects.Count(x => x.Equals(effect)) > 0)
                 return EffectResult.EffectAlreadyAdded();
 
-            character.EffectMappings.Add(new EffectMapping { Effect = effect, Character = character });
+            character.Effects.Add(effect);
             await _charProvider.UpdateCharacterAsync(character);
             
             return EffectResult.EffectAdded();
@@ -200,12 +200,12 @@ namespace Frags.Presentation.Controllers
             var effect = await _effectProvider.GetEffectAsync(effectName);
             if (effect == null) return EffectResult.EffectNotFound();
 
-            var match = character.EffectMappings.FirstOrDefault(x => x.Effect.Equals(effect));
+            var match = character.Effects.FirstOrDefault(x => x.Equals(effect));
 
             if (match == null)
                 return EffectResult.EffectNotFound();
 
-            character.EffectMappings.Remove(match);
+            character.Effects.Remove(match);
             await _charProvider.UpdateCharacterAsync(character);
 
             return EffectResult.EffectRemoved();

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Frags.Core.Statistics;
 
-namespace Frags.Core.Effects
+namespace Frags.Database.Effects
 {
-    public class Effect
+    public class EffectDto
     {
-        public Effect()
+        public EffectDto ()
         {
             StatisticEffects = new List<StatisticMapping>();
         }
@@ -20,5 +20,7 @@ namespace Frags.Core.Effects
         public ulong OwnerUserIdentifier { get; set; }
 
         public virtual IList<StatisticMapping> StatisticEffects { get; set; }
+
+        public virtual IList<EffectMapping> EffectMappings { get; set; }
     }
 }

@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.DataAccess;
+using Frags.Core.Effects;
 using Frags.Database.Characters;
+using Frags.Database.Effects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -22,6 +24,8 @@ namespace Frags.Database.DataAccess
             var mapperConfig = new MapperConfiguration(cfg => {
                 cfg.CreateMap<Character, CharacterDto>();
                 cfg.CreateMap<CharacterDto, Character>();
+                cfg.CreateMap<Effect, EffectDto>();
+                cfg.CreateMap<EffectDto, Effect>();
             });
 
             _mapper = new Mapper(mapperConfig);
@@ -68,16 +72,7 @@ namespace Frags.Database.DataAccess
             // hope you packed your holy water
             var character = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Select(usr => usr.ActiveCharacter)
-                    .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
-                    .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
-                    .Include(charDto => charDto.EffectMappings)
-                        .ThenInclude(effectMap => effectMap.Effect)
-                            .ThenInclude(effect => effect.StatisticEffects)
-                                .ThenInclude(statMap => statMap.Statistic)
-                    .Include(charDto => charDto.EffectMappings)
-                        .ThenInclude(effectMap => effectMap.Effect)
-                            .ThenInclude(effect => effect.StatisticEffects)
-                                .ThenInclude(statMap => statMap.StatisticValue)
+                .Include(_context.GetIncludePaths(typeof(CharacterDto)))
                 .FirstOrDefaultAsync();
             
             if (character == null) return null;
@@ -90,16 +85,7 @@ namespace Frags.Database.DataAccess
         public async Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier)
         {
             var charDtos = await _context.Characters.Where(c => c.UserIdentifier == userIdentifier)
-                .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.Statistic)
-                    .Include(charDto => charDto.Statistics).ThenInclude(statMap => statMap.StatisticValue)
-                    .Include(charDto => charDto.EffectMappings)
-                        .ThenInclude(effectMap => effectMap.Effect)
-                            .ThenInclude(effect => effect.StatisticEffects)
-                                .ThenInclude(statMap => statMap.Statistic)
-                    .Include(charDto => charDto.EffectMappings)
-                        .ThenInclude(effectMap => effectMap.Effect)
-                            .ThenInclude(effect => effect.StatisticEffects)
-                                .ThenInclude(statMap => statMap.StatisticValue)
+                .Include(_context.GetIncludePaths(typeof(CharacterDto)))
                 .ToListAsync();
 
             if (charDtos == null) return null;
@@ -124,14 +110,17 @@ namespace Frags.Database.DataAccess
                 return;
             
             var dbChar = await _context.Characters.Where(x => x.Id.Equals(character.Id))
-                .Include(x => x.Statistics).ThenInclude(y => y.Statistic)
-                .Include(x => x.Statistics).ThenInclude(y => y.StatisticValue)
-                .Include(charDto => charDto.EffectMappings)
-                        .ThenInclude(effectMap => effectMap.Effect)
-                            .ThenInclude(effect => effect.StatisticEffects)
-            .FirstOrDefaultAsync();
+                .Include(_context.GetIncludePaths(typeof(CharacterDto)))
+                .FirstOrDefaultAsync();
 
             _mapper.Map<Character, CharacterDto>(character, dbChar);
+            foreach (var effect in character.Effects)
+            {
+                dbChar.EffectMappings.Clear();
+                var effectDto = _mapper.Map<EffectDto>(effect);
+                dbChar.EffectMappings.Add(new EffectMapping { Effect = effectDto, Character = dbChar });
+            }
+            
             _context.Update(dbChar);
 
             if (character.Active)

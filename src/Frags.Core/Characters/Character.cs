@@ -76,7 +76,7 @@ namespace Frags.Core.Characters
         {
             var effectiveStats = CloneStatistics();
 
-            foreach (var effect in EffectMappings.Select(x => x.Effect))
+            foreach (var effect in Effects)
             {
                 foreach (var statEffect in effect.StatisticEffects)
                 {
@@ -93,7 +93,7 @@ namespace Frags.Core.Characters
         /// <summary>
         /// A list of which Effects are currently applied to this character.
         /// </summary>
-        public virtual IList<EffectMapping> EffectMappings { get; set; }
+        public virtual IList<Effect> Effects { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.
@@ -106,7 +106,7 @@ namespace Frags.Core.Characters
             Name = name;
 
             Statistics = new List<StatisticMapping>();
-            EffectMappings = new List<EffectMapping>();
+            Effects = new List<Effect>();
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Frags.Core.Characters
             Story = story;
 
             Statistics = new List<StatisticMapping>();
-            EffectMappings = new List<EffectMapping>();
+            Effects = new List<Effect>();
         }
 
         /// <summary>
