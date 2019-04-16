@@ -98,7 +98,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("money")]
-        [RequireRole("FragsAdmin")]
+        [RequireAdminRole]
         public async Task AddMoneyAsync(IUser user, int money)
         {
             var result = await _controller.GiveMoneyAsync(user.Id, money);

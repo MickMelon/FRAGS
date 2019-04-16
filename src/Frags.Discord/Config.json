@@ -1,6 +1,9 @@
 {
   "GeneralOptions": {
-    "CommandPrefix": "!"
+    "CommandPrefix": "!",
+    "AdminRole": "FragsAdmin",
+    "CharacterLimit": 25,
+    "EffectsLimit": 25
   },
 
   "StatisticOptions": {

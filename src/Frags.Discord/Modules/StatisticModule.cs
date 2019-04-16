@@ -10,7 +10,7 @@ namespace Frags.Discord.Modules
 {
     [Group("statistic")]
     [Alias("stat", "stats")]
-    [RequireRole("FragsAdmin")]
+    [RequireAdminRole]
     public class StatisticModule : ModuleBase
     {
         private readonly StatisticController _statController;
@@ -90,7 +90,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("reset")]
-        [RequireRole("FragsAdmin")]
+        [RequireAdminRole]
         public async Task ResetCharacterAsync(IUser user)
         {
             var result = await _statController.ResetStatisticsAsync(user.Id);
