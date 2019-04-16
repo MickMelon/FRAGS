@@ -31,6 +31,11 @@ namespace Frags.Presentation.ViewModels.Characters
         /// <summary>
         /// The character's experience points.
         /// </summary>
-        public object Experience { get; set; }
+        public int Experience { get; set; }
+
+        /// <summary>
+        /// The character's money.
+        /// </summary>
+        public long Money { get; set; }
     }
 }

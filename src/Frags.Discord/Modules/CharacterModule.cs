@@ -5,6 +5,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Frags.Core.Statistics;
+using Frags.Discord.Modules.Preconditions;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.ViewModels.Characters;
 
@@ -36,6 +37,7 @@ namespace Frags.Discord.Modules
             embed.WithTitle(view.Name);
             embed.WithDescription($"**Description:** {view.Description}\n" +
                 $"**Level:** {view.Level}\n" +
+                $"**Money:** {view.Money}\n" +
                 $"**Experience:** {view.Experience}");
             
             await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
@@ -92,6 +94,14 @@ namespace Frags.Discord.Modules
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.ActivateCharacterAsync(discordId, name);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("money")]
+        [RequireRole("FragsAdmin")]
+        public async Task AddMoneyAsync(IUser user, int money)
+        {
+            var result = await _controller.GiveMoneyAsync(user.Id, money);
             await ReplyAsync(result.Message);
         }
     }

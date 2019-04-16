@@ -61,7 +61,7 @@ namespace Frags.Core.Characters
         /// <summary>
         /// The character's current amount of money.
         /// </summary>
-        public int Money { get; set; }
+        public long Money { get; set; }
 
         /// <summary>
         /// Where the character's statistics are actually stored.
