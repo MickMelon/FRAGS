@@ -10,7 +10,7 @@ namespace Frags.Core.Statistics
             StatisticValue = value;
         }
 
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public Statistic Statistic { get; set; }
         public StatisticValue StatisticValue { get; set; }

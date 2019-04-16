@@ -28,7 +28,7 @@ namespace Frags.Test.Database.DataAccess
             var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("TestDb1").Options);
             var provider = new EfCharacterProvider(context);
 
-            await provider.CreateCharacterAsync("1", 305847674974896128, true, "Melon Head");
+            await provider.CreateCharacterAsync(1, 305847674974896128, true, "Melon Head");
             var result = await provider.GetActiveCharacterAsync(305847674974896128);
 
             Assert.True(result.UserIdentifier == 305847674974896128);
@@ -42,7 +42,8 @@ namespace Frags.Test.Database.DataAccess
             var statProvider = new EfStatisticProvider(context);
 
             ulong userIdentifier = 305847674974896128;
-            string name = "Melon Head", id = "1";
+            string name = "Melon Head";
+            int id = 1;
             
             var strength = await statProvider.CreateAttributeAsync("Strength");
             var value = new StatisticValue(5);
@@ -63,7 +64,8 @@ namespace Frags.Test.Database.DataAccess
             var provider = new EfCharacterProvider(context);
             
             ulong userIdentifier = 305847674974896128;
-            string oldName = "Melon Head", newName = "Mr. Melon", id = "1";
+            string oldName = "Melon Head", newName = "Mr. Melon";
+            int id = 1;
 
             var result = await provider.CreateCharacterAsync(id, userIdentifier, true, oldName);
 

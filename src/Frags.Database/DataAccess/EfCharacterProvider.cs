@@ -62,16 +62,20 @@ namespace Frags.Database.DataAccess
             await CreateCharacterAsync(new Character(userIdentifier, name));
 
         /// <inheritdoc/>
-        public async Task<Character> CreateCharacterAsync(string id, ulong userIdentifier, bool active, string name,
+        public async Task<Character> CreateCharacterAsync(int id, ulong userIdentifier, bool active, string name,
             string description = "", string story = "") =>
             await CreateCharacterAsync(new Character(id, userIdentifier, active, name, description, story));
 
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
         {
+            // Guess we still need the holy water, damn.
             var dto = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Select(usr => usr.ActiveCharacter)
-                .Include(_context.GetIncludePaths(typeof(CharacterDto)))
+                .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
+                .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
+                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
+                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
                 .FirstOrDefaultAsync();
             
             if (dto == null) return null;
@@ -86,7 +90,10 @@ namespace Frags.Database.DataAccess
         public async Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier)
         {
             var charDtos = await _context.Characters.Where(c => c.UserIdentifier == userIdentifier)
-                .Include(_context.GetIncludePaths(typeof(CharacterDto)))
+                .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
+                .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
+                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
+                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
                 .ToListAsync();
 
             if (charDtos == null) return null;
@@ -119,7 +126,10 @@ namespace Frags.Database.DataAccess
                 return;
             
             var dbChar = await _context.Characters.Where(x => x.Id.Equals(character.Id))
-                .Include(_context.GetIncludePaths(typeof(CharacterDto)))
+                .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
+                .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
+                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
+                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
                 .FirstOrDefaultAsync();
 
             _mapper.Map<Character, CharacterDto>(character, dbChar);

@@ -9,7 +9,7 @@ namespace Frags.Database.Characters
     /// </summary>
     public class User : BaseModel
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public ulong UserIdentifier { get; set; }
 

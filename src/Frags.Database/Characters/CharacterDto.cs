@@ -15,7 +15,7 @@ namespace Frags.Database.Characters
     /// </summary>
     public class CharacterDto : BaseModel
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public ulong UserIdentifier { get; set; }
 
@@ -50,7 +50,7 @@ namespace Frags.Database.Characters
         
         public int SkillPoints { get; set; }
 
-        public IList<StatisticMapping> Statistics { get; set; }
+        public virtual IList<StatisticMapping> Statistics { get; set; }
 
         public virtual IList<EffectMapping> EffectMappings { get; set; }
     }

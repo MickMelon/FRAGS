@@ -48,6 +48,8 @@ namespace Frags.Database
                 .HasOne(ec => ec.Character)
                 .WithMany(c => c.EffectMappings)
                 .HasForeignKey(ec => ec.CharacterId);
+
+            builder.Entity<CharacterDto>().Metadata.FindNavigation(nameof(CharacterDto.EffectMappings)).IsEagerLoaded = true;
         }
     }
 }

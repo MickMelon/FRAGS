@@ -10,7 +10,8 @@ namespace Frags.Database.Migrations
                 name: "Characters",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     UserIdentifier = table.Column<ulong>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
                     Name = table.Column<string>(nullable: true),
@@ -30,7 +31,8 @@ namespace Frags.Database.Migrations
                 name: "Effects",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     OwnerUserIdentifier = table.Column<ulong>(nullable: false)
@@ -44,12 +46,13 @@ namespace Frags.Database.Migrations
                 name: "Statistics",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: true),
                     Aliases = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false),
-                    AttributeId = table.Column<string>(nullable: true),
+                    AttributeId = table.Column<int>(nullable: true),
                     MinimumValue = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -67,7 +70,8 @@ namespace Frags.Database.Migrations
                 name: "StatisticValue",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     Value = table.Column<int>(nullable: false),
                     IsProficient = table.Column<bool>(nullable: false),
                     Proficiency = table.Column<double>(nullable: false)
@@ -81,9 +85,10 @@ namespace Frags.Database.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     UserIdentifier = table.Column<ulong>(nullable: false),
-                    ActiveCharacterId = table.Column<string>(nullable: true)
+                    ActiveCharacterId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -100,8 +105,8 @@ namespace Frags.Database.Migrations
                 name: "EffectMapping",
                 columns: table => new
                 {
-                    CharacterId = table.Column<string>(nullable: false),
-                    EffectId = table.Column<string>(nullable: false)
+                    CharacterId = table.Column<int>(nullable: false),
+                    EffectId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -124,11 +129,12 @@ namespace Frags.Database.Migrations
                 name: "StatisticMapping",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    StatisticId = table.Column<string>(nullable: true),
-                    StatisticValueId = table.Column<string>(nullable: true),
-                    CharacterDtoId = table.Column<string>(nullable: true),
-                    EffectDtoId = table.Column<string>(nullable: true)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    StatisticId = table.Column<int>(nullable: true),
+                    StatisticValueId = table.Column<int>(nullable: true),
+                    CharacterDtoId = table.Column<int>(nullable: true),
+                    EffectDtoId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {

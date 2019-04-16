@@ -5,9 +5,9 @@ namespace Frags.Database.Effects
     public class EffectMapping
     {
         public CharacterDto Character { get; set; }
-        public string CharacterId { get; set; }
+        public int CharacterId { get; set; }
 
         public EffectDto Effect { get; set; }
-        public string EffectId { get; set; }
+        public int EffectId { get; set; }
     }
 }

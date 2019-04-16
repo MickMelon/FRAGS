@@ -14,7 +14,7 @@ namespace Frags.Core.DataAccess
 
         public Task<Effect> CreateEffectAsync(string name)
         {
-            var effect = new Effect { Id = (id++).ToString(), Name = name };
+            var effect = new Effect { Id = id++, Name = name };
             _effects.Add(effect);
             return Task.FromResult(effect);
         }

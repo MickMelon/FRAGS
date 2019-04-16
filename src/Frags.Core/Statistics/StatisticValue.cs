@@ -8,7 +8,7 @@ namespace Frags.Core.Statistics
     /// </summary>
     public class StatisticValue
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// The value associated with the statistic.

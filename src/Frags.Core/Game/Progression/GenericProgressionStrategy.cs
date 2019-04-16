@@ -194,13 +194,16 @@ namespace Frags.Core.Game.Progression
             foreach (var stat in character.Statistics)
             {
                 if (stat.Statistic is Attribute)
-                    stat.StatisticValue = new StatisticValue(_statOptions.InitialAttributeMin);
+                    stat.StatisticValue.Value = _statOptions.InitialAttributeMin;
                 if (stat.Statistic is Skill)
-                    stat.StatisticValue = new StatisticValue(_statOptions.InitialSkillMin);
+                    stat.StatisticValue.Value = _statOptions.InitialSkillMin;
+
+                stat.StatisticValue.IsProficient = false;
+                stat.StatisticValue.Proficiency = 0;
             }
 
-            character.AttributePoints = _statOptions.InitialAttributePoints;
-            character.SkillPoints = _statOptions.InitialSkillPoints;
+            character.AttributePoints = 0;
+            character.SkillPoints = 0;
 
             OnLevelUp(character, level - 1);
 

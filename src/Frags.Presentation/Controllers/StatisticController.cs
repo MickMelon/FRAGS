@@ -80,6 +80,7 @@ namespace Frags.Presentation.Controllers
 
             bool result = await _strategy.ResetCharacter(character);
             if (!result) return CharacterResult.LevelTooLow();
+            await _charProvider.UpdateCharacterAsync(character);
 
             return StatisticResult.Reset();
         }
