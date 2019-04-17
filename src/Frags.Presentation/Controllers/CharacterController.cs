@@ -110,13 +110,20 @@ namespace Frags.Presentation.Controllers
             var target = await _provider.GetActiveCharacterAsync(targetId);
             if (target == null) return CharacterResult.CharacterNotFound();
             
-            caller.Money -= money;
-            target.Money += money;
+            if (caller.Money - money >= 0)
+            {
+                caller.Money -= money;
+                target.Money += money;
 
-            await _provider.UpdateCharacterAsync(caller);
-            await _provider.UpdateCharacterAsync(target);
-            
-            return CharacterResult.CharacterUpdatedSuccessfully();
+                await _provider.UpdateCharacterAsync(caller);
+                await _provider.UpdateCharacterAsync(target);
+
+                return CharacterResult.CharacterUpdatedSuccessfully();
+            }
+            else
+            {
+                return GenericResult.ValueTooHigh();
+            }
         }
 
         /// <summary>
