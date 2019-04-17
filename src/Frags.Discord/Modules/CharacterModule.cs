@@ -97,6 +97,15 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("pay")]
+        public async Task PayCharacterAsync(IUser user, int money)
+        {
+            ulong callerId = Context.User.Id;
+            ulong targetId = user.Id;
+            var result = await _controller.GiveMoneyToOtherAsync(callerId, targetId, money);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("money")]
         [RequireAdminRole]
         public async Task AddMoneyAsync(IUser user, int money)

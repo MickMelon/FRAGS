@@ -102,6 +102,23 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.CharacterUpdatedSuccessfully();
         }
 
+        public async Task<IResult> GiveMoneyToOtherAsync(ulong callerId, ulong targetId, int money)
+        {
+            var caller = await _provider.GetActiveCharacterAsync(callerId);
+            if (caller == null) return CharacterResult.CharacterNotFound();
+
+            var target = await _provider.GetActiveCharacterAsync(targetId);
+            if (target == null) return CharacterResult.CharacterNotFound();
+            
+            caller.Money -= money;
+            target.Money += money;
+
+            await _provider.UpdateCharacterAsync(caller);
+            await _provider.UpdateCharacterAsync(target);
+            
+            return CharacterResult.CharacterUpdatedSuccessfully();
+        }
+
         /// <summary>
         /// Gets the caller's specified character by name, sets its description, and updates it.
         /// </summary>
