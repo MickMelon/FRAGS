@@ -14,7 +14,6 @@ namespace Frags.Discord.Services
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
-        private readonly CharacterController _charController;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         private readonly GeneralOptions _options;
@@ -22,13 +21,11 @@ namespace Frags.Discord.Services
         private readonly static Dictionary<ulong, IServiceScope> _serviceScopes = new Dictionary<ulong, IServiceScope>();
 
         public CommandHandler(IServiceProvider services,
-            CharacterController charController,
             CommandService commands,
             DiscordSocketClient client,
             GeneralOptions options)
         {
             _commands = commands;
-            _charController = charController;
             _services = services;
             _client = client;
             _options = options;
@@ -40,8 +37,9 @@ namespace Frags.Discord.Services
                 assembly: Assembly.GetEntryAssembly(), 
                 services: _services);
 
+            _client.MessageReceived += HandleCommandAsync;
             #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-            _client.MessageReceived += async (msg) => _ = Task.Run(() => HandleCommandAsync(msg));
+            _client.MessageReceived += async (msg) => _ = Task.Run(() => GiveExperienceAsync(msg));
             #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
             _commands.CommandExecuted += OnCommandExecuted;
         }
@@ -49,6 +47,7 @@ namespace Frags.Discord.Services
         private Task OnCommandExecuted(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
             _serviceScopes[context.Message.Id].Dispose();
+            _serviceScopes.Remove(context.Message.Id);
             return Task.CompletedTask;
         }
 
@@ -59,20 +58,9 @@ namespace Frags.Discord.Services
             int argPos = 0;
 
             if (!(message.HasCharPrefix(_options.CommandPrefix, ref argPos) ||
-                message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
-            {
-                if (!message.Author.IsBot)
-                {
-                    bool leveledUp = await _charController.GiveExperienceAsync(message.Author.Id, message.Channel.Id, message.Content);
-
-                    if (leveledUp)
-                    {
-                        await msg.Author.SendMessageAsync("Level up!");
-                    }
-                }
-
+                message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+                && !message.Author.IsBot)
                 return;
-            }
 
             var context = new SocketCommandContext(_client, message);
             var scope = _services.CreateScope();
@@ -82,6 +70,29 @@ namespace Frags.Discord.Services
                 context: context, 
                 argPos: argPos, 
                 services: scope.ServiceProvider);
+        }
+
+        private async Task GiveExperienceAsync(SocketMessage msg)
+        {
+            if (!(msg is SocketUserMessage message)) return;
+            int _ = 0;
+
+            if (!(message.HasCharPrefix(_options.CommandPrefix, ref _) ||
+                message.HasMentionPrefix(_client.CurrentUser, ref _))
+                && !message.Author.IsBot)
+            {
+                using (var scope = _services.CreateScope())
+                {
+                    var controller = scope.ServiceProvider.GetRequiredService<CharacterController>();
+
+                    bool leveledUp = await controller.GiveExperienceAsync(message.Author.Id, message.Channel.Id, message.Content);
+
+                    if (leveledUp)
+                        await msg.Author.SendMessageAsync("Level up!");
+
+                    return;
+                }
+            }
         }
     }
 }
