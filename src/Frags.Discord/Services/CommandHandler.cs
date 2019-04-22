@@ -16,19 +16,16 @@ namespace Frags.Discord.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly GeneralOptions _options;
 
         private readonly static Dictionary<ulong, IServiceScope> _serviceScopes = new Dictionary<ulong, IServiceScope>();
 
         public CommandHandler(IServiceProvider services,
             CommandService commands,
-            DiscordSocketClient client,
-            GeneralOptions options)
+            DiscordSocketClient client)
         {
             _commands = commands;
             _services = services;
             _client = client;
-            _options = options;
         }
 
         public async Task InitializeAsync()
@@ -57,13 +54,15 @@ namespace Frags.Discord.Services
 
             int argPos = 0;
 
-            if (!(message.HasCharPrefix(_options.CommandPrefix, ref argPos) ||
+            var scope = _services.CreateScope();
+            var options = scope.ServiceProvider.GetRequiredService<GeneralOptions>();
+
+            if (!(message.HasCharPrefix(options.CommandPrefix, ref argPos) ||
                 message.HasMentionPrefix(_client.CurrentUser, ref argPos))
                 && !message.Author.IsBot)
                 return;
 
             var context = new SocketCommandContext(_client, message);
-            var scope = _services.CreateScope();
             _serviceScopes.Add(context.Message.Id, scope);
 
             await _commands.ExecuteAsync(
@@ -77,11 +76,13 @@ namespace Frags.Discord.Services
             if (!(msg is SocketUserMessage message)) return;
             int _ = 0;
 
-            if (!(message.HasCharPrefix(_options.CommandPrefix, ref _) ||
-                message.HasMentionPrefix(_client.CurrentUser, ref _))
-                && !message.Author.IsBot)
+            using (var scope = _services.CreateScope())
             {
-                using (var scope = _services.CreateScope())
+                var options = scope.ServiceProvider.GetRequiredService<GeneralOptions>();
+
+                if (!(message.HasCharPrefix(options.CommandPrefix, ref _) ||
+                    message.HasMentionPrefix(_client.CurrentUser, ref _))
+                    && !message.Author.IsBot)
                 {
                     var controller = scope.ServiceProvider.GetRequiredService<CharacterController>();
 
