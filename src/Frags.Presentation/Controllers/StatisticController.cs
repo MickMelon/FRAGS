@@ -73,6 +73,30 @@ namespace Frags.Presentation.Controllers
             return StatisticResult.StatisticCreatedSuccessfully();
         }
 
+        /// <summary>
+        /// Gets the character associated with the id and checks
+        /// if their specified statistic is higher than the given value.
+        /// </summary>
+        /// <param name="id">The id of the character to get.</param>
+        /// <param name="statName">The name of the statistic to get.</param>
+        /// <param name="minimum">Checks if the character's StatisticValue is greater than or equal to this value.</param>
+        /// <returns>
+        /// A result detailing if the operation was successful or why it failed.
+        /// </returns>
+        public async Task<IResult> CheckStatisticAsync(ulong id, string statName, int minimum)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(id);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            var statValue = character.GetStatistic(stat);
+            if (statValue == null) return StatisticResult.StatisticNotFound();
+
+            return StatisticResult.StatisticCheck(character.Name, stat.Name, minimum, statValue.Value);
+        }
+
         public async Task<IResult> ResetStatisticsAsync(ulong id)
         {
             var character = await _charProvider.GetActiveCharacterAsync(id);

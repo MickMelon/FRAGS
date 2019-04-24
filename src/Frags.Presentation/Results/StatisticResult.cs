@@ -40,6 +40,14 @@ namespace Frags.Presentation.Results
         public static StatisticResult StatisticNotFound() =>
             new StatisticResult(Messages.STAT_NOT_FOUND, false);
 
+        public static StatisticResult StatisticCheck(string charName, string statName, int expected, int actual)
+        {
+            if (actual >= expected)
+                return new StatisticResult(string.Format(Messages.STAT_CHECK_PASSED, statName, actual, charName), true);
+            else
+                return new StatisticResult(string.Format(Messages.STAT_CHECK_TOO_LOW, statName, actual, expected, charName), true);
+        }
+
         public static StatisticResult Reset() =>
             new StatisticResult(Messages.STAT_RESET);
 

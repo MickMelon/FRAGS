@@ -82,6 +82,14 @@ namespace Frags.Discord.Modules
             _statController = statController;
         }
 
+        [Command("check")]
+        public async Task CheckStatisticAsync(string statName, int value, IUser user = null)
+        {
+            user = user ?? Context.User;
+            var result = await _statController.CheckStatisticAsync(user.Id, statName, value);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("set")]
         public async Task SetStatisticAsync(string statName, int? newValue = null)
         {
