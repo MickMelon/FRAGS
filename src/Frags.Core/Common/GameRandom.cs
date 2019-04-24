@@ -56,6 +56,19 @@ namespace Frags.Core.Common
         /// </summary>
         public static int D20() => Between(1, 20);
 
+        public static int[] RollDice(int dieCount, int sides)
+        {
+            int[] dice = new int[dieCount];
+
+            for (int die = 0; die < dieCount; die++)
+            {
+                int dieResult = GameRandom.Between(1, sides);
+                dice[die] = dieResult;
+            }
+
+            return dice;
+        }
+
         /// <summary>
         /// Gets a random number between two inclusive numbers.
         /// </summary>

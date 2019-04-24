@@ -1,3 +1,5 @@
+using System;
+
 namespace Frags.Core.Common
 {
     public static class Messages
@@ -16,6 +18,7 @@ namespace Frags.Core.Common
 
         #region Game
         public static readonly string ROLL_FAILED = "Error rolling character statistic.";
+        public static readonly string ROLL_DICE = "Rolled: {0}.";
         #endregion
 
         #region NPC
