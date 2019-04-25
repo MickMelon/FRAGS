@@ -74,6 +74,17 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.CharacterActive();
         }
 
+        public async Task<IResult> RenameCharacterAsync(ulong id, string newName)
+        {
+            var character = await _provider.GetActiveCharacterAsync(id);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            character.Name = newName;
+            await _provider.UpdateCharacterAsync(character);
+            
+            return CharacterResult.CharacterUpdatedSuccessfully();
+        }
+
         /// <summary>
         /// Creates a new character.
         /// </summary>
