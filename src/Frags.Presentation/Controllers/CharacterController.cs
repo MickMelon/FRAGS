@@ -27,7 +27,7 @@ namespace Frags.Presentation.Controllers
         private readonly IProgressionStrategy _progStrategy;
 
         /// <summary>
-        /// Used to determine the character limit;
+        /// Used to determine the character limit.
         /// </summary>
         private readonly GeneralOptions _options;
 
@@ -103,12 +103,22 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.CharacterCreatedSuccessfully();
         }
 
-        public async Task<IResult> GiveMoneyAsync(ulong id, int money)
+        public async Task<IResult> GiveMoneyAsync(ulong callerId, int money)
         {
-            var character = await _provider.GetActiveCharacterAsync(id);
+            var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
             
             character.Money += money;
+            await _provider.UpdateCharacterAsync(character);
+            return CharacterResult.CharacterUpdatedSuccessfully();
+        }
+
+        public async Task<IResult> AddExperienceAsync(ulong callerId, int xp)
+        {
+            var character = await _provider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            //_progStrategy
             await _provider.UpdateCharacterAsync(character);
             return CharacterResult.CharacterUpdatedSuccessfully();
         }

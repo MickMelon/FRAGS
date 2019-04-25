@@ -120,5 +120,13 @@ namespace Frags.Discord.Modules
             var result = await _controller.GiveMoneyAsync(user.Id, money);
             await ReplyAsync(result.Message);
         }
+
+        [Command("exp")]
+        [RequireAdminRole]
+        public async Task AddExperienceAsync(IUser user, int xp)
+        {
+            var result = await _controller.AddExperienceAsync(user.Id, xp);
+            await ReplyAsync(result.Message);
+        }
     }
 }
