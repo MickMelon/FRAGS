@@ -6,7 +6,13 @@ namespace Frags.Core.Game.Progression
 {
     public class MockProgressionStrategy : IProgressionStrategy
     {
-        public Task<bool> AddExperience(Character character, ulong channelId, string message)
+        public Task<bool> AddExperience(Character character, int amount)
+        {
+            character.Experience += amount;
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> AddExperienceFromMessage(Character character, ulong channelId, string message)
         {
             character.Experience += message.Length;
             return Task.FromResult(true);

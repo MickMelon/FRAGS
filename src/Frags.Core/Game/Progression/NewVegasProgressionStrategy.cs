@@ -27,6 +27,20 @@ namespace Frags.Core.Game.Progression
             _statProvider = statProvider;
         }
 
+        override protected void OnLevelUp(Character character, int timesLeveledUp)
+        {
+            for (int levelUp = 1; levelUp <= timesLeveledUp; levelUp++)
+            {
+                int inte = character.Statistics.Where(x => x.Statistic.Name.EqualsIgnoreCase("intelligence")).FirstOrDefault()?.StatisticValue?.Value ?? 0;
+                int origLevel = GetCharacterLevel(character) - timesLeveledUp;
+
+                character.SkillPoints += _statOptions.SkillPointsOnLevelUp + inte / 2;
+
+                if (inte % 2 != 0 && (origLevel + levelUp) % 2 == 0)
+                    character.SkillPoints += 1;
+            }
+        }
+
         override public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
         {
             await InitializeStatistics(character);

@@ -254,14 +254,11 @@ namespace Frags.Core.Game.Progression
             return true;
         }
 
-        public Task<bool> AddExperience(Character character, ulong channelId, string message)
+        public Task<bool> AddExperience(Character character, int amount)
         {
             int origLevel = GetCharacterLevel(character);
 
-            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return Task.FromResult(false);
-            if (string.IsNullOrWhiteSpace(message)) return Task.FromResult(false);
-
-            character.Experience += message.Length / _statOptions.ExpMessageLengthDivisor;
+            character.Experience += amount;
 
             int newLevel = GetCharacterLevel(character);
             int difference = newLevel - origLevel;
@@ -274,7 +271,15 @@ namespace Frags.Core.Game.Progression
             return Task.FromResult(false);
         }
 
-        protected void OnLevelUp(Character character, int timesLeveledUp)
+        public Task<bool> AddExperienceFromMessage(Character character, ulong channelId, string message)
+        {
+            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return Task.FromResult(false);
+            if (string.IsNullOrWhiteSpace(message)) return Task.FromResult(false);
+
+            return AddExperience(character, message.Length / _statOptions.ExpMessageLengthDivisor);
+        }
+
+        virtual protected void OnLevelUp(Character character, int timesLeveledUp)
         {
             for (int levelUp = 1; levelUp <= timesLeveledUp; levelUp++)
             {

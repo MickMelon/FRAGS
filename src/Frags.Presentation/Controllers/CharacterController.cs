@@ -113,16 +113,6 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.CharacterUpdatedSuccessfully();
         }
 
-        public async Task<IResult> AddExperienceAsync(ulong callerId, int xp)
-        {
-            var character = await _provider.GetActiveCharacterAsync(callerId);
-            if (character == null) return CharacterResult.CharacterNotFound();
-
-            //_progStrategy
-            await _provider.UpdateCharacterAsync(character);
-            return CharacterResult.CharacterUpdatedSuccessfully();
-        }
-
         public async Task<IResult> GiveMoneyToOtherAsync(ulong callerId, ulong targetId, int money)
         {
             var caller = await _provider.GetActiveCharacterAsync(callerId);
@@ -194,7 +184,7 @@ namespace Frags.Presentation.Controllers
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return false;
 
-            bool result = await _progStrategy.AddExperience(character, channelId, message);
+            bool result = await _progStrategy.AddExperienceFromMessage(character, channelId, message);
             _ = _provider.UpdateCharacterAsync(character);
             return result;
         }

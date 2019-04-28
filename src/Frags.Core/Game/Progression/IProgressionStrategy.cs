@@ -6,11 +6,13 @@ namespace Frags.Core.Game.Progression
 {
     public interface IProgressionStrategy
     {
+        Task<bool> AddExperience(Character character, int amount);
+
         /// <summary>
         /// Adds experience to a character depending on the message and what channel it was sent from.
         /// </summary>
         /// <returns>True if adding experience causes the character to level up; false otherwise.</returns>
-        Task<bool> AddExperience(Character character, ulong channelId, string message);
+        Task<bool> AddExperienceFromMessage(Character character, ulong channelId, string message);
 
         /// <summary>
         /// Gets the character's level.

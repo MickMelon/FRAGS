@@ -97,6 +97,14 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("exp")]
+        [RequireAdminRole]
+        public async Task AddExperienceAsync(IUser user, int xp)
+        {
+            var result = await _statController.AddExperienceAsync(user.Id, xp);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("reset")]
         [RequireAdminRole]
         public async Task ResetCharacterAsync(IUser user)

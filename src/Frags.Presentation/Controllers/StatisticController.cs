@@ -31,6 +31,8 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly IProgressionStrategy _strategy;
 
+
+
         public StatisticController(ICharacterProvider charProvider, IStatisticProvider statProvider, IProgressionStrategy strategy)
         {
             _charProvider = charProvider;
@@ -95,6 +97,17 @@ namespace Frags.Presentation.Controllers
             if (statValue == null) return StatisticResult.StatisticNotFound();
 
             return StatisticResult.StatisticCheck(character.Name, stat.Name, minimum, statValue.Value);
+        }
+
+        public async Task<IResult> AddExperienceAsync(ulong callerId, int xp)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            await _strategy.AddExperience(character, xp);
+            await _charProvider.UpdateCharacterAsync(character);
+
+            return CharacterResult.CharacterUpdatedSuccessfully();
         }
 
         public async Task<IResult> ResetStatisticsAsync(ulong id)
