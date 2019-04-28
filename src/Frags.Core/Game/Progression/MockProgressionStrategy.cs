@@ -14,7 +14,7 @@ namespace Frags.Core.Game.Progression
 
         public Task<string> GetCharacterInfo(Character character)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult("");
         }
 
         public int GetCharacterLevel(Character character)
@@ -24,7 +24,7 @@ namespace Frags.Core.Game.Progression
 
         public Task<string> GetCharacterStatisticsInfo(Character character)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult("");
         }
 
         public Task<bool> ResetCharacter(Character character)

@@ -28,7 +28,7 @@ namespace Frags.Test.Presentation.Controllers
             var viewModel = charResult.ViewModel as ShowCharacterViewModel;
 
             // Assert
-            Assert.True(CharacterResult.Show(dbChar, 1).Equals(result) &&
+            Assert.True(CharacterResult.Show(dbChar, 1, "").Equals(result) &&
                 viewModel.Name.EqualsIgnoreCase(dbChar.Name) &&
                 viewModel.Story.EqualsIgnoreCase(dbChar.Story) &&
                 viewModel.Description.EqualsIgnoreCase(dbChar.Description));
