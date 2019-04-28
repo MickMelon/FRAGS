@@ -83,7 +83,7 @@ namespace Frags.Presentation.Results
                 viewModel: stat);
         }
 
-        public static IResult ShowCharacter(Character character)
+        public static IResult ShowCharacter(Character character, string progressionInfo)
         {
             var result = new ShowCharacterStatisticsViewModel();
             result.AttributePoints = character.AttributePoints;
@@ -104,6 +104,8 @@ namespace Frags.Presentation.Results
                 var skills = stats.OfType<ShowSkillViewModel>().Where(x => x.Attribute.Name.Equals(attribute.Name)).ToList();
                 result.Statistics.Add(attribute, skills);
             }
+
+            result.ProgressionInformation = progressionInfo;
 
             return new StatisticResult($"{character.Statistics.Count()} Statistics found",
                 viewModel: result);

@@ -12,9 +12,19 @@ namespace Frags.Core.Game.Progression
             return Task.FromResult(true);
         }
 
+        public Task<string> GetCharacterInfo(Character character)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public int GetCharacterLevel(Character character)
         {
             return character.Experience;
+        }
+
+        public Task<string> GetCharacterStatisticsInfo(Character character)
+        {
+            throw new System.NotImplementedException();
         }
 
         public Task<bool> ResetCharacter(Character character)

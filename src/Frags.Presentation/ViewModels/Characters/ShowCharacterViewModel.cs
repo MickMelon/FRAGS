@@ -37,5 +37,10 @@ namespace Frags.Presentation.ViewModels.Characters
         /// The character's money.
         /// </summary>
         public long Money { get; set; }
+
+        /// <summary>
+        /// Important info related to the character provided by the ProgressionStrategy.
+        /// </summary>
+        public string ProgressionInformation { get; set; }
     }
 }

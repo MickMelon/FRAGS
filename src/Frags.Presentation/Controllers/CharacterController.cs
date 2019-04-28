@@ -51,7 +51,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
-            return CharacterResult.Show(character, _progStrategy.GetCharacterLevel(character));
+            return CharacterResult.Show(character, _progStrategy.GetCharacterLevel(character), await _progStrategy.GetCharacterInfo(character));
         }
 
         /// <summary>

@@ -20,6 +20,22 @@ namespace Frags.Core.Game.Progression
         int GetCharacterLevel(Character character);
 
         /// <summary>
+        /// Shows important information when viewing a character related to the progression strategy.
+        /// Example: How many more experience points the character needs before leveling up.
+        /// </summary>
+        /// <param name="character">The character being viewed.</param>
+        /// <returns>Important information to show when viewing a character.</returns>
+        Task<string> GetCharacterInfo(Character character);
+
+        /// <summary>
+        /// Shows important information when viewing a character's statistics related to the progression strategy.
+        /// Example: How many attribute or skill points the character has remaining to spend.
+        /// </summary>
+        /// <param name="character">The character whose statistics are being viewed.</param>
+        /// <returns>Important information related to the strategy to show when viewing a character's statistics.</returns>
+        Task<string> GetCharacterStatisticsInfo(Character character);
+
+        /// <summary>
         /// Sets the value of one of the character's statistics.
         /// </summary>
         /// <param name="character">The character to set the statistic value to.</param>

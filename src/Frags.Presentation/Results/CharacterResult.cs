@@ -21,7 +21,7 @@ namespace Frags.Presentation.Results
         /// Returns a new <see cref="CharacterResult" />.
         /// </summary>
         /// <param name="character">The character to show.</param>
-        public static IResult Show(Character character, int level) =>
+        public static IResult Show(Character character, int level, string progressionInfo) =>
             new CharacterResult($"{character.Name}: {character.Id}", 
                 viewModel: new ShowCharacterViewModel()
                 {
@@ -30,7 +30,8 @@ namespace Frags.Presentation.Results
                     Description = character.Description,
                     Level = level,
                     Money = character.Money,
-                    Experience = character.Experience
+                    Experience = character.Experience,
+                    ProgressionInformation = progressionInfo
                 });        
 
         /// <summary>

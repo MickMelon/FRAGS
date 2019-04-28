@@ -13,5 +13,10 @@ namespace Frags.Presentation.ViewModels.Statistics
 
         public int AttributePoints { get; set; }
         public int SkillPoints { get; set; }
+
+        /// <summary>
+        /// Important info related to the character's statistics provided by the ProgressionStrategy.
+        /// </summary>
+        public string ProgressionInformation { get; set; }
     }
 }

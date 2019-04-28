@@ -157,6 +157,9 @@ namespace Frags.Discord.Modules
             if (viewModel.SkillPoints > 0)
                 output.Append($"*You have {viewModel.SkillPoints} skill points left to spend!*\n");
 
+            if (!string.IsNullOrWhiteSpace(viewModel.ProgressionInformation))
+                output.Append($"Progression info:\n{viewModel.ProgressionInformation}\n");
+
             EmbedBuilder eb = new EmbedBuilder();
             eb.WithDescription(output.ToString());
             await ReplyAsync(embed: eb.Build());

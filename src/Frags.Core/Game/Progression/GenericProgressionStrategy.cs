@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
 using Frags.Core.Common;
@@ -21,6 +22,15 @@ namespace Frags.Core.Game.Progression
         {
             _statProvider = statProvider;
             _statOptions = statOptions;
+        }
+
+        /// <summary>
+        /// Calculate the experience required for a level.
+        /// </summary>
+        private int CalculateExperienceForLevel(int level)
+        {
+            if (level < 1 || level > 1000) return -1;
+            return (level * (level - 1) / 2) * 1000;
         }
 
         public int GetCharacterLevel(Character character)
@@ -116,7 +126,7 @@ namespace Frags.Core.Game.Progression
                 
                 stats = character.Statistics.Where(x => x.Statistic is Attribute).Select(x => x.StatisticValue.Value).ToArray();
 
-                if (level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character)) 
+                if (level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character))
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
             }
             else
@@ -271,6 +281,40 @@ namespace Frags.Core.Game.Progression
                 character.SkillPoints += _statOptions.SkillPointsOnLevelUp;
                 character.AttributePoints += _statOptions.AttributePointsOnLevelUp;
             }
+        }
+
+        public async Task<string> GetCharacterInfo(Character character)
+        {
+            var level = GetCharacterLevel(character);
+            StringBuilder output = new StringBuilder($"Remaining exp to level: {CalculateExperienceForLevel(level + 1) - character.Experience}\n");
+
+            if (!await InitialAttributesSet(character))
+                output.Append("Attributes are not set.\n");
+
+            if (!await InitialSkillsSet(character))
+                output.Append("Skills are not set.\n");
+
+            return output.ToString();
+        }
+
+        public async Task<string> GetCharacterStatisticsInfo(Character character)
+        {
+            var level = GetCharacterLevel(character);
+            StringBuilder output = new StringBuilder();
+
+            if (!await InitialAttributesSet(character))
+            {
+                var sum = character.Statistics.Where(x => x.Statistic is Attribute).Sum(x => x.StatisticValue.Value);
+                output.Append($"Remaining initial attribute points: {_statOptions.InitialAttributePoints - sum}\n");
+            }
+
+            if (!await InitialSkillsSet(character))
+            {
+                var sum = character.Statistics.Where(x => x.Statistic is Skill).Sum(x => x.StatisticValue.Value);
+                output.Append($"Remaining initial skill points: {_statOptions.InitialSkillPoints - sum}\n");
+            }
+
+            return output.ToString();
         }
     }
 }

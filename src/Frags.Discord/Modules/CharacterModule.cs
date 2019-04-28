@@ -38,7 +38,8 @@ namespace Frags.Discord.Modules
             embed.WithDescription($"**Description:** {view.Description}\n" +
                 $"**Level:** {view.Level}\n" +
                 $"**Money:** {view.Money}\n" +
-                $"**Experience:** {view.Experience}");
+                $"**Experience:** {view.Experience}\n" +
+                $"**Progression:** {view.ProgressionInformation}");
             
             await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
         }
