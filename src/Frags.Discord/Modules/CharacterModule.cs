@@ -71,6 +71,13 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("changename")]
+        public async Task RenameCharacterAsync(string newName)
+        {
+            var result = await _controller.RenameCharacterAsync(Context.User.Id, newName);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("description")]
         [Alias("desc")]
         public async Task SetCharacterDescriptionAsync(string desc)
