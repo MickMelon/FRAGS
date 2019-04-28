@@ -251,7 +251,7 @@ namespace Frags.Core.Game.Progression
             if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return Task.FromResult(false);
             if (string.IsNullOrWhiteSpace(message)) return Task.FromResult(false);
 
-            character.Experience += message.Length;
+            character.Experience += message.Length / _statOptions.ExpMessageLengthDivisor;
 
             int newLevel = GetCharacterLevel(character);
             int difference = newLevel - origLevel;
