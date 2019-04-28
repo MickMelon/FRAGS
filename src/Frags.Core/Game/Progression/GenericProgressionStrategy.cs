@@ -54,7 +54,7 @@ namespace Frags.Core.Game.Progression
             }
         }
 
-        public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
+        virtual public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
         {
             await InitializeStatistics(character);
 
@@ -110,7 +110,7 @@ namespace Frags.Core.Game.Progression
             return false;
         }
 
-        private async Task<bool> SetInitialStatistic(Character character, Statistic statistic, int newValue)
+        protected async Task<bool> SetInitialStatistic(Character character, Statistic statistic, int newValue)
         {
             int statMin, statMax, statsAtMax, points, level = GetCharacterLevel(character);
             // This is either an array of all the character's attributes or skills, never both.
@@ -170,7 +170,7 @@ namespace Frags.Core.Game.Progression
             return true;
         }
 
-        public Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)
+        virtual public Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)
         {
             int alreadySet, level = GetCharacterLevel(character);
             if (statistic is Attribute attrib)
@@ -220,7 +220,7 @@ namespace Frags.Core.Game.Progression
             return Task.FromResult(true);
         }
 
-        private async Task<bool> InitialAttributesSet(Character character)
+        protected async Task<bool> InitialAttributesSet(Character character)
         {
             if (character == null || character.Statistics == null) return false;
 
@@ -237,7 +237,7 @@ namespace Frags.Core.Game.Progression
             return true;
         }
 
-        private async Task<bool> InitialSkillsSet(Character character)
+        protected async Task<bool> InitialSkillsSet(Character character)
         {
             if (character == null || character.Statistics == null) return false;
 
@@ -274,7 +274,7 @@ namespace Frags.Core.Game.Progression
             return Task.FromResult(false);
         }
 
-        private void OnLevelUp(Character character, int timesLeveledUp)
+        protected void OnLevelUp(Character character, int timesLeveledUp)
         {
             for (int levelUp = 1; levelUp <= timesLeveledUp; levelUp++)
             {

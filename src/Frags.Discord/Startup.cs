@@ -119,6 +119,7 @@ namespace Frags.Discord
                 .AddTransient<FragsRollStrategy>()
                 .AddTransient<MockRollStrategy>()
                 .AddTransient<GenericProgressionStrategy>()
+                .AddTransient<NewVegasProgressionStrategy>()
                 .AddTransient(provider =>
                     ResolveServices<IRollStrategy>(provider, provider.GetRequiredService<RollOptions>().RollStrategy))
                 .AddTransient(provider =>
