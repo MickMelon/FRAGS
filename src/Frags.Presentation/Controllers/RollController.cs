@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
@@ -58,6 +59,37 @@ namespace Frags.Presentation.Controllers
 
             if (!string.IsNullOrEmpty(result))
                 return RollResult.Roll(result);
+
+            return RollResult.RollFailed();
+        }
+
+        /// <summary>
+        /// Performs a roll on a character's statistic assuming it is set to the value given and returns the result.
+        /// </summary>
+        /// <param name="callerId">Discord ID of the caller.</param>
+        /// <param name="statName">The statistic name.</param>
+        /// <param name="value">The new, temporary value of the character's statistic.</param>
+        /// <returns>The result of the roll.</returns>
+        public async Task<IResult> RollStatisticWithValueAsync(ulong callerId, string statName, int value, string displayName = null)
+        {
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            var character = await _provider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            var statVal = character.GetStatistic(stat);
+            statVal.Value = value;
+
+            if (displayName != null)
+                character.Name = displayName;
+            
+            character.SetStatistic(stat, statVal);
+
+            string msg = _strategy.GetRollMessage(stat, character);
+
+            if (!string.IsNullOrEmpty(msg))
+                return RollResult.Roll(msg);
 
             return RollResult.RollFailed();
         }

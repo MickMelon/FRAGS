@@ -26,6 +26,14 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("rollmanual")]
+        [Alias("rollm", "rm")]
+        public async Task RollManualAsync(string stat, int value)
+        {
+            var result = await _controller.RollStatisticWithValueAsync(Context.User.Id, stat, value, Context.User.Username);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("rolldice")]
         [Alias("rd")]
         public async Task RollDiceAsync(int dieCount, int sides, int bonus = 0)
