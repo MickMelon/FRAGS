@@ -60,14 +60,14 @@ namespace Frags.Presentation.Results
 
             if (statMap.Statistic is Attribute attrib)
             {
-                stat = new ShowAttributeViewModel(attrib.Name, attrib.Description, attrib.AliasesArray, statMap?.StatisticValue.Value,
+                stat = new ShowAttributeViewModel(attrib.Name, attrib.Description, attrib.AliasesArray, attrib.Id, statMap?.StatisticValue.Value,
                     statMap?.StatisticValue.IsProficient, statMap?.StatisticValue.Proficiency);
             }
             else if (statMap.Statistic is Skill s)
             {
-                var attribViewModel = new ShowAttributeViewModel(s.Attribute.Name, s.Attribute.Description, s.Attribute.AliasesArray, null, null, null);
+                var attribViewModel = new ShowAttributeViewModel(s.Attribute.Name, s.Attribute.Description, s.Attribute.AliasesArray, s.Attribute.Id, null, null, null);
 
-                stat = new ShowSkillViewModel(s.Name, s.Description, s.AliasesArray, statMap?.StatisticValue.Value,
+                stat = new ShowSkillViewModel(s.Name, s.Description, s.AliasesArray, s.Id, statMap?.StatisticValue.Value,
                     statMap?.StatisticValue.IsProficient, statMap?.StatisticValue.Proficiency, s.MinimumValue, attribViewModel);
             }
             else

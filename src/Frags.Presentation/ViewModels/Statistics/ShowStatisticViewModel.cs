@@ -8,11 +8,12 @@ namespace Frags.Presentation.ViewModels.Statistics
     [ViewModel]
     public abstract class ShowStatisticViewModel
     {
-        public ShowStatisticViewModel(string name, string desc, string[] aliases, int? value, bool? isProf, double? prof)
+        public ShowStatisticViewModel(string name, string desc, string[] aliases, int order, int? value, bool? isProf, double? prof)
         {
             Name = name;
             Description = desc;
             Aliases = aliases;
+            Order = order;
             Value = value;
             IsProficient = isProf;
             Proficiency = prof;
@@ -49,5 +50,7 @@ namespace Frags.Presentation.ViewModels.Statistics
         /// The statistic's proficiency bonus.
         /// </summary>
         public double? Proficiency { get; set; }
+
+        public int Order { get; set; }
     }
 }

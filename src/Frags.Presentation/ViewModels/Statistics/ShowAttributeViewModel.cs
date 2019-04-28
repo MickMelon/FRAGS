@@ -8,8 +8,8 @@ namespace Frags.Presentation.ViewModels.Statistics
     [ViewModel]
     public class ShowAttributeViewModel : ShowStatisticViewModel
     {
-        public ShowAttributeViewModel(string name, string desc, string[] aliases, int? value, bool? isProf, double? prof) 
-            : base(name, desc, aliases, value, isProf, prof)
+        public ShowAttributeViewModel(string name, string desc, string[] aliases, int order, int? value, bool? isProf, double? prof) 
+            : base(name, desc, aliases, order, value, isProf, prof)
         {
         }
 

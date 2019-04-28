@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
@@ -137,7 +138,7 @@ namespace Frags.Discord.Modules
             StringBuilder output = new StringBuilder();
             var viewModel = (ShowCharacterStatisticsViewModel)result.ViewModel;
             
-            foreach (var attrib in viewModel.Statistics.Keys)
+            foreach (var attrib in viewModel.Statistics.Keys.OrderBy(x => x.Order))
             {
                 // Example: "Strength: 5" or "Strength: N/A"
                 output.Append($"__**{attrib.Name}: {attrib.Value?.ToString() ?? "N/A"}**__\n");
@@ -146,7 +147,7 @@ namespace Frags.Discord.Modules
                     output.Append("*");
 
                 // Loop through associated skills with attribute
-                foreach (var skill in viewModel.Statistics[attrib])
+                foreach (var skill in viewModel.Statistics[attrib].OrderBy(x => x.Name))
                 {
                     // Example: "Powerlifting: 50" or "Powerlifting: N/A"
                     output.Append($"**{skill.Name}:** {skill.Value?.ToString() ?? "N/A"}");

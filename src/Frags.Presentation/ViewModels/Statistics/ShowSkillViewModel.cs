@@ -8,7 +8,7 @@ namespace Frags.Presentation.ViewModels.Statistics
     [ViewModel]
     public class ShowSkillViewModel : ShowStatisticViewModel
     {
-        public ShowSkillViewModel(string name, string desc, string[] aliases, int? value, bool? isProf, double? prof, int minimumValue, ShowAttributeViewModel attribute) : base(name, desc, aliases, value, isProf, prof)
+        public ShowSkillViewModel(string name, string desc, string[] aliases, int order, int? value, bool? isProf, double? prof, int minimumValue, ShowAttributeViewModel attribute) : base(name, desc, aliases, order, value, isProf, prof)
         {
             MinimumValue = minimumValue;
             Attribute = attribute;
