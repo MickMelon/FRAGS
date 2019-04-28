@@ -30,21 +30,21 @@ namespace Frags.Discord.Modules
 
         [Command("create attribute")]
         [Alias("create attrib")]
-        public async Task CreateAttributeAsync(string statName)
+        public async Task CreateAttributeAsync([Remainder]string statName)
         {
             var result = await _statController.CreateAttributeAsync(statName);
             await ReplyAsync(result.Message);
         }
 
         [Command("create skill")]
-        public async Task CreateSkillAsync(string statName, string attribName)
+        public async Task CreateSkillAsync(string statName, [Remainder]string attribName)
         {
             var result = await _statController.CreateSkillAsync(statName, attribName);
             await ReplyAsync(result.Message);
         }
 
         [Command("alias")]
-        public async Task AddAliasAsync(string statName, string alias)
+        public async Task AddAliasAsync(string statName, [Remainder]string alias)
         {
             var result = await _statController.AddAliasAsync(statName, alias);
             await ReplyAsync(result.Message);
@@ -52,21 +52,21 @@ namespace Frags.Discord.Modules
 
         [Command("alias clear")]
         [Alias("clearalias", "clearaliases")]
-        public async Task ClearAliasesAsync(string statName)
+        public async Task ClearAliasesAsync([Remainder]string statName)
         {
             var result = await _statController.ClearAliasesAsync(statName);
             await ReplyAsync(result.Message);
         }
 
         [Command("rename")]
-        public async Task RenameStatisticAsync(string statName, string newName)
+        public async Task RenameStatisticAsync(string statName, [Remainder]string newName)
         {
             var result = await _statController.RenameStatisticAsync(statName, newName);
             await ReplyAsync(result.Message);
         }
 
         [Command("delete")]
-        public async Task SetStatisticAsync(string statName)
+        public async Task DeleteStatisticAsync([Remainder]string statName)
         {
             var result = await _statController.DeleteStatisticAsync(statName);
             await ReplyAsync(result.Message);

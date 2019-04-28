@@ -65,7 +65,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("create")]
-        public async Task CreateCharacterAsync(string name)
+        public async Task CreateCharacterAsync([Remainder]string name)
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.CreateCharacterAsync(discordId, name);
@@ -73,7 +73,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("changename")]
-        public async Task RenameCharacterAsync(string newName)
+        public async Task RenameCharacterAsync([Remainder]string newName)
         {
             var result = await _controller.RenameCharacterAsync(Context.User.Id, newName);
             await ReplyAsync(result.Message);
@@ -81,7 +81,7 @@ namespace Frags.Discord.Modules
 
         [Command("description")]
         [Alias("desc")]
-        public async Task SetCharacterDescriptionAsync(string desc)
+        public async Task SetCharacterDescriptionAsync([Remainder]string desc)
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.SetCharacterDescriptionAsync(discordId, desc);
@@ -89,7 +89,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("story")]
-        public async Task SetCharacterStoryAsync(string story)
+        public async Task SetCharacterStoryAsync([Remainder]string story)
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.SetCharacterStoryAsync(discordId, story);
@@ -98,7 +98,7 @@ namespace Frags.Discord.Modules
 
         [Command("activate")]
         [Alias("act")]
-        public async Task ActivateCharacterAsync(string name)
+        public async Task ActivateCharacterAsync([Remainder]string name)
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.ActivateCharacterAsync(discordId, name);

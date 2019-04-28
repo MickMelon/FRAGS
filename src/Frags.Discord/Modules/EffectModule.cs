@@ -19,7 +19,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("create")]
-        public async Task CreateEffectAsync(string effectName)
+        public async Task CreateEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.CreateEffectAsync(Context.User.Id, effectName);
             await ReplyAsync(result.Message);
@@ -41,14 +41,14 @@ namespace Frags.Discord.Modules
         }
 
         [Command("rename")]
-        public async Task RenameEffectAsync(string effectName, string newName)
+        public async Task RenameEffectAsync(string effectName, [Remainder]string newName)
         {
             var result = await _controller.RenameEffectAsync(effectName, newName);
             await ReplyAsync(result.Message);
         }
 
         [Command("delete")]
-        public async Task DeleteEffectAsync(string effectName)
+        public async Task DeleteEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.DeleteEffectAsync(effectName);
             await ReplyAsync(result.Message);
@@ -66,7 +66,7 @@ namespace Frags.Discord.Modules
 
         [Command("effect add")]
         [Alias("effect apply", "applyeffect")]
-        public async Task AddEffectAsync(string effectName)
+        public async Task AddEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.AddEffectAsync(Context.User.Id, effectName);
             await ReplyAsync(result.Message);
@@ -74,7 +74,7 @@ namespace Frags.Discord.Modules
 
         [Command("effect remove")]
         [Alias("effect unapply", "unapplyeffect")]
-        public async Task RemoveEffectAsync(string effectName)
+        public async Task RemoveEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.RemoveEffectAsync(Context.User.Id, effectName);
             await ReplyAsync(result.Message);

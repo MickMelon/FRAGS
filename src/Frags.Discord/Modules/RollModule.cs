@@ -66,7 +66,7 @@ namespace Frags.Discord.Modules
 
         [Command("rollagainst")]
         [Alias("rollvs", "rv")]
-        public async Task RollAgainstAsync(IUser targetUser, string stat)
+        public async Task RollAgainstAsync(IUser targetUser, [Remainder]string stat)
         {
             ulong discordId = Context.User.Id;
             ulong targetDiscordId = targetUser.Id;
@@ -76,7 +76,7 @@ namespace Frags.Discord.Modules
 
         [Command("brollagainst")]
         [Alias("brollvs", "brv")]
-        public async Task EffectsRollAgainstAsync(IUser targetUser, string stat)
+        public async Task EffectsRollAgainstAsync(IUser targetUser, [Remainder]string stat)
         {
             ulong discordId = Context.User.Id;
             ulong targetDiscordId = targetUser.Id;
