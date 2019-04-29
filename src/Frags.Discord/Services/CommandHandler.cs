@@ -41,11 +41,12 @@ namespace Frags.Discord.Services
             _commands.CommandExecuted += OnCommandExecuted;
         }
 
-        private Task OnCommandExecuted(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        private async Task OnCommandExecuted(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
             _serviceScopes[context.Message.Id].Dispose();
             _serviceScopes.Remove(context.Message.Id);
-            return Task.CompletedTask;
+
+            try { if (!context.Message.Author.IsBot) await context.Message.DeleteAsync(); } catch { }
         }
 
         private async Task HandleCommandAsync(SocketMessage msg)
