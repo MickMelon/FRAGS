@@ -70,12 +70,14 @@ namespace Frags.Core.Game.Progression
                 if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
                 if (character.AttributePoints + current.Value - newValue.Value >= 0)
                 {
-                    if (current.IsProficient)
-                        current.Value += Convert.ToInt32(newValue.Value * _statOptions.ProficientAttributeMultiplier);
-                    else
-                        current.Value += newValue.Value;
+                    int amt = newValue.Value - current.Value;
 
-                    character.AttributePoints -= newValue.Value;
+                    if (current.IsProficient)
+                        newValue += (int)(amt * _statOptions.ProficientAttributeMultiplier);
+
+                    current.Value = newValue.Value;
+
+                    character.AttributePoints -= amt;
                     character.SetStatistic(attribute, current);
                 }
                 else
@@ -91,12 +93,14 @@ namespace Frags.Core.Game.Progression
                 if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
                 if (character.SkillPoints + current.Value - newValue.Value >= 0)
                 {
-                    if (current.IsProficient)
-                        current.Value += Convert.ToInt32(newValue.Value * _statOptions.ProficientSkillMultiplier);
-                    else
-                        current.Value += newValue.Value;
+                    int amt = newValue.Value - current.Value;
 
-                    character.SkillPoints -= newValue.Value;
+                    if (current.IsProficient)
+                        newValue += (int)(amt * _statOptions.ProficientAttributeMultiplier);
+
+                    current.Value = newValue.Value;
+
+                    character.SkillPoints -= amt;
                     character.SetStatistic(skill, current);
                 }
                 else
