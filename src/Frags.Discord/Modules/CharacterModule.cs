@@ -44,6 +44,16 @@ namespace Frags.Discord.Modules
             await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
         }
 
+        [Command("list")]
+        public async Task ListCharactersAsync()
+        {
+            var result = await _controller.ListCharactersAsync(Context.User.Id);
+            var embed = new EmbedBuilder();
+            embed.WithDescription(result.Message);
+
+            await ReplyAsync(embed: embed.Build());
+        }
+
         [Command("story")]
         public async Task ShowCharacterStoryAsync(IUser user = null)
         {

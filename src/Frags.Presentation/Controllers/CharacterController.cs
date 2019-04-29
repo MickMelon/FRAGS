@@ -54,6 +54,12 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.Show(character, _progStrategy.GetCharacterLevel(character), await _progStrategy.GetCharacterInfo(character));
         }
 
+        public async Task<IResult> ListCharactersAsync(ulong callerId)
+        {
+            var characters = await _provider.GetAllCharactersAsync(callerId);
+            return GenericResult.Generic(string.Join("\n", characters.OrderBy(x => x.Id).Select(x => x.Name)));
+        }
+
         /// <summary>
         /// Gets the caller's specified character by name, sets it as active, and updates it.
         /// </summary>
@@ -64,7 +70,7 @@ namespace Frags.Presentation.Controllers
         {
             var characters = await _provider.GetAllCharactersAsync(callerId);
 
-            var match = characters.FirstOrDefault(x => x.Name.ContainsIgnoreCase(charName));
+            var match = characters.OrderBy(x => x.Id).FirstOrDefault(x => x.Name.ContainsIgnoreCase(charName));
 
             if (match == null) return CharacterResult.CharacterNotFound();
             if (match.Active) return CharacterResult.CharacterAlreadyActive();
@@ -76,6 +82,9 @@ namespace Frags.Presentation.Controllers
 
         public async Task<IResult> RenameCharacterAsync(ulong id, string newName)
         {
+            if (newName.Length < 3) return GenericResult.ValueTooLow();
+            if (newName.Length > 30) return GenericResult.ValueTooHigh();
+
             var character = await _provider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
 
@@ -93,6 +102,9 @@ namespace Frags.Presentation.Controllers
         /// <returns>A new CharacterResult object.</returns>
         public async Task<IResult> CreateCharacterAsync(ulong callerId, string name)
         {
+            if (name.Length < 3) return GenericResult.ValueTooLow();
+            if (name.Length > 30) return GenericResult.ValueTooHigh();
+
             var characters = await _provider.GetAllCharactersAsync(callerId);
             if (characters.Count >= _options.CharacterLimit) return CharacterResult.TooManyCharacters();
 
