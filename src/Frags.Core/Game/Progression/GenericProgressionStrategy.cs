@@ -67,7 +67,10 @@ namespace Frags.Core.Game.Progression
             if (statistic is Attribute attribute)
             {
                 var current = character.GetStatistic(attribute);
+
                 if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
+                if (newValue.Value > _statOptions.AttributeMax) throw new ProgressionException(Messages.TOO_HIGH);
+
                 if (character.AttributePoints + current.Value - newValue.Value >= 0)
                 {
                     int amt = newValue.Value - current.Value;
@@ -90,7 +93,10 @@ namespace Frags.Core.Game.Progression
             else if (statistic is Skill skill)
             {
                 var current = character.GetStatistic(skill);
+
                 if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
+                if (newValue.Value > _statOptions.SkillMax) throw new ProgressionException(Messages.TOO_HIGH);
+
                 if (character.SkillPoints + current.Value - newValue.Value >= 0)
                 {
                     int amt = newValue.Value - current.Value;

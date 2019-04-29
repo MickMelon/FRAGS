@@ -51,34 +51,13 @@ namespace Frags.Core.Game.Progression
             if (level <= _statOptions.InitialSetupMaxLevel || !await InitialAttributesSet(character))
                 return await SetInitialStatistic(character, statistic, newValue.Value);
 
-            // Character is above setup level and has their attributes & skills set
-            if (statistic is Attribute attribute)
-            {
-                var current = character.GetStatistic(attribute);
-                if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
-                if (character.AttributePoints + current.Value - newValue.Value >= 0)
-                {
-                    int amt = newValue.Value - current.Value;
-
-                    if (current.IsProficient)
-                        newValue += (int)(amt * _statOptions.ProficientAttributeMultiplier);
-                        
-                    current.Value = newValue.Value;
-
-                    character.AttributePoints -= amt;
-                    character.SetStatistic(attribute, current);
-                }
-                else
-                {
-                    throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
-                }
-
-                return true;
-            }
-            else if (statistic is Skill skill)
+            if (statistic is Skill skill)
             {
                 var current = character.GetStatistic(skill);
+
                 if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
+                if (newValue.Value > _statOptions.SkillMax) throw new ProgressionException(Messages.TOO_HIGH);
+
                 if (character.SkillPoints + current.Value - newValue.Value >= 0)
                 {
                     int amt = newValue.Value - current.Value;
