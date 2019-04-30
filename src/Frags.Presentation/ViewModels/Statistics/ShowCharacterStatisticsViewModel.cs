@@ -11,6 +11,8 @@ namespace Frags.Presentation.ViewModels.Statistics
         public IDictionary<ShowAttributeViewModel, ICollection<ShowSkillViewModel>> Statistics { get; set; } =
             new Dictionary<ShowAttributeViewModel, ICollection<ShowSkillViewModel>>();
 
+        public string CharacterName { get; set; }
+
         public int AttributePoints { get; set; }
         public int SkillPoints { get; set; }
 

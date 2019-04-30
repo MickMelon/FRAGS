@@ -85,11 +85,14 @@ namespace Frags.Presentation.Results
 
         public static IResult ShowCharacter(Character character, string progressionInfo)
         {
-            var result = new ShowCharacterStatisticsViewModel();
-            result.AttributePoints = character.AttributePoints;
-            result.SkillPoints = character.SkillPoints;
+            var result = new ShowCharacterStatisticsViewModel
+            {
+                CharacterName = character.Name,
+                AttributePoints = character.AttributePoints,
+                SkillPoints = character.SkillPoints
+            };
 
-            // Get a list of view models using Show()
+            // Get a list of all statistic view models using Show()
             var stats = new List<ShowStatisticViewModel>();
             foreach (var statMap in character.Statistics)
             {
@@ -99,6 +102,7 @@ namespace Frags.Presentation.Results
                     stats.Add(viewModel);
             }
 
+            // Get a list of skill view models associated with each attribute
             foreach (var attribute in stats.OfType<ShowAttributeViewModel>())
             {
                 var skills = stats.OfType<ShowSkillViewModel>().Where(x => x.Attribute.Name.Equals(attribute.Name)).ToList();

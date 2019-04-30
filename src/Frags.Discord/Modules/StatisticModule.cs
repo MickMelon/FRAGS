@@ -154,6 +154,7 @@ namespace Frags.Discord.Modules
                 output.Append($"Progression info:\n{viewModel.ProgressionInformation}\n");
 
             EmbedBuilder eb = new EmbedBuilder();
+            eb.WithTitle($"{viewModel.CharacterName}'s Statistics");
             eb.WithDescription(output.ToString());
             await ReplyAsync(embed: eb.Build());
         }
