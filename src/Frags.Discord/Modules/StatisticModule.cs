@@ -168,6 +168,7 @@ namespace Frags.Discord.Modules
 
         [Command("proficiency")]
         [Alias("proficient", "prof")]
+        [RequireAdminRole]
         public async Task ForceSetProficiencyAsync(IUser user, string statName, bool prof = true)
         {
             var result = await _statController.SetProficiencyAsync(user.Id, statName, prof, true);
