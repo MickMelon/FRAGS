@@ -138,7 +138,7 @@ namespace Frags.Discord.Modules
             StringBuilder output = new StringBuilder();
             var viewModel = (ShowCharacterStatisticsViewModel)result.ViewModel;
             
-            foreach (var attrib in viewModel.Statistics.Keys.OrderBy(x => x.Order))
+            foreach (var attrib in viewModel.Statistics.Keys.OrderByDescending(x => x.Order))
             {
                 // Example: "Strength: 5" or "Strength: N/A"
                 output.Append($"__**{attrib.Name}: {attrib.Value?.ToString() ?? "N/A"}**__\n");
