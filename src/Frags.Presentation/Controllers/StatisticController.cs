@@ -110,6 +110,28 @@ namespace Frags.Presentation.Controllers
             return CharacterResult.CharacterUpdatedSuccessfully();
         }
 
+        public async Task<IResult> AddAttributePointsAsync(ulong callerId, int pts)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            character.AttributePoints += pts;
+            await _charProvider.UpdateCharacterAsync(character);
+
+            return CharacterResult.CharacterUpdatedSuccessfully();
+        }
+
+        public async Task<IResult> AddSkillPointsAsync(ulong callerId, int pts)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            character.SkillPoints += pts;
+            await _charProvider.UpdateCharacterAsync(character);
+
+            return CharacterResult.CharacterUpdatedSuccessfully();
+        }
+
         public async Task<IResult> ResetStatisticsAsync(ulong id)
         {
             var character = await _charProvider.GetActiveCharacterAsync(id);
@@ -217,7 +239,7 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         /// <param name="callerId">The user identifier of the caller.</param>
         /// <param name="values">What to set the initial attributes to.</param>
-        public async Task<IResult> SetStatisticAsync(ulong callerId, string statName, int? newValue = null)
+        public async Task<IResult> SetStatisticAsync(ulong callerId, string statName, int? newValue = null, bool force = false)
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
@@ -227,7 +249,18 @@ namespace Frags.Presentation.Controllers
 
             try
             {
-                await _strategy.SetStatistic(character, statistic, newValue);
+                if (force)
+                {
+                    var statValue = character.GetStatistic(statistic);
+
+                    if (newValue.HasValue)
+                        statValue.Value = newValue.Value;
+                }
+                else
+                {
+                    await _strategy.SetStatistic(character, statistic, newValue);
+                }
+
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
             }
@@ -246,7 +279,7 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         /// <param name="callerId">The user identifier of the caller.</param>
         /// <param name="values">What to set the initial attributes to.</param>
-        public async Task<IResult> SetProficiencyAsync(ulong callerId, string statName, bool isProficient)
+        public async Task<IResult> SetProficiencyAsync(ulong callerId, string statName, bool isProficient, bool force = false)
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
@@ -256,7 +289,16 @@ namespace Frags.Presentation.Controllers
 
             try
             {
-                await _strategy.SetProficiency(character, statistic, isProficient);
+                if (force)
+                {
+                    var statVal = character.GetStatistic(statistic);
+                    statVal.IsProficient = isProficient;
+                }
+                else
+                {
+                    await _strategy.SetProficiency(character, statistic, isProficient);
+                }
+                
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
             }

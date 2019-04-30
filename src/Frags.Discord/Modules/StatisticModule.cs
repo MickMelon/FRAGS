@@ -98,22 +98,6 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
-        [Command("exp")]
-        [RequireAdminRole]
-        public async Task AddExperienceAsync(IUser user, int xp)
-        {
-            var result = await _statController.AddExperienceAsync(user.Id, xp);
-            await ReplyAsync(result.Message);
-        }
-
-        [Command("reset")]
-        [RequireAdminRole]
-        public async Task ResetCharacterAsync(IUser user)
-        {
-            var result = await _statController.ResetStatisticsAsync(user.Id);
-            await ReplyAsync(result.Message);
-        }
-
         [Command("proficiency")]
         [Alias("proficient", "prof")]
         public async Task SetProficiencyAsync(string statName, bool prof = true)
@@ -172,6 +156,56 @@ namespace Frags.Discord.Modules
             EmbedBuilder eb = new EmbedBuilder();
             eb.WithDescription(output.ToString());
             await ReplyAsync(embed: eb.Build());
+        }
+
+        [Command("set")]
+        [RequireAdminRole]
+        public async Task ForceSetStatisticAsync(IUser user, string statName, int? newValue = null)
+        {
+            var result = await _statController.SetStatisticAsync(user.Id, statName, newValue, true);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("proficiency")]
+        [Alias("proficient", "prof")]
+        public async Task ForceSetProficiencyAsync(IUser user, string statName, bool prof = true)
+        {
+            var result = await _statController.SetProficiencyAsync(user.Id, statName, prof, true);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("exp")]
+        [RequireAdminRole]
+        public async Task AddExperienceAsync(IUser user, int xp)
+        {
+            var result = await _statController.AddExperienceAsync(user.Id, xp);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("attributepoints")]
+        [Alias("attribpoints", "apoints", "addattributepoints", "addattribpoints", "addapoints")]
+        [RequireAdminRole]
+        public async Task AddAttributePointsAsync(IUser user, int pts)
+        {
+            var result = await _statController.AddAttributePointsAsync(user.Id, pts);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("skillpoints")]
+        [Alias("spoints", "addskillpoints", "addspoints")]
+        [RequireAdminRole]
+        public async Task AddSkillPointsAsync(IUser user, int pts)
+        {
+            var result = await _statController.AddSkillPointsAsync(user.Id, pts);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("reset")]
+        [RequireAdminRole]
+        public async Task ResetCharacterAsync(IUser user)
+        {
+            var result = await _statController.ResetStatisticsAsync(user.Id);
+            await ReplyAsync(result.Message);
         }
     }
 }

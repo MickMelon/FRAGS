@@ -68,7 +68,6 @@ namespace Frags.Core.Game.Progression
                     current.Value = newValue.Value;
 
                     character.SkillPoints -= amt;
-                    character.SetStatistic(skill, current);
                 }
                 else
                 {

@@ -78,13 +78,15 @@ namespace Frags.Presentation.Controllers
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            var statVal = character.GetStatistic(stat);
-            statVal.Value = value;
-
             if (displayName != null)
                 character.Name = displayName;
-            
-            character.SetStatistic(stat, statVal);
+
+            var current = character.GetStatistic(stat);
+
+            if (current == null)
+                character.SetStatistic(stat, new StatisticValue(value));
+            else
+                current.Value = value;
 
             string msg = _strategy.GetRollMessage(stat, character);
 

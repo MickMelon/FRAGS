@@ -81,7 +81,6 @@ namespace Frags.Core.Game.Progression
                     current.Value = newValue.Value;
 
                     character.AttributePoints -= amt;
-                    character.SetStatistic(attribute, current);
                 }
                 else
                 {
@@ -107,7 +106,6 @@ namespace Frags.Core.Game.Progression
                     current.Value = newValue.Value;
 
                     character.SkillPoints -= amt;
-                    character.SetStatistic(skill, current);
                 }
                 else
                 {
@@ -175,7 +173,6 @@ namespace Frags.Core.Game.Progression
                         throw new ProgressionException(String.Format(Messages.STAT_TOO_MANY_AT_MAX, statsAtMax));
 
             currentVal.Value = newValue;
-            character.SetStatistic(statistic, currentVal);
             
             return true;
         }
