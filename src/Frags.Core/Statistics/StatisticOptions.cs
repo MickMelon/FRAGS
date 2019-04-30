@@ -4,6 +4,9 @@ namespace Frags.Core.Statistics
     {
         public string ProgressionStrategy { get; set; }
 
+        public int AttributeMax { get; set; }
+        public int SkillMax { get; set; }
+
         #region Initial Setup
         public int InitialSetupMaxLevel { get; set; } = 1;
 

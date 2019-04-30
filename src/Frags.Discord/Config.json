@@ -9,6 +9,9 @@
   "StatisticOptions": {
     "ProgressionStrategy": "GenericProgressionStrategy",
 
+    "AttributeMax": 10,
+    "SkillMax": 200,
+
     "InitialSetupMaxLevel": 1,
 
     "InitialAttributeMin": 1,
