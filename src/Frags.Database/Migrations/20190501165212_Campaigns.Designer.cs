@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frags.Database.Migrations
 {
     [DbContext(typeof(RpgContext))]
-    [Migration("20190416004715_Initial")]
-    partial class Initial
+    [Migration("20190501165212_Campaigns")]
+    partial class Campaigns
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -25,6 +25,8 @@ namespace Frags.Database.Migrations
 
                     b.Property<string>("Aliases");
 
+                    b.Property<int?>("CampaignDtoId");
+
                     b.Property<string>("Description");
 
                     b.Property<string>("Discriminator")
@@ -33,6 +35,8 @@ namespace Frags.Database.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CampaignDtoId");
 
                     b.ToTable("Statistics");
 
@@ -81,6 +85,39 @@ namespace Frags.Database.Migrations
                     b.ToTable("StatisticValue");
                 });
 
+            modelBuilder.Entity("Frags.Database.Campaigns.CampaignDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<ulong>("OwnerUserIdentifier");
+
+                    b.Property<int?>("RollOptionsId");
+
+                    b.Property<int?>("StatisticOptionsId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RollOptionsId");
+
+                    b.HasIndex("StatisticOptionsId");
+
+                    b.ToTable("Campaigns");
+                });
+
+            modelBuilder.Entity("Frags.Database.Campaigns.Moderator", b =>
+                {
+                    b.Property<int>("UserId");
+
+                    b.Property<int>("CampaignId");
+
+                    b.HasKey("UserId", "CampaignId");
+
+                    b.HasIndex("CampaignId");
+
+                    b.ToTable("Moderator");
+                });
+
             modelBuilder.Entity("Frags.Database.Characters.CharacterDto", b =>
                 {
                     b.Property<int>("Id")
@@ -89,6 +126,8 @@ namespace Frags.Database.Migrations
                     b.Property<bool>("Active");
 
                     b.Property<int>("AttributePoints");
+
+                    b.Property<int?>("CampaignDtoId");
 
                     b.Property<string>("Description");
 
@@ -105,6 +144,8 @@ namespace Frags.Database.Migrations
                     b.Property<ulong>("UserIdentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CampaignDtoId");
 
                     b.ToTable("Characters");
                 });
@@ -130,6 +171,8 @@ namespace Frags.Database.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int?>("CampaignDtoId");
+
                     b.Property<string>("Description");
 
                     b.Property<string>("Name");
@@ -137,6 +180,8 @@ namespace Frags.Database.Migrations
                     b.Property<ulong>("OwnerUserIdentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CampaignDtoId");
 
                     b.ToTable("Effects");
                 });
@@ -152,6 +197,84 @@ namespace Frags.Database.Migrations
                     b.HasIndex("CharacterId");
 
                     b.ToTable("EffectMapping");
+                });
+
+            modelBuilder.Entity("Frags.Database.Statistics.ChannelDto", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("CampaignDtoId");
+
+                    b.Property<int?>("StatisticOptionsDtoId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignDtoId");
+
+                    b.HasIndex("StatisticOptionsDtoId");
+
+                    b.ToTable("ChannelDto");
+                });
+
+            modelBuilder.Entity("Frags.Database.Statistics.RollOptionsDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("RollStrategy");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RollOptionsDto");
+                });
+
+            modelBuilder.Entity("Frags.Database.Statistics.StatisticOptionsDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AttributeMax");
+
+                    b.Property<int>("AttributePointsOnLevelUp");
+
+                    b.Property<int>("ExpMessageLengthDivisor");
+
+                    b.Property<int>("InitialAttributeMax");
+
+                    b.Property<int>("InitialAttributeMin");
+
+                    b.Property<int>("InitialAttributePoints");
+
+                    b.Property<int>("InitialAttributesAtMax");
+
+                    b.Property<int>("InitialAttributesProficient");
+
+                    b.Property<int>("InitialSetupMaxLevel");
+
+                    b.Property<int>("InitialSkillMax");
+
+                    b.Property<int>("InitialSkillMin");
+
+                    b.Property<int>("InitialSkillPoints");
+
+                    b.Property<int>("InitialSkillsAtMax");
+
+                    b.Property<int>("InitialSkillsProficient");
+
+                    b.Property<double>("ProficientAttributeMultiplier");
+
+                    b.Property<double>("ProficientSkillMultiplier");
+
+                    b.Property<string>("ProgressionStrategy");
+
+                    b.Property<int>("SkillMax");
+
+                    b.Property<int>("SkillPointsOnLevelUp");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StatisticOptionsDto");
                 });
 
             modelBuilder.Entity("Frags.Core.Statistics.Attribute", b =>
@@ -174,6 +297,13 @@ namespace Frags.Database.Migrations
                     b.HasDiscriminator().HasValue("Skill");
                 });
 
+            modelBuilder.Entity("Frags.Core.Statistics.Statistic", b =>
+                {
+                    b.HasOne("Frags.Database.Campaigns.CampaignDto")
+                        .WithMany("Statistics")
+                        .HasForeignKey("CampaignDtoId");
+                });
+
             modelBuilder.Entity("Frags.Core.Statistics.StatisticMapping", b =>
                 {
                     b.HasOne("Frags.Database.Characters.CharacterDto")
@@ -194,11 +324,49 @@ namespace Frags.Database.Migrations
                         .HasForeignKey("StatisticValueId");
                 });
 
+            modelBuilder.Entity("Frags.Database.Campaigns.CampaignDto", b =>
+                {
+                    b.HasOne("Frags.Database.Statistics.RollOptionsDto", "RollOptions")
+                        .WithMany()
+                        .HasForeignKey("RollOptionsId");
+
+                    b.HasOne("Frags.Database.Statistics.StatisticOptionsDto", "StatisticOptions")
+                        .WithMany()
+                        .HasForeignKey("StatisticOptionsId");
+                });
+
+            modelBuilder.Entity("Frags.Database.Campaigns.Moderator", b =>
+                {
+                    b.HasOne("Frags.Database.Campaigns.CampaignDto", "Campaign")
+                        .WithMany("Moderators")
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Frags.Database.Characters.User", "User")
+                        .WithMany("ModeratedCampaigns")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Frags.Database.Characters.CharacterDto", b =>
+                {
+                    b.HasOne("Frags.Database.Campaigns.CampaignDto")
+                        .WithMany("Characters")
+                        .HasForeignKey("CampaignDtoId");
+                });
+
             modelBuilder.Entity("Frags.Database.Characters.User", b =>
                 {
                     b.HasOne("Frags.Database.Characters.CharacterDto", "ActiveCharacter")
                         .WithMany()
                         .HasForeignKey("ActiveCharacterId");
+                });
+
+            modelBuilder.Entity("Frags.Database.Effects.EffectDto", b =>
+                {
+                    b.HasOne("Frags.Database.Campaigns.CampaignDto")
+                        .WithMany("Effects")
+                        .HasForeignKey("CampaignDtoId");
                 });
 
             modelBuilder.Entity("Frags.Database.Effects.EffectMapping", b =>
@@ -212,6 +380,17 @@ namespace Frags.Database.Migrations
                         .WithMany("EffectMappings")
                         .HasForeignKey("EffectId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Frags.Database.Statistics.ChannelDto", b =>
+                {
+                    b.HasOne("Frags.Database.Campaigns.CampaignDto")
+                        .WithMany("Channels")
+                        .HasForeignKey("CampaignDtoId");
+
+                    b.HasOne("Frags.Database.Statistics.StatisticOptionsDto")
+                        .WithMany("ExpEnabledChannels")
+                        .HasForeignKey("StatisticOptionsDtoId");
                 });
 
             modelBuilder.Entity("Frags.Core.Statistics.Skill", b =>

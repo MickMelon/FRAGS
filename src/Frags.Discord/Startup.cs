@@ -85,7 +85,7 @@ namespace Frags.Discord
         /// </summary>
         private static IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
-                .AddDbContext<RpgContext>(opt => opt.UseInMemoryDatabase("TestDb"),
+                .AddDbContext<RpgContext>(opt => opt.UseSqlite("Filename=Frags.db"),
                     contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
                 .AddTransient<ICharacterProvider, EfCharacterProvider>()
                 .AddTransient<IEffectProvider, EfEffectProvider>()

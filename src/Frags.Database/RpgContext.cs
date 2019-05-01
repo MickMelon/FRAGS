@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Frags.Core.Statistics;
+using Frags.Database.Campaigns;
 using Frags.Database.Characters;
 using Frags.Database.Effects;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ namespace Frags.Database
     public class RpgContext : DbContext
     {
         public DbSet<Attribute> Attributes { get; set; }
+        public DbSet<CampaignDto> Campaigns { get; set; }
         public DbSet<CharacterDto> Characters { get; set; }
         public DbSet<EffectDto> Effects { get; set; }
         public DbSet<Skill> Skills { get; set; }
@@ -48,6 +50,19 @@ namespace Frags.Database
                 .HasOne(ec => ec.Character)
                 .WithMany(c => c.EffectMappings)
                 .HasForeignKey(ec => ec.CharacterId);
+
+            builder.Entity<Moderator>()
+                .HasKey(mod => new { mod.UserId, mod.CampaignId });  
+
+            builder.Entity<Moderator>()
+                .HasOne(mod => mod.Campaign)
+                .WithMany(c => c.Moderators)
+                .HasForeignKey(mod => mod.CampaignId);  
+
+            builder.Entity<Moderator>()
+                .HasOne(mod => mod.User)
+                .WithMany(u => u.ModeratedCampaigns)
+                .HasForeignKey(mod => mod.UserId);
 
             builder.Entity<CharacterDto>().Metadata.FindNavigation(nameof(CharacterDto.EffectMappings)).IsEagerLoaded = true;
         }

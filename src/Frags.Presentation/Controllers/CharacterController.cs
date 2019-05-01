@@ -102,9 +102,6 @@ namespace Frags.Presentation.Controllers
         /// <returns>A new CharacterResult object.</returns>
         public async Task<IResult> CreateCharacterAsync(ulong callerId, string name)
         {
-            if (name.Length < 3) return GenericResult.ValueTooLow();
-            if (name.Length > 30) return GenericResult.ValueTooHigh();
-
             var characters = await _provider.GetAllCharactersAsync(callerId);
             if (characters.Count >= _options.CharacterLimit) return CharacterResult.TooManyCharacters();
 

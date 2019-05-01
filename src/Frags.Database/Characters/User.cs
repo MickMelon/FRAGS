@@ -1,5 +1,7 @@
 using Frags.Core.Common;
+using Frags.Database.Campaigns;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frags.Database.Characters
@@ -14,5 +16,6 @@ namespace Frags.Database.Characters
         public ulong UserIdentifier { get; set; }
 
         public CharacterDto ActiveCharacter { get; set; }
+        public ICollection<Moderator> ModeratedCampaigns { get; set; }
     }
 }
