@@ -49,6 +49,7 @@ namespace Frags.Discord.Modules
         {
             var result = await _controller.ListCharactersAsync(Context.User.Id);
             var embed = new EmbedBuilder();
+            embed.WithTitle(Context.User.Username + "'s Characters");
             embed.WithDescription(result.Message);
 
             await ReplyAsync(embed: embed.Build());

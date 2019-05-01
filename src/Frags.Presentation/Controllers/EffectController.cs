@@ -59,9 +59,23 @@ namespace Frags.Presentation.Controllers
             if ((await _effectProvider.GetUserEffectsAsync(callerId)).Count() >= _options.EffectsLimit)
                 return EffectResult.TooManyEffects();
 
-            var result = await _effectProvider.CreateEffectAsync(effectName);
+            var result = await _effectProvider.CreateEffectAsync(effectName, callerId);
+            result.OwnerUserIdentifier = callerId;
+            await _effectProvider.UpdateEffectAsync(result);
+
             if (result == null) return EffectResult.EffectCreationFailed();
             return EffectResult.EffectCreatedSuccessfully();
+        }
+
+        /// <summary>
+        /// Returns a result containing a string of effects created by the given user.
+        /// </summary>
+        /// <param name="id">The user identifier to show effects created by.</param>
+        /// <returns>A GenericResult with a Message property containing the user's created effects.</returns>
+        public async Task<IResult> ListCreatedEffectsAsync(ulong callerId)
+        {
+            var effects = await _effectProvider.GetUserEffectsAsync(callerId);
+            return GenericResult.Generic(string.Join("\n", effects.OrderBy(x => x.Id).Select(x => x.Name)));
         }
 
         /// <summary>

@@ -12,9 +12,9 @@ namespace Frags.Core.DataAccess
 
         private int id = 1;
 
-        public Task<Effect> CreateEffectAsync(string name)
+        public Task<Effect> CreateEffectAsync(string name, ulong ownerId)
         {
-            var effect = new Effect { Id = id++, Name = name };
+            var effect = new Effect(name, ownerId) { Id = id++ };
             _effects.Add(effect);
             return Task.FromResult(effect);
         }
