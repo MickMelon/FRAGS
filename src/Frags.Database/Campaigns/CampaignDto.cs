@@ -11,6 +11,8 @@ namespace Frags.Database.Campaigns
     {
         public int Id { get; set; }
 
+        public string Name { get; set; }
+
         public ulong OwnerUserIdentifier { get; set; }
         public ICollection<Moderator> Moderators { get; set; }
 
