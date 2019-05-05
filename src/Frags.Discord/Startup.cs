@@ -37,6 +37,10 @@ namespace Frags.Discord
             services.GetRequiredService<LogService>();
             var client = services.GetRequiredService<DiscordSocketClient>();
             var commands = services.GetRequiredService<CommandHandler>();
+            var context = services.GetRequiredService<RpgContext>();
+
+            if (context.Database.IsSqlite())
+                context.Database.Migrate();
                       
             await commands.InitializeAsync();          
             await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
@@ -54,9 +58,9 @@ namespace Frags.Discord
             IServiceCollection services = new ServiceCollection();
                 
             services = AddDiscordServices(services);
+            services = AddConfiguredServices(services);
             services = AddDatabaseServices(services);
             services = AddGameServices(services);
-            services = AddConfiguredServices(services);
 
             return services.BuildServiceProvider();
         } 
@@ -85,8 +89,7 @@ namespace Frags.Discord
         /// </summary>
         private static IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
-                .AddDbContext<RpgContext>(opt => opt.UseInMemoryDatabase("TestDb"),
-                    contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
+                .AddDbContext<RpgContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
                 .AddTransient<ICharacterProvider, EfCharacterProvider>()
                 .AddTransient<IEffectProvider, EfEffectProvider>()
                 .AddTransient<IStatisticProvider, EfStatisticProvider>();
