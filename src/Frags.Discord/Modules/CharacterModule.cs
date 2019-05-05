@@ -78,6 +78,9 @@ namespace Frags.Discord.Modules
         [Command("create")]
         public async Task CreateCharacterAsync([Remainder]string name)
         {
+            if (name.Length < 3) return;
+            if (name.Length > 30) return;
+
             ulong discordId = Context.User.Id;
             var result = await _controller.CreateCharacterAsync(discordId, name);
             await ReplyAsync(result.Message);
@@ -86,6 +89,9 @@ namespace Frags.Discord.Modules
         [Command("changename")]
         public async Task RenameCharacterAsync([Remainder]string newName)
         {
+            if (newName.Length < 3) return;
+            if (newName.Length > 30) return;
+
             var result = await _controller.RenameCharacterAsync(Context.User.Id, newName);
             await ReplyAsync(result.Message);
         }
