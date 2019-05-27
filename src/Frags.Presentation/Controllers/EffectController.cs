@@ -59,9 +59,7 @@ namespace Frags.Presentation.Controllers
             if ((await _effectProvider.GetUserEffectsAsync(callerId)).Count() >= _options.EffectsLimit)
                 return EffectResult.TooManyEffects();
 
-            var result = await _effectProvider.CreateEffectAsync(effectName, callerId);
-            result.OwnerUserIdentifier = callerId;
-            await _effectProvider.UpdateEffectAsync(result);
+            var result = await _effectProvider.CreateEffectAsync(callerId, effectName);
 
             if (result == null) return EffectResult.EffectCreationFailed();
             return EffectResult.EffectCreatedSuccessfully();

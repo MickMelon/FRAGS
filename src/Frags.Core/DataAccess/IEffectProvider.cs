@@ -12,7 +12,7 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="name">Effect's name.</param>
         /// <returns>The added effect if successful, null if not.</returns>
-        Task<Effect> CreateEffectAsync(string name, ulong ownerId);
+        Task<Effect> CreateEffectAsync(ulong ownerId, string name);
 
         /// <summary>
         /// Deletes an effect from the database. 

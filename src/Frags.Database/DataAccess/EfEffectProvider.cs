@@ -28,9 +28,9 @@ namespace Frags.Database.DataAccess
             _mapper = new Mapper(mapperConfig);
         }
 
-        public async Task<Effect> CreateEffectAsync(string name, ulong ownerId)
+        public async Task<Effect> CreateEffectAsync(ulong ownerId, string name)
         {
-            var effect = new Effect(name, ownerId);
+            var effect = new Effect(ownerId, name);
             var dto = _mapper.Map<EffectDto>(effect);
 
             await _context.Effects.AddAsync(dto);

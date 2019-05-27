@@ -9,7 +9,7 @@ namespace Frags.Core.Effects
     {
         protected Effect() { }
 
-        public Effect(string name, ulong ownerId)
+        public Effect(ulong ownerId, string name)
         {
             StatisticEffects = new List<StatisticMapping>();
             Name = name;
