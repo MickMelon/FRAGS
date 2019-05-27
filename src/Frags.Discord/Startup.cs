@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -58,6 +59,7 @@ namespace Frags.Discord
             IServiceCollection services = new ServiceCollection();
                 
             services = AddDiscordServices(services);
+            services = AddPluginServices(services);
             services = AddConfiguredServices(services);
             services = AddDatabaseServices(services);
             services = AddGameServices(services);
@@ -129,12 +131,32 @@ namespace Frags.Discord
                     ResolveServices<IProgressionStrategy>(provider, provider.GetRequiredService<StatisticOptions>().ProgressionStrategy));
         }
 
+        private static readonly List<Type> _pluginTypes = new List<Type>();
+
+        private static IServiceCollection AddPluginServices(IServiceCollection services)
+        {
+            List<Assembly> assemblies = new List<Assembly>();
+
+            // Add all .dll's in the Plugins folder the list of assemblies
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Plugins");
+
+            foreach (string dll in Directory.GetFiles(path, "*.dll"))
+                assemblies.Add(Assembly.LoadFile(dll));
+
+            // Add all of the .dll's types to a list
+            foreach (var assembly in assemblies)
+                _pluginTypes.AddRange(assembly.ExportedTypes);
+
+            foreach (var type in _pluginTypes)
+                services.AddTransient(type);
+
+            return services;
+        }
+
         private static T ResolveServices<T>(IServiceProvider provider, string typeName)
         {
-            var assembly = typeof(T).Assembly;
-
-            // Case-insensitively search the types in the specified assembly
-            var type = assembly.ExportedTypes
+            // Search plugins & the interface's assembly's types
+            var type = _pluginTypes.Union(typeof(T).Assembly.ExportedTypes)
                 .Where(x => typeof(T).IsAssignableFrom(x))
                 .Single(x => x.Name.ContainsIgnoreCase(typeName));
 
