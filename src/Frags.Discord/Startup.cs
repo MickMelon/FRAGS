@@ -41,7 +41,7 @@ namespace Frags.Discord
             var context = services.GetRequiredService<RpgContext>();
 
             if (context.Database.IsSqlite())
-                context.Database.Migrate();
+                context.Database.EnsureCreated();
                       
             await commands.InitializeAsync();          
             await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
