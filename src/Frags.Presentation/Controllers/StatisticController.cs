@@ -275,6 +275,38 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
+        /// Used to set a character's attributes up.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the caller.</param>
+        /// <param name="values">What to set the initial attributes to.</param>
+        public async Task<IResult> UsePointsOnStatisticAsync(ulong callerId, string statName, int? newValue = null)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            var statistic = await _statProvider.GetStatisticAsync(statName);
+            if (statistic == null) return StatisticResult.StatisticNotFound();
+
+            try
+            {
+                var currentVal = character.GetStatistic(statistic).Value;
+
+                await _strategy.SetStatistic(character, statistic, newValue + currentVal);
+
+                await _charProvider.UpdateCharacterAsync(character);
+                return StatisticResult.StatisticSetSucessfully();
+            }
+            catch (System.Exception e)
+            {
+                if (!(e is ProgressionException))
+                    System.Console.WriteLine(e);
+
+                return GenericResult.Failure(e.Message);
+                throw e;
+            }
+        }
+
+        /// <summary>
         /// Used to set a character's proficiencies up.
         /// </summary>
         /// <param name="callerId">The user identifier of the caller.</param>

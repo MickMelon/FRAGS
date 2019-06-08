@@ -98,6 +98,13 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("spend")]
+        public async Task UsePointsOnStatisticAsync(string statName, int? newValue = null)
+        {
+            var result = await _statController.UsePointsOnStatisticAsync(Context.User.Id, statName, newValue);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("proficiency")]
         [Alias("proficient", "prof")]
         public async Task SetProficiencyAsync(string statName, bool prof = true)
