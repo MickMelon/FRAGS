@@ -84,7 +84,8 @@ namespace Frags.Discord
                     DefaultRunMode = RunMode.Async
                 }))
                 .AddSingleton<CommandHandler>()
-                .AddSingleton<LogService>();
+                .AddSingleton<LogService>()
+                .AddSingleton<ReliabilityService>();
 
         /// <summary>
         /// Adds the database services to the collection.
