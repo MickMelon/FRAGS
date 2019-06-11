@@ -26,6 +26,9 @@ namespace Frags.Core.Game.Rolling
         
         private static readonly string ROLL_RESULT_SUCCESS = " for {0}: did **{1}%** better than needed!";
         private static readonly string ROLL_RESULT_FAILURE = " for {0}: did **{1}%** worse than needed!";
+
+        private static readonly string USE_EFFECTS_EMOJI = "\uD83D\uDCAA";
+        private static readonly string USE_EFFECTS_MESSAGE = $"{USE_EFFECTS_EMOJI} **USING EFFECTS!** {USE_EFFECTS_EMOJI}";
         #endregion
 
         /// </inheritdoc>
@@ -57,6 +60,10 @@ namespace Frags.Core.Game.Rolling
         public string GetRollMessage(Statistic stat, Character character, bool useEffects = false)
         {
             var result = new StringBuilder();
+
+            if (useEffects)
+                result.Append(USE_EFFECTS_MESSAGE);
+
             var percent = RollStatistic(stat, character, useEffects);
             if (percent == null) return null;
 
