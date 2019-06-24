@@ -17,7 +17,7 @@ namespace Frags.Discord.Modules
     {
         private readonly CharacterController _controller;
 
-        public CharacterModule(CharacterController controller, DiscordSocketClient client)
+        public CharacterModule(CharacterController controller)
         {
             _controller = controller;
         }
