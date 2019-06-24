@@ -35,8 +35,7 @@ namespace Frags.Core.Common
         public static readonly string STAT_SET_SUCCESS = "Statistic set sucessfully.";
         public static readonly string STAT_TOO_MANY_AT_MAX = "Too many statistics were set to their max value. (Limit {0})";
         public static readonly string STAT_RESET = "Statistics reset.";
-        public static readonly string STAT_CHECK_PASSED = "[{0} {1}] Check passed for {2}!";
-        public static readonly string STAT_CHECK_TOO_LOW = "[{0} {1}/{2}] Check failed for {3}!";
+        public static readonly string STAT_CHECK = "{0}'s {1} is set to: {2}.";
 
         public static readonly string STAT_NOT_ENOUGH_POINTS = "Not enough points to set that statistic. Attempted: {0}/{1}.";
         #endregion

@@ -85,7 +85,7 @@ namespace Frags.Presentation.Controllers
         /// <returns>
         /// A result detailing if the operation was successful or why it failed.
         /// </returns>
-        public async Task<IResult> CheckStatisticAsync(ulong id, string statName, int minimum)
+        public async Task<IResult> CheckStatisticAsync(ulong id, string statName)
         {
             var character = await _charProvider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
@@ -96,7 +96,7 @@ namespace Frags.Presentation.Controllers
             var statValue = character.GetStatistic(stat);
             if (statValue == null) return StatisticResult.StatisticNotFound();
 
-            return StatisticResult.StatisticCheck(character.Name, stat.Name, minimum, statValue.Value);
+            return StatisticResult.StatisticCheck(character.Name, stat.Name, statValue.Value);
         }
 
         public async Task<IResult> AddExperienceAsync(ulong callerId, int xp)
