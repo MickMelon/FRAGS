@@ -33,7 +33,7 @@ namespace Frags.Discord.Modules
 
                 foreach (var user in users)
                 {
-                    var result = await _controller.RollStatisticAsync(Context.User.Id, stat);
+                    var result = await _controller.RollStatisticAsync(user.Id, stat);
                     messages.Append(result.Message + "\n");
                 }
 
@@ -86,7 +86,7 @@ namespace Frags.Discord.Modules
 
                 foreach (var user in users)
                 {
-                    var result = await _controller.RollStatisticAsync(Context.User.Id, stat, true);
+                    var result = await _controller.RollStatisticAsync(user.Id, stat, true);
                     messages.Append(result.Message + "\n");
                 }
 
