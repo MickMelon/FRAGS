@@ -19,11 +19,26 @@ namespace Frags.Discord.Modules
 
         [Command("roll")]
         [Alias("r")]
-        public async Task RollAsync(string stat, IUser user = null)
+        public async Task RollAsync(string stat, params IUser[] users)
         {
-            ulong discordId = user?.Id ?? Context.User.Id;
-            var result = await _controller.RollStatisticAsync(discordId, stat);
-            await ReplyAsync(result.Message);
+            if (users.Length == 0)
+            {
+                var result = await _controller.RollStatisticAsync(Context.User.Id, stat);
+                await ReplyAsync(result.Message);
+                return;
+            }
+            else
+            {
+                StringBuilder messages = new StringBuilder();
+
+                foreach (var user in users)
+                {
+                    var result = await _controller.RollStatisticAsync(Context.User.Id, stat);
+                    messages.Append(result.Message + "\n");
+                }
+
+                await ReplyAsync(messages.ToString());
+            }
         }
 
         [Command("rollmanual")]
@@ -57,11 +72,26 @@ namespace Frags.Discord.Modules
 
         [Command("broll")]
         [Alias("br")]
-        public async Task EffectsRollAsync(string stat, IUser user = null)
+        public async Task EffectsRollAsync(string stat, params IUser[] users)
         {
-            ulong discordId = user?.Id ?? Context.User.Id;
-            var result = await _controller.RollStatisticAsync(discordId, stat, true);
-            await ReplyAsync(result.Message);
+            if (users.Length == 0)
+            {
+                var result = await _controller.RollStatisticAsync(Context.User.Id, stat, true);
+                await ReplyAsync(result.Message);
+                return;
+            }
+            else
+            {
+                StringBuilder messages = new StringBuilder();
+
+                foreach (var user in users)
+                {
+                    var result = await _controller.RollStatisticAsync(Context.User.Id, stat, true);
+                    messages.Append(result.Message + "\n");
+                }
+
+                await ReplyAsync(messages.ToString());
+            }
         }
 
         [Command("rollagainst")]
