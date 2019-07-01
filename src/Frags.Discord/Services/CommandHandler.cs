@@ -46,7 +46,14 @@ namespace Frags.Discord.Services
             _serviceScopes[context.Message.Id].Dispose();
             _serviceScopes.Remove(context.Message.Id);
 
-            try { if (!context.Message.Author.IsBot) await context.Message.DeleteAsync(); } catch { }
+            try
+            {
+                if (!context.Message.Author.IsBot && result.IsSuccess)
+                {
+                    await context.Message.DeleteAsync();
+                }
+            }
+            catch { }
         }
 
         private async Task HandleCommandAsync(SocketMessage msg)

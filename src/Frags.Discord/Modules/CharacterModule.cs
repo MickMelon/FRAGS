@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Frags.Core.Common;
 using Frags.Core.Statistics;
 using Frags.Discord.Modules.Preconditions;
 using Frags.Presentation.Controllers;
+using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels.Characters;
 
 namespace Frags.Discord.Modules
@@ -15,7 +17,7 @@ namespace Frags.Discord.Modules
     {
         private readonly CharacterController _controller;
 
-        public CharacterModule(CharacterController controller, DiscordSocketClient client)
+        public CharacterModule(CharacterController controller)
         {
             _controller = controller;
         }
@@ -49,6 +51,7 @@ namespace Frags.Discord.Modules
         {
             var result = await _controller.ListCharactersAsync(Context.User.Id);
             var embed = new EmbedBuilder();
+            embed.WithTitle(Context.User.Username + "'s Characters");
             embed.WithDescription(result.Message);
 
             await ReplyAsync(embed: embed.Build());
@@ -100,6 +103,13 @@ namespace Frags.Discord.Modules
         public async Task SetCharacterDescriptionAsync([Remainder]string desc)
         {
             ulong discordId = Context.User.Id;
+
+            if (desc.Length > 1500)
+            {
+                await ReplyAsync(Messages.TOO_HIGH);
+                return;
+            }
+
             var result = await _controller.SetCharacterDescriptionAsync(discordId, desc);
             await ReplyAsync(result.Message);
         }
@@ -108,6 +118,13 @@ namespace Frags.Discord.Modules
         public async Task SetCharacterStoryAsync([Remainder]string story)
         {
             ulong discordId = Context.User.Id;
+
+            if (story.Length > 1750)
+            {
+                await ReplyAsync(Messages.TOO_HIGH);
+                return;
+            }
+
             var result = await _controller.SetCharacterStoryAsync(discordId, story);
             await ReplyAsync(result.Message);
         }

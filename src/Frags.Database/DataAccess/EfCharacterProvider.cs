@@ -133,12 +133,14 @@ namespace Frags.Database.DataAccess
                 .FirstOrDefaultAsync();
 
             _mapper.Map<Character, CharacterDto>(character, dbChar);
+
+            if (dbChar.EffectMappings == null)
+                dbChar.EffectMappings = new List<EffectMapping>();
+            else
+                dbChar.EffectMappings.Clear();
+
             foreach (var effect in character.Effects)
             {
-                if (dbChar.EffectMappings == null) 
-                    dbChar.EffectMappings = new List<EffectMapping>();
-
-                dbChar.EffectMappings.Clear();
                 var effectDto = _mapper.Map<EffectDto>(effect);
                 dbChar.EffectMappings.Add(new EffectMapping { Effect = effectDto, Character = dbChar });
             }

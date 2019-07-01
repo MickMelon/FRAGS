@@ -85,7 +85,7 @@ namespace Frags.Presentation.Controllers
         /// <returns>
         /// A result detailing if the operation was successful or why it failed.
         /// </returns>
-        public async Task<IResult> CheckStatisticAsync(ulong id, string statName, int minimum)
+        public async Task<IResult> CheckStatisticAsync(ulong id, string statName)
         {
             var character = await _charProvider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
@@ -96,7 +96,7 @@ namespace Frags.Presentation.Controllers
             var statValue = character.GetStatistic(stat);
             if (statValue == null) return StatisticResult.StatisticNotFound();
 
-            return StatisticResult.StatisticCheck(character.Name, stat.Name, minimum, statValue.Value);
+            return StatisticResult.StatisticCheck(character.Name, stat.Name, statValue.Value);
         }
 
         public async Task<IResult> AddExperienceAsync(ulong callerId, int xp)
@@ -260,6 +260,38 @@ namespace Frags.Presentation.Controllers
                 {
                     await _strategy.SetStatistic(character, statistic, newValue);
                 }
+
+                await _charProvider.UpdateCharacterAsync(character);
+                return StatisticResult.StatisticSetSucessfully();
+            }
+            catch (System.Exception e)
+            {
+                if (!(e is ProgressionException))
+                    System.Console.WriteLine(e);
+
+                return GenericResult.Failure(e.Message);
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Used to set a character's attributes up.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the caller.</param>
+        /// <param name="values">What to set the initial attributes to.</param>
+        public async Task<IResult> UsePointsOnStatisticAsync(ulong callerId, string statName, int? newValue = null)
+        {
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            var statistic = await _statProvider.GetStatisticAsync(statName);
+            if (statistic == null) return StatisticResult.StatisticNotFound();
+
+            try
+            {
+                var currentVal = character.GetStatistic(statistic).Value;
+
+                await _strategy.SetStatistic(character, statistic, newValue + currentVal);
 
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();

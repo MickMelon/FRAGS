@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -37,6 +38,10 @@ namespace Frags.Discord
             services.GetRequiredService<LogService>();
             var client = services.GetRequiredService<DiscordSocketClient>();
             var commands = services.GetRequiredService<CommandHandler>();
+            var context = services.GetRequiredService<RpgContext>();
+
+            if (context.Database.IsSqlite())
+                context.Database.EnsureCreated();
                       
             await commands.InitializeAsync();          
             await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
@@ -54,9 +59,10 @@ namespace Frags.Discord
             IServiceCollection services = new ServiceCollection();
                 
             services = AddDiscordServices(services);
+            services = AddPluginServices(services);
+            services = AddConfiguredServices(services);
             services = AddDatabaseServices(services);
             services = AddGameServices(services);
-            services = AddConfiguredServices(services);
 
             return services.BuildServiceProvider();
         } 
@@ -78,15 +84,15 @@ namespace Frags.Discord
                     DefaultRunMode = RunMode.Async
                 }))
                 .AddSingleton<CommandHandler>()
-                .AddSingleton<LogService>();
+                .AddSingleton<LogService>()
+                .AddSingleton<ReliabilityService>();
 
         /// <summary>
         /// Adds the database services to the collection.
         /// </summary>
         private static IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
-                .AddDbContext<RpgContext>(opt => opt.UseSqlite("Filename=Frags.db"),
-                    contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
+                .AddDbContext<RpgContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
                 .AddTransient<ICharacterProvider, EfCharacterProvider>()
                 .AddTransient<IEffectProvider, EfEffectProvider>()
                 .AddTransient<IStatisticProvider, EfStatisticProvider>();
@@ -126,12 +132,32 @@ namespace Frags.Discord
                     ResolveServices<IProgressionStrategy>(provider, provider.GetRequiredService<StatisticOptions>().ProgressionStrategy));
         }
 
+        private static readonly List<Type> _pluginTypes = new List<Type>();
+
+        private static IServiceCollection AddPluginServices(IServiceCollection services)
+        {
+            List<Assembly> assemblies = new List<Assembly>();
+
+            // Add all .dll's in the Plugins folder the list of assemblies
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Plugins");
+
+            foreach (string dll in Directory.GetFiles(path, "*.dll"))
+                assemblies.Add(Assembly.LoadFile(dll));
+
+            // Add all of the .dll's types to a list
+            foreach (var assembly in assemblies)
+                _pluginTypes.AddRange(assembly.ExportedTypes);
+
+            foreach (var type in _pluginTypes)
+                services.AddTransient(type);
+
+            return services;
+        }
+
         private static T ResolveServices<T>(IServiceProvider provider, string typeName)
         {
-            var assembly = typeof(T).Assembly;
-
-            // Case-insensitively search the types in the specified assembly
-            var type = assembly.ExportedTypes
+            // Search plugins & the interface's assembly's types
+            var type = _pluginTypes.Union(typeof(T).Assembly.ExportedTypes)
                 .Where(x => typeof(T).IsAssignableFrom(x))
                 .Single(x => x.Name.ContainsIgnoreCase(typeName));
 

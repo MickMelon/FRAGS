@@ -1,7 +1,12 @@
 {
   "GeneralOptions": {
-    "CommandPrefix": "!",
+    "CommandPrefix": "%",
+
+    "UseInMemoryDatabase": true,
+    "DatabaseName": "Core",
+
     "AdminRole": "FragsAdmin",
+
     "CharacterLimit": 25,
     "EffectsLimit": 25
   },

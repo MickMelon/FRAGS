@@ -82,9 +82,6 @@ namespace Frags.Presentation.Controllers
 
         public async Task<IResult> RenameCharacterAsync(ulong id, string newName)
         {
-            if (newName.Length < 3) return GenericResult.ValueTooLow();
-            if (newName.Length > 30) return GenericResult.ValueTooHigh();
-
             var character = await _provider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
 

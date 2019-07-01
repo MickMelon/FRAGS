@@ -25,6 +25,17 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("list")]
+        public async Task ListEffectsAsync()
+        {
+            var result = await _controller.ListCreatedEffectsAsync(Context.User.Id);
+
+            var embed = new EmbedBuilder();
+            embed.WithTitle(Context.User.Username + "'s Effects");
+            embed.WithDescription(result.Message);
+            await ReplyAsync(embed: embed.Build());
+        }
+
         [Command("set")]
         public async Task SetStatisticEffectAsync(string effectName, string statName, int value)
         {

@@ -17,17 +17,22 @@ namespace Frags.Database
         public DbSet<Statistic> Statistics { get; set; }
         public DbSet<User> Users { get; set; }
 
-        public RpgContext() {}
+        private readonly GeneralOptions _options;
 
-        public RpgContext(DbContextOptions<RpgContext> options) : base(options)
+        public RpgContext(GeneralOptions options)
         {
+            _options = options;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
+            if (_options.UseInMemoryDatabase)
             {
-                optionsBuilder.UseSqlite("Filename=test.db");
+                optionsBuilder.UseInMemoryDatabase(_options.DatabaseName);
+            }
+            else
+            {
+                optionsBuilder.UseSqlite($"Filename={_options.DatabaseName}.db");
             }
         }
 

@@ -84,10 +84,10 @@ namespace Frags.Discord.Modules
         }
 
         [Command("check")]
-        public async Task CheckStatisticAsync(string statName, int value, IUser user = null)
+        public async Task CheckStatisticAsync(string statName, IUser user = null)
         {
             user = user ?? Context.User;
-            var result = await _statController.CheckStatisticAsync(user.Id, statName, value);
+            var result = await _statController.CheckStatisticAsync(user.Id, statName);
             await ReplyAsync(result.Message);
         }
 
@@ -95,6 +95,13 @@ namespace Frags.Discord.Modules
         public async Task SetStatisticAsync(string statName, int? newValue = null)
         {
             var result = await _statController.SetStatisticAsync(Context.User.Id, statName, newValue);
+            await ReplyAsync(result.Message);
+        }
+
+        [Command("spend")]
+        public async Task UsePointsOnStatisticAsync(string statName, int? newValue = null)
+        {
+            var result = await _statController.UsePointsOnStatisticAsync(Context.User.Id, statName, newValue);
             await ReplyAsync(result.Message);
         }
 

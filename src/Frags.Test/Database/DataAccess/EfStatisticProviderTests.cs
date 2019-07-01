@@ -19,7 +19,12 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task CreateStatistic_ValidInput_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("CreateStatistic_EntityMatchesInput").Options);
+            var context = new RpgContext(new GeneralOptions
+            {
+                UseInMemoryDatabase = true,
+                DatabaseName = "CreateStatistic_EntityMatchesInput"
+            });
+
             var provider = new EfStatisticProvider(context);
 
             await provider.CreateAttributeAsync("Strength");
@@ -31,7 +36,12 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task GetAllStatistics_ValidInput_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("GetAllStatistics_EntityMatchesInput").Options);
+            var context = new RpgContext(new GeneralOptions
+            {
+                UseInMemoryDatabase = true,
+                DatabaseName = "GetAllStatistics_EntityMatchesInput"
+            });
+
             var statProvider = new EfStatisticProvider(context);
 
             await statProvider.CreateAttributeAsync("Strength");
@@ -45,7 +55,12 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task UpdateStatistic_ValidInput_EntityMatchesInput()
         {
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("UpdateStatistic_EntityMatchesInput").Options);
+            var context = new RpgContext(new GeneralOptions
+            {
+                UseInMemoryDatabase = true,
+                DatabaseName = "UpdateStatistic_EntityMatchesInput"
+            });
+
             var provider = new EfStatisticProvider(context);
             
             await provider.CreateAttributeAsync("Strength");
@@ -64,7 +79,12 @@ namespace Frags.Test.Database.DataAccess
         public async Task DeleteStatistic_ValidInput_CharacterNoLongerHasValue()
         {
             // Arrange
-            var context = new RpgContext(new DbContextOptionsBuilder<RpgContext>().UseInMemoryDatabase("DeleteStatistic_ValidInput_CharacterNoLongerHasValue").Options);
+            var context = new RpgContext(new GeneralOptions
+            {
+                UseInMemoryDatabase = true,
+                DatabaseName = "DeleteStatistic_ValidInput_CharacterNoLongerHasValue"
+            });
+
             var provider = new EfStatisticProvider(context);
             var charProvider = new EfCharacterProvider(context);
 
