@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Common;
 using Frags.Core.Effects;
 using Frags.Core.Game.Progression;
@@ -33,6 +34,11 @@ namespace Frags.Core.Characters
         /// Whether this character is the user's active character.
         /// </summary>
         public bool Active { get; set; }
+
+        /// <summary>
+        /// The optional campaign this character is a part of.
+        /// </summary>
+        public Campaign Campaign { get; set; }
 
         /// <summary>
         /// The character's name.

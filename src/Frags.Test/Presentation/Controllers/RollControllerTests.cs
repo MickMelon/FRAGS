@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Rolling;
@@ -28,7 +29,7 @@ namespace Frags.Test.Presentation.Controllers
 
             await provider.UpdateCharacterAsync(chars[0]);
 
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAsync(1, "strength");
@@ -43,7 +44,7 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var provider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAsync(1, "invalid");
@@ -61,7 +62,7 @@ namespace Frags.Test.Presentation.Controllers
 
             var provider = new MockCharacterProvider();
 
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             // Character should have null or empty Statistics list.
@@ -77,7 +78,7 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var provider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAsync(0, "strength");
@@ -100,7 +101,7 @@ namespace Frags.Test.Presentation.Controllers
             (await provider.GetAllCharactersAsync(1))[0].SetStatistic(strength, new StatisticValue(5));
             (await provider.GetAllCharactersAsync(2))[0].SetStatistic(strength, new StatisticValue(5));
             
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAgainstAsync(1, 2, "strength");
@@ -115,7 +116,7 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var provider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAgainstAsync(0, 2, "strength");
@@ -130,7 +131,7 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var provider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAgainstAsync(1, 0, "strength");
@@ -145,7 +146,7 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var provider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAgainstAsync(1, 2, "invalid");
@@ -160,13 +161,49 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var provider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new RollController(provider, statProvider, new MockRollStrategy());
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), null);
 
             // Act
             var result = await controller.RollStatisticAgainstAsync(1, 2, "strength");
 
             // Assert
             Assert.Equal(RollResult.RollFailed(), result);
+        }
+        #endregion
+
+        #region Campaign Tests
+        [Fact]
+        public async Task RollWithCampaign_ValidValues_ReturnSuccess()
+        {
+            // Arrange
+            var statProvider = new MockStatisticProvider();
+            var strength = await statProvider.GetStatisticAsync("Strength");
+
+            var campaign = new Campaign(1, "myCampaign")
+            {
+                Statistics = new List<Statistic>() { strength },
+                RollOptions = new RollOptions { RollStrategy = "frags" }
+            };
+            strength.Campaign = campaign;
+
+            var provider = new MockCharacterProvider();
+            var chars = await provider.GetAllCharactersAsync(1);
+
+            // Give the new character a Statistic to test
+            chars[0].Campaign = campaign;
+            // 0 stat will guarantee a crit fail with FRAGS rules
+            chars[0].SetStatistic(strength, new StatisticValue(0));
+
+            await provider.UpdateCharacterAsync(chars[0]);
+
+            var strategies = new List<IRollStrategy>() { new MockRollStrategy(), new FragsRollStrategy() };
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), strategies);
+
+            // Act
+            var result = await controller.RollStatisticAsync(1, "strength");
+
+            // Assert
+            Assert.True(result.GetType() == typeof(RollResult) && result.IsSuccess && result.Message.Contains("CRITICAL"));
         }
         #endregion
     }

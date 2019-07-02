@@ -102,6 +102,10 @@ namespace Frags.Discord
         /// </summary>
         private static IServiceCollection AddGameServices(IServiceCollection services) =>
             services
+                .AddTransient<MockProgressionStrategy>()
+                .AddTransient<NewVegasProgressionStrategy>()
+                .AddTransient<FragsRollStrategy>()
+                .AddTransient<MockRollStrategy>()
                 .AddTransient<CharacterController>()
                 .AddTransient<EffectController>()
                 .AddTransient<RollController>()
@@ -122,14 +126,8 @@ namespace Frags.Discord
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<GeneralOptions>>().Value)
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value)
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
-                .AddTransient<FragsRollStrategy>()
-                .AddTransient<MockRollStrategy>()
-                .AddTransient<GenericProgressionStrategy>()
-                .AddTransient<NewVegasProgressionStrategy>()
-                .AddTransient(provider =>
-                    ResolveServices<IRollStrategy>(provider, provider.GetRequiredService<RollOptions>().RollStrategy))
-                .AddTransient(provider =>
-                    ResolveServices<IProgressionStrategy>(provider, provider.GetRequiredService<StatisticOptions>().ProgressionStrategy));
+                .AddTransient(provider => provider.GetServices<IRollStrategy>().ToList())
+                .AddTransient(provider => provider.GetServices<IProgressionStrategy>().ToList());
         }
 
         private static readonly List<Type> _pluginTypes = new List<Type>();
@@ -152,16 +150,6 @@ namespace Frags.Discord
                 services.AddTransient(type);
 
             return services;
-        }
-
-        private static T ResolveServices<T>(IServiceProvider provider, string typeName)
-        {
-            // Search plugins & the interface's assembly's types
-            var type = _pluginTypes.Union(typeof(T).Assembly.ExportedTypes)
-                .Where(x => typeof(T).IsAssignableFrom(x))
-                .Single(x => x.Name.ContainsIgnoreCase(typeName));
-
-            return (T)provider.GetRequiredService(type);
         }
     }
 }

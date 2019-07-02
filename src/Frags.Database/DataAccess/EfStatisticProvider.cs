@@ -60,6 +60,11 @@ namespace Frags.Database.DataAccess
             return await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase));
         }
 
+        public async Task<Statistic> GetStatisticFromCampaignAsync(string name, int campaignId)
+        {
+            return await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaignId);
+        }
+
         public async Task UpdateStatisticAsync(Statistic statistic)
         {
             _context.Update(statistic);

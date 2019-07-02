@@ -25,7 +25,7 @@ namespace Frags.Core.Campaigns
         public StatisticOptions StatisticOptions { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Character" /> class.
+        /// Initializes a new instance of the <see cref="Campaign" /> class.
         /// </summary>
         /// <param name="ownerIdentifier">The unique identifier of user that owns the campaign.</param>
         /// <param name="name">The campaigns's name.</param>

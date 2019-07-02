@@ -1,4 +1,5 @@
 using System;
+using Frags.Core.Campaigns;
 using Frags.Core.Common;
 
 namespace Frags.Core.Statistics
@@ -19,6 +20,8 @@ namespace Frags.Core.Statistics
         public string Name { get; set; }
 
         public string Aliases { get; set; }
+
+        public Campaign Campaign { get; set; }
 
         public string[] AliasesArray
         {
