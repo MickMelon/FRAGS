@@ -68,8 +68,6 @@ namespace Frags.Database
                 .HasOne(mod => mod.User)
                 .WithMany(u => u.ModeratedCampaigns)
                 .HasForeignKey(mod => mod.UserId);
-
-            builder.Entity<CharacterDto>().Metadata.FindNavigation(nameof(CharacterDto.EffectMappings)).IsEagerLoaded = true;
         }
     }
 }

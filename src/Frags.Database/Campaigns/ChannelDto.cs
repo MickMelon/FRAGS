@@ -7,5 +7,7 @@ namespace Frags.Database.Campaigns
     public class ChannelDto
     {
         public ulong Id { get; set; }
+
+        public CampaignDto Campaign { get; set; }
     }
 }
