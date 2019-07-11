@@ -83,9 +83,17 @@ namespace Frags.Database.DataAccess
             return _mapper.Map<Campaign>(await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == id));
         }
 
-        public Task UpdateCampaignAsync(Campaign Campaign)
+        public async Task UpdateCampaignAsync(Campaign campaign)
         {
-            throw new System.NotImplementedException();
+            // If the campaign does not exist in the database, abort
+            if (await _context.Campaigns.CountAsync(c => c.Id.Equals(campaign.Id)) <= 0)
+                return;
+
+            var dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            _mapper.Map(campaign, dto);
+
+            _context.Update(dto);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<ICollection<ulong>> GetModeratorsAsync(int id)
