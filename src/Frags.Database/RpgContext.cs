@@ -3,18 +3,19 @@ using Frags.Core.Statistics;
 using Frags.Database.Campaigns;
 using Frags.Database.Characters;
 using Frags.Database.Effects;
+using Frags.Database.Statistics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database
 {
     public class RpgContext : DbContext
     {
-        public DbSet<Attribute> Attributes { get; set; }
+        public DbSet<AttributeDto> Attributes { get; set; }
         public DbSet<CampaignDto> Campaigns { get; set; }
         public DbSet<CharacterDto> Characters { get; set; }
         public DbSet<EffectDto> Effects { get; set; }
-        public DbSet<Skill> Skills { get; set; }
-        public DbSet<Statistic> Statistics { get; set; }
+        public DbSet<SkillDto> Skills { get; set; }
+        public DbSet<StatisticDto> Statistics { get; set; }
         public DbSet<User> Users { get; set; }
 
         private readonly GeneralOptions _options;

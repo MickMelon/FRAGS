@@ -93,12 +93,14 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            var match = effect.StatisticEffects.FirstOrDefault(x => x.Statistic.Equals(stat));
-
-            if (match == null)
-                effect.StatisticEffects.Add(new StatisticMapping(stat, new StatisticValue(value)));
+            if (effect.StatisticEffects.ContainsKey(stat))
+            {
+                effect.StatisticEffects[stat].Value = value;
+            }
             else
-                match.StatisticValue.Value = value;
+            {
+                effect.StatisticEffects.Add(stat, new StatisticValue(value));
+            }
 
             await _effectProvider.UpdateEffectAsync(effect);
             return EffectResult.EffectUpdatedSucessfully();

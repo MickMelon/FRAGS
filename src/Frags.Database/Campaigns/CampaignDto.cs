@@ -28,12 +28,21 @@ namespace Frags.Database.Campaigns
         public ICollection<EffectDto> Effects { get; set; }
 
         // Many to one
-        public ICollection<Statistic> Statistics { get; set; }
+        public ICollection<StatisticDto> Statistics { get; set; }
 
         // One to one
         public RollOptionsDto RollOptions { get; set; }
 
         // One to one
         public StatisticOptionsDto StatisticOptions { get; set; }
+
+        public CampaignDto()
+        {
+            Moderators = new List<Moderator>();
+            Channels = new List<ChannelDto>();
+            Characters = new List<CharacterDto>();
+            Effects = new List<EffectDto>();
+            Statistics = new List<StatisticDto>();
+        }
     }
 }

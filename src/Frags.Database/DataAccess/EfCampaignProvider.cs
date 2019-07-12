@@ -11,6 +11,7 @@ using Frags.Core.Statistics;
 using Frags.Database.Campaigns;
 using Frags.Database.Characters;
 using Frags.Database.Effects;
+using Frags.Database.Statistics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -32,6 +33,20 @@ namespace Frags.Database.DataAccess
                 cfg.CreateMap<CharacterDto, Character>();
                 cfg.CreateMap<Effect, EffectDto>();
                 cfg.CreateMap<EffectDto, Effect>();
+
+                cfg.CreateMap<Statistic, StatisticDto>()
+                    .Include<Attribute, AttributeDto>()
+                    .Include<Skill, SkillDto>();
+
+                cfg.CreateMap<StatisticDto, Statistic>()
+                    .Include<AttributeDto, Attribute>()
+                    .Include<SkillDto, Skill>();
+
+                cfg.CreateMap<Skill, SkillDto>();
+                cfg.CreateMap<SkillDto, Skill>();
+
+                cfg.CreateMap<Attribute, AttributeDto>();
+                cfg.CreateMap<AttributeDto, Attribute>();
             });
 
             _mapper = new Mapper(mapperConfig);
@@ -52,7 +67,8 @@ namespace Frags.Database.DataAccess
 
             if (user == null)
             {
-                user = new User { UserIdentifier = campaign.OwnerUserIdentifier };   
+                user = new User { UserIdentifier = campaign.OwnerUserIdentifier };
+                await _context.AddAsync(user);
             }
 
             var moderator = new Moderator { Campaign = campDto, User = user };
@@ -64,8 +80,8 @@ namespace Frags.Database.DataAccess
         }
 
         /// <inheritdoc/>
-        public async Task<Campaign> CreateCampaignAsync(ulong userIdentifier, string name) =>
-            await CreateCampaignAsync(new Campaign(userIdentifier, name));
+        public async Task<Campaign> CreateCampaignAsync(ulong ownerUserIdentifier, string name) =>
+            await CreateCampaignAsync(new Campaign(ownerUserIdentifier, name));
 
         public async Task<bool> DeleteCampaignAsync(Campaign campaign)
         {
@@ -132,7 +148,7 @@ namespace Frags.Database.DataAccess
         public async Task<ICollection<Statistic>> GetStatisticsAsync(int id)
         {
             var campaign = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == id);
-            return await _context.Entry(campaign).Collection(x => x.Statistics).Query().ToListAsync();
+            return _mapper.Map<List<StatisticDto>, List<Statistic>>(await _context.Entry(campaign).Collection(x => x.Statistics).Query().ToListAsync());
         }
 
         public async Task<RollOptions> GetRollOptionsAsync(int id)

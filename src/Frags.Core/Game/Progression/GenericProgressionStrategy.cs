@@ -121,8 +121,8 @@ namespace Frags.Core.Game.Progression
         protected async Task<bool> SetInitialStatistic(Character character, Statistic statistic, int newValue)
         {
             int statMin, statMax, statsAtMax, points, level = GetCharacterLevel(character);
-            // This is either an array of all the character's attributes or skills, never both.
-            int[] stats;
+            // This is either an enumerable of all the character's attributes or skills, never both.
+            IEnumerable<int> stats;
 
             // Set variables
             if (statistic is Attribute attrib)
@@ -130,9 +130,9 @@ namespace Frags.Core.Game.Progression
                 statMin = _statOptions.InitialAttributeMin; 
                 statMax = _statOptions.InitialAttributeMax; 
                 points = _statOptions.InitialAttributePoints;
-                statsAtMax = _statOptions.InitialAttributesAtMax; 
-                
-                stats = character.Statistics.Where(x => x.Statistic is Attribute).Select(x => x.StatisticValue.Value).ToArray();
+                statsAtMax = _statOptions.InitialAttributesAtMax;
+
+                stats = character.Attributes.Select(x => x.Value.Value);
 
                 if (level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character))
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
@@ -143,8 +143,8 @@ namespace Frags.Core.Game.Progression
                 statMax = _statOptions.InitialSkillMax;
                 points = _statOptions.InitialSkillPoints;
                 statsAtMax = _statOptions.InitialSkillsAtMax;
-                
-                stats = character.Statistics.Where(x => x.Statistic is Skill).Select(x => x.StatisticValue.Value).ToArray();
+
+                stats = character.Skills.Select(x => x.Value.Value);
 
                 if (level > _statOptions.InitialSetupMaxLevel && await InitialSkillsSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
@@ -179,25 +179,23 @@ namespace Frags.Core.Game.Progression
 
         virtual public Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)
         {
-            int alreadySet, level = GetCharacterLevel(character);
+            int alreadySet, level = GetCharacterLevel(character), initialProficient;
             if (statistic is Attribute attrib)
             {
-                alreadySet = character.Statistics.Where(x => x.Statistic is Attribute).Count(x => x.StatisticValue.IsProficient);
-                if (level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialAttributesProficient) 
-                    throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
-
-                if (proficient && alreadySet + 1 > _statOptions.InitialAttributesProficient)
-                    throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
+                alreadySet = character.Attributes.Count(x => x.Value.IsProficient);
+                initialProficient = _statOptions.InitialAttributesProficient;
             }
             else
             {
-                alreadySet = character.Statistics.Where(x => x.Statistic is Skill).Count(x => x.StatisticValue.IsProficient);
-                if (level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialSkillsProficient) 
-                    throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
-
-                if (proficient && alreadySet + 1 > _statOptions.InitialSkillsProficient)
-                    throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
+                alreadySet = character.Skills.Count(x => x.Value.IsProficient);
+                initialProficient = _statOptions.InitialSkillsProficient;
             }
+
+            if (level > _statOptions.InitialSetupMaxLevel && alreadySet >= initialProficient)
+                throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
+
+            if (proficient && alreadySet + 1 > initialProficient)
+                throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
 
             character.GetStatistic(statistic).IsProficient = proficient;
             return Task.FromResult(true);
@@ -210,13 +208,13 @@ namespace Frags.Core.Game.Progression
 
             foreach (var stat in character.Statistics)
             {
-                if (stat.Statistic is Attribute)
-                    stat.StatisticValue.Value = _statOptions.InitialAttributeMin;
-                if (stat.Statistic is Skill)
-                    stat.StatisticValue.Value = _statOptions.InitialSkillMin;
+                if (stat.Key is Attribute)
+                    stat.Value.Value = _statOptions.InitialAttributeMin;
+                if (stat.Key is Skill)
+                    stat.Value.Value = _statOptions.InitialSkillMin;
 
-                stat.StatisticValue.IsProficient = false;
-                stat.StatisticValue.Proficiency = 0;
+                stat.Value.IsProficient = false;
+                stat.Value.Proficiency = 0;
             }
 
             character.AttributePoints = 0;
@@ -231,7 +229,7 @@ namespace Frags.Core.Game.Progression
         {
             if (character == null || character.Statistics == null) return false;
 
-            var attribs = character.Statistics.Where(x => x.Statistic is Attribute).ToDictionary(x => (Attribute)x.Statistic, x => x.StatisticValue);
+            var attribs = character.Attributes;
             var sum = attribs.Sum(x => x.Value.Value);
 
             // Character attributes don't match up with database attributes
@@ -248,7 +246,7 @@ namespace Frags.Core.Game.Progression
         {
             if (character == null || character.Statistics == null) return false;
 
-            var skills = character.Statistics.Where(x => x.Statistic is Skill).ToDictionary(x => (Skill)x.Statistic, x => x.StatisticValue);
+            var skills = character.Skills;
             var sum = skills.Sum(x => x.Value.Value);
 
             // Character attributes don't match up with database attributes
@@ -316,13 +314,13 @@ namespace Frags.Core.Game.Progression
 
             if (!await InitialAttributesSet(character))
             {
-                var sum = character.Statistics.Where(x => x.Statistic is Attribute).Sum(x => x.StatisticValue.Value);
+                var sum = character.Attributes.Sum(x => x.Value.Value);
                 output.Append($"Remaining initial attribute points: {_statOptions.InitialAttributePoints - sum}\n");
             }
 
             if (!await InitialSkillsSet(character))
             {
-                var sum = character.Statistics.Where(x => x.Statistic is Skill).Sum(x => x.StatisticValue.Value);
+                var sum = character.Skills.Sum(x => x.Value.Value);
                 output.Append($"Remaining initial skill points: {_statOptions.InitialSkillPoints - sum}\n");
             }
 

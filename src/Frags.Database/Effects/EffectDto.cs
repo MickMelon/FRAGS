@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Frags.Core.Statistics;
+using Frags.Database.Statistics;
 
 namespace Frags.Database.Effects
 {

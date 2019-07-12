@@ -11,6 +11,11 @@ namespace Frags.Database.Characters
     /// </summary>
     public class User : BaseModel
     {
+        public User()
+        {
+            ModeratedCampaigns = new List<Moderator>();
+        }
+
         public int Id { get; set; }
 
         public ulong UserIdentifier { get; set; }

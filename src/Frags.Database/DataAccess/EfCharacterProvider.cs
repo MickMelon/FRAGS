@@ -5,8 +5,10 @@ using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
+using Frags.Core.Statistics;
 using Frags.Database.Characters;
 using Frags.Database.Effects;
+using Frags.Database.Statistics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -22,10 +24,26 @@ namespace Frags.Database.DataAccess
             _context = context;
             
             var mapperConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Character, CharacterDto>();
-                cfg.CreateMap<CharacterDto, Character>();
+                cfg.CreateMap<Character, CharacterDto>()
+                    .ForMember(x => x.Statistics, opt => opt.Ignore());
+                cfg.CreateMap<CharacterDto, Character>()
+                    .ForMember(x => x.Statistics, opt => opt.Ignore());
                 cfg.CreateMap<Effect, EffectDto>();
                 cfg.CreateMap<EffectDto, Effect>();
+
+                cfg.CreateMap<Statistic, StatisticDto>()
+                    .Include<Attribute, AttributeDto>()
+                    .Include<Skill, SkillDto>();
+
+                cfg.CreateMap<StatisticDto, Statistic>()
+                    .Include<AttributeDto, Attribute>()
+                    .Include<SkillDto, Skill>();
+
+                cfg.CreateMap<Skill, SkillDto>();
+                cfg.CreateMap<SkillDto, Skill>();
+
+                cfg.CreateMap<Attribute, AttributeDto>();
+                cfg.CreateMap<AttributeDto, Attribute>();
             });
 
             _mapper = new Mapper(mapperConfig);
@@ -82,6 +100,12 @@ namespace Frags.Database.DataAccess
             dto.Active = true;
 
             var mapped = _mapper.Map<Character>(dto);
+
+            // Convert from StatisticMapping list to Dictionary
+            mapped.Statistics.Clear();
+            foreach (var stat in dto.Statistics)
+                mapped.Statistics.Add(_mapper.Map<Statistic>(stat.Statistic), stat.StatisticValue);
+
             mapped.Effects = _mapper.Map<List<Effect>>(dto.EffectMappings.Select(x => x.Effect).ToList());
             return mapped;
         }
@@ -112,6 +136,12 @@ namespace Frags.Database.DataAccess
             {
                 var mapped = _mapper.Map<Character>(dto);
                 mapped.Effects = _mapper.Map<List<Effect>>(dto.EffectMappings.Select(x => x.Effect).ToList());
+
+                // Convert from StatisticMapping list to Dictionary
+                mapped.Statistics.Clear();
+                foreach (var stat in dto.Statistics)
+                    mapped.Statistics.Add(_mapper.Map<Statistic>(stat.Statistic), stat.StatisticValue);
+
                 mappedList.Add(mapped);
             }
 
@@ -144,6 +174,11 @@ namespace Frags.Database.DataAccess
                 var effectDto = _mapper.Map<EffectDto>(effect);
                 dbChar.EffectMappings.Add(new EffectMapping { Effect = effectDto, Character = dbChar });
             }
+
+            // Convert from Statistic Dictionary to StatisticMapping List
+            dbChar.Statistics.Clear();
+            foreach (var stat in character.Statistics)
+                dbChar.Statistics.Add(new StatisticMapping(_mapper.Map<StatisticDto>(stat.Key), stat.Value));
 
             _context.Update(dbChar);
 

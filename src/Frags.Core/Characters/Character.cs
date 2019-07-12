@@ -8,6 +8,7 @@ using Frags.Core.Effects;
 using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
+using Attribute = Frags.Core.Statistics.Attribute;
 
 namespace Frags.Core.Characters
 {
@@ -72,28 +73,28 @@ namespace Frags.Core.Characters
         /// <summary>
         /// Where the character's statistics are actually stored.
         /// </summary>
-        public IList<StatisticMapping> Statistics { get; set; }
+        public Dictionary<Statistic, StatisticValue> Statistics { get; set; }
+
+        public Dictionary<Attribute, StatisticValue> Attributes => 
+            Statistics.Where(x => x.Key is Attribute).ToDictionary(x => (Attribute)x.Key, x => x.Value);
+
+        public Dictionary<Skill, StatisticValue> Skills =>
+            Statistics.Where(x => x.Key is Skill).ToDictionary(x => (Skill)x.Key, x => x.Value);
 
         /// <summary>
         /// Clones the character's statistics and applies their current effects to it.
         /// </summary>
         /// <returns>A new statistic list with values reflecting their applied effects.</returns>
-        public IList<StatisticMapping> GetEffectiveStatistics()
+        public Dictionary<Statistic, StatisticValue> GetEffectiveStatistics()
         {
-            var effectiveStats = CloneStatistics();
+            var clonedStats = CloneStatistics();
 
             foreach (var effect in Effects)
-            {
                 foreach (var statEffect in effect.StatisticEffects)
-                {
-                    var match = effectiveStats.FirstOrDefault(x => x.Statistic.Equals(statEffect.Statistic));
+                    if (clonedStats.ContainsKey(statEffect.Key))
+                        clonedStats[statEffect.Key].Value += statEffect.Value.Value;
 
-                    if (match != null)
-                        match.StatisticValue.Value += statEffect.StatisticValue.Value;
-                }
-            }
-
-            return effectiveStats;
+            return clonedStats;
         }
 
         /// <summary>
@@ -111,7 +112,7 @@ namespace Frags.Core.Characters
             UserIdentifier = userIdentifier;
             Name = name;
 
-            Statistics = new List<StatisticMapping>();
+            Statistics = new Dictionary<Statistic, StatisticValue>();
             Effects = new List<Effect>();
         }
 
@@ -134,7 +135,7 @@ namespace Frags.Core.Characters
             Description = description;
             Story = story;
 
-            Statistics = new List<StatisticMapping>();
+            Statistics = new Dictionary<Statistic, StatisticValue>();
             Effects = new List<Effect>();
         }
 
@@ -142,10 +143,24 @@ namespace Frags.Core.Characters
         /// Retrives the specified StatisticValue from the character's Statistics if it exists.
         /// </summary>
         /// <param name="stat">The statistic to retrieve.</param>
-        /// <returns>A StatisticValue associated with the specified Statistic.</returns>
-        public StatisticValue GetStatistic(Statistic stat, bool useEffects = false) =>
-            useEffects ? GetEffectiveStatistics()?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue :
-            Statistics?.FirstOrDefault(x => x.Statistic.Equals(stat))?.StatisticValue;
+        /// <returns>A StatisticValue associated with the specified Statistic, or null if not found.</returns>
+        public StatisticValue GetStatistic(Statistic stat, bool useEffects = false)
+        {
+            if (stat == null) return null;
+
+            StatisticValue result;
+
+            if (useEffects)
+            {
+                GetEffectiveStatistics().TryGetValue(stat, out result);
+            }
+            else
+            {
+                Statistics.TryGetValue(stat, out result);
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Sets the specified Statistic to the given StatisticValue if it exists.
@@ -155,26 +170,29 @@ namespace Frags.Core.Characters
         /// <param name="newValue">The StatisticValue to associate with the Statistic.</param>
         public void SetStatistic(Statistic stat, StatisticValue newValue)
         {
-            var statMap = Statistics.FirstOrDefault(x => x.Statistic.Equals(stat));
-            if (statMap == null) 
+            if (Statistics.ContainsKey(stat))
             {
-                Statistics.Add(new StatisticMapping(stat, newValue));
-                return;
+                Statistics[stat] = newValue;
             }
-
-            statMap.StatisticValue = newValue;
+            else
+            {
+                Statistics.Add(stat, newValue);
+            }
         }
 
         /// <summary>
         /// Deep clones the character's current statistics.
         /// </summary>
         /// <returns>A new list containing clones of the character's statistics.</returns>
-        private List<StatisticMapping> CloneStatistics()
+        private Dictionary<Statistic, StatisticValue> CloneStatistics()
         {
-            var newStats = new List<StatisticMapping>();
+            var newStats = new Dictionary<Statistic, StatisticValue>();
 
             foreach (var stat in Statistics)
-                newStats.Add(new StatisticMapping(stat.Statistic, stat.StatisticValue));
+            {
+                var statVal = stat.Value;
+                newStats.Add(stat.Key, new StatisticValue(statVal.Value, statVal.IsProficient, statVal.Proficiency));
+            }
 
             return newStats;
         }

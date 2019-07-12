@@ -10,7 +10,7 @@ namespace Frags.Presentation.ViewModels.Effects
     [ViewModel]
     public class ShowEffectViewModel
     {
-        public ShowEffectViewModel(string name, string desc, ICollection<StatisticMapping> statisticEffects)
+        public ShowEffectViewModel(string name, string desc, Dictionary<Statistic, StatisticValue> statisticEffects)
         {
             Name = name;
             Description = desc;
@@ -32,6 +32,6 @@ namespace Frags.Presentation.ViewModels.Effects
         /// <summary>
         /// The Effect's statistic effects.
         /// </summary>
-        public ICollection<StatisticMapping> StatisticEffects { get; set; }
+        public Dictionary<Statistic, StatisticValue> StatisticEffects { get; set; }
     }
 }

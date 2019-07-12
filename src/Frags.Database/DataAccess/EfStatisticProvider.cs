@@ -7,6 +7,7 @@ using AutoMapper;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Statistics;
+using Frags.Database.Statistics;
 using Microsoft.EntityFrameworkCore;
 using Attribute = Frags.Core.Statistics.Attribute;
 
@@ -15,59 +16,88 @@ namespace Frags.Database.DataAccess
     public class EfStatisticProvider : IStatisticProvider
     {
         private readonly RpgContext _context;
+        private readonly IMapper _mapper;
 
         public EfStatisticProvider(RpgContext context)
         {
             _context = context;
+
+            var mapperConfig = new MapperConfiguration(cfg => {
+                cfg.CreateMap<Statistic, StatisticDto>()
+                    .Include<Attribute, AttributeDto>()
+                    .Include<Skill, SkillDto>();
+
+                cfg.CreateMap<StatisticDto, Statistic>()
+                    .Include<AttributeDto, Attribute>()
+                    .Include<SkillDto, Skill>();
+
+                cfg.CreateMap<Skill, SkillDto>();
+                cfg.CreateMap<SkillDto, Skill>();
+
+                cfg.CreateMap<Attribute, AttributeDto>();
+                cfg.CreateMap<AttributeDto, Attribute>();
+            });
+
+            _mapper = new Mapper(mapperConfig);
         }
         
         public async Task<Attribute> CreateAttributeAsync(string name)
         {
-            var attribute = new Attribute(name);
+            var dto = new AttributeDto(name);
 
-            await _context.AddAsync(attribute);
+            await _context.AddAsync(dto);
             await _context.SaveChangesAsync();
 
-            return attribute;
+            return _mapper.Map<Attribute>(dto);
         }
 
         public async Task<Skill> CreateSkillAsync(string name, string attribName)
         {
-            var attrib = await _context.Attributes.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(attribName));
-            if (attrib == null) return null;
+            var attribDto = await _context.Attributes.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(attribName));
+            if (attribDto == null) return null;
 
-            var skill = new Skill(attrib, name);
+            var dto = new SkillDto(attribDto, name);
 
-            await _context.AddAsync(skill);
+            await _context.AddAsync(dto);
             await _context.SaveChangesAsync();
             
-            return skill;
+            return _mapper.Map<Skill>(dto);
         }
 
         public async Task DeleteStatisticAsync(Statistic statistic)
         {
-            _context.Remove(statistic);
-            await _context.SaveChangesAsync();
+            var match = await _context.Statistics.FirstOrDefaultAsync(x => x.Id == statistic.Id);
+
+            if (match != null)
+            {
+                _context.Remove(match);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync()
         {
-            return await _context.Statistics.ToListAsync();
+            return _mapper.Map<List<Statistic>>(await _context.Statistics.ToListAsync());
         }
 
         public async Task<Statistic> GetStatisticAsync(string name)
         {
-            return await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase));
+            return _mapper.Map<Statistic>(await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
         }
 
         public async Task<Statistic> GetStatisticFromCampaignAsync(string name, int campaignId)
         {
-            return await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaignId);
+            return _mapper.Map<Statistic>(await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaignId));
         }
 
         public async Task UpdateStatisticAsync(Statistic statistic)
         {
-            _context.Update(statistic);
+            var dto = await _context.Statistics.FirstOrDefaultAsync(x => x.Id == statistic.Id);
+
+            // Update DTO instance with updated info from POCO instance
+            _mapper.Map(statistic, dto);
+            _context.Update(dto);
+            
             await _context.SaveChangesAsync();
         }
     }

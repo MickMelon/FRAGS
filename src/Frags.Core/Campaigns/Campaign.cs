@@ -40,5 +40,7 @@ namespace Frags.Core.Campaigns
             Statistics = new List<Statistic>();
             Effects = new List<Effect>();
         }
+
+        protected Campaign() { }
     }
 }

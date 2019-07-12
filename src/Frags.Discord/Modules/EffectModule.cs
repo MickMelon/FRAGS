@@ -113,10 +113,10 @@ namespace Frags.Discord.Modules
 
                 foreach (var statEffect in effect.StatisticEffects)
                 {
-                    if (statEffect.StatisticValue.Value == 0)
+                    if (statEffect.Value.Value == 0)
                         continue;
 
-                    output.Append($"{statEffect.Statistic.Name}: {statEffect.StatisticValue.Value}\n");
+                    output.Append($"{statEffect.Key.Name}: {statEffect.Value.Value}\n");
                 }
 
                 output.Append("\n");

@@ -49,29 +49,29 @@ namespace Frags.Presentation.Results
         public static StatisticResult TooManyAtMax(int limit) =>
             new StatisticResult(string.Format(Messages.STAT_TOO_MANY_AT_MAX, limit), false);
 
-        public static IResult Show(StatisticMapping statMap)
+        public static IResult Show(Statistic stat, StatisticValue statVal)
         {
-            ShowStatisticViewModel stat = null;
+            ShowStatisticViewModel statModel;
 
-            if (statMap.Statistic is Attribute attrib)
+            if (stat is Attribute attrib)
             {
-                stat = new ShowAttributeViewModel(attrib.Name, attrib.Description, attrib.AliasesArray, attrib.Id, statMap?.StatisticValue.Value,
-                    statMap?.StatisticValue.IsProficient, statMap?.StatisticValue.Proficiency);
+                statModel = new ShowAttributeViewModel(attrib.Name, attrib.Description, attrib.AliasesArray, attrib.Id, statVal?.Value,
+                    statVal?.IsProficient, statVal.Proficiency);
             }
-            else if (statMap.Statistic is Skill s)
+            else if (stat is Skill s)
             {
                 var attribViewModel = new ShowAttributeViewModel(s.Attribute.Name, s.Attribute.Description, s.Attribute.AliasesArray, s.Attribute.Id, null, null, null);
 
-                stat = new ShowSkillViewModel(s.Name, s.Description, s.AliasesArray, s.Id, statMap?.StatisticValue.Value,
-                    statMap?.StatisticValue.IsProficient, statMap?.StatisticValue.Proficiency, s.MinimumValue, attribViewModel);
+                statModel = new ShowSkillViewModel(s.Name, s.Description, s.AliasesArray, s.Id, statVal?.Value,
+                    statVal?.IsProficient, statVal?.Proficiency, s.MinimumValue, attribViewModel);
             }
             else
             {
                 return StatisticResult.StatisticNotFound();
             }
 
-            var message = $"**{stat.Name}:** {stat.Value?.ToString() ?? "N/A"}";
-            if (stat.IsProficient.HasValue && stat.IsProficient.Value)
+            var message = $"**{statModel.Name}:** {statModel?.Value.ToString() ?? "N/A"}";
+            if (statModel.Proficiency.HasValue && statModel.IsProficient.Value)
                 message += "*";
 
             return new StatisticResult(message,
@@ -89,9 +89,9 @@ namespace Frags.Presentation.Results
 
             // Get a list of all statistic view models using Show()
             var stats = new List<ShowStatisticViewModel>();
-            foreach (var statMap in character.Statistics)
+            foreach (var stat in character.Statistics)
             {
-                var viewModel = (ShowStatisticViewModel)Show(statMap).ViewModel;
+                var viewModel = (ShowStatisticViewModel)Show(stat.Key, stat.Value).ViewModel;
 
                 if (viewModel != null)
                     stats.Add(viewModel);

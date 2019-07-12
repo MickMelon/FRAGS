@@ -31,7 +31,7 @@ namespace Frags.Core.Game.Progression
         {
             for (int levelUp = 1; levelUp <= timesLeveledUp; levelUp++)
             {
-                int inte = character.Statistics.Where(x => x.Statistic.Name.EqualsIgnoreCase("intelligence")).FirstOrDefault()?.StatisticValue?.Value ?? 0;
+                int inte = character.Statistics.Where(x => x.Key.Name.EqualsIgnoreCase("intelligence")).FirstOrDefault().Value?.Value ?? 0;
                 int origLevel = GetCharacterLevel(character) - timesLeveledUp;
 
                 character.SkillPoints += _statOptions.SkillPointsOnLevelUp + inte / 2;
@@ -102,12 +102,12 @@ namespace Frags.Core.Game.Progression
 
             if (success && await InitialAttributesSet(character))
             {
-                int luck = character.Statistics.Where(x => x.Statistic.Name.EqualsIgnoreCase("luck")).FirstOrDefault()?.StatisticValue?.Value ?? 0;
+                int luck = character.Statistics.Where(x => x.Key.Name.EqualsIgnoreCase("luck")).FirstOrDefault().Value?.Value ?? 0;
 
-                foreach (var skill in character.Statistics.Select(x => x.Statistic).OfType<Skill>())
+                foreach (var skill in character.Skills)
                 {
-                    var special = character.GetStatistic(skill.Attribute);
-                    character.SetStatistic(skill, new StatisticValue(SKILL_BASE + (special.Value * 2) + (luck / 2)));
+                    var special = character.GetStatistic(skill.Key.Attribute);
+                    character.SetStatistic(skill.Key, new StatisticValue(SKILL_BASE + (special.Value * 2) + (luck / 2)));
                 }
             }
 
@@ -124,7 +124,7 @@ namespace Frags.Core.Game.Progression
             }
             else
             {
-                alreadySet = character.Statistics.Where(x => x.Statistic is Skill).Count(x => x.StatisticValue.IsProficient);
+                alreadySet = character.Skills.Count(x => x.Value.IsProficient);
 
                 if (level > _statOptions.InitialSetupMaxLevel && alreadySet >= _statOptions.InitialSkillsProficient)
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);

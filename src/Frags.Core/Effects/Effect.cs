@@ -11,7 +11,7 @@ namespace Frags.Core.Effects
 
         public Effect(ulong ownerId, string name)
         {
-            StatisticEffects = new List<StatisticMapping>();
+            StatisticEffects = new Dictionary<Statistic, StatisticValue>();
             Name = name;
             OwnerUserIdentifier = ownerId;
         }
@@ -23,6 +23,6 @@ namespace Frags.Core.Effects
 
         public ulong OwnerUserIdentifier { get; set; }
 
-        public virtual IList<StatisticMapping> StatisticEffects { get; set; }
+        public virtual Dictionary<Statistic, StatisticValue> StatisticEffects { get; set; }
     }
 }

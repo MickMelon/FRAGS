@@ -158,6 +158,8 @@ namespace Frags.Presentation.Controllers
                 strategy = GetCampaignStrategy(caller.Campaign);
             }
 
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
             double? callerRoll = strategy.RollStatistic(stat, caller, useEffects);
             double? targetRoll = strategy.RollStatistic(stat, target, useEffects);
 
