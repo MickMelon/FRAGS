@@ -27,8 +27,11 @@ namespace Frags.Database.DataAccess
             _context = context;
             
             var mapperConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Campaign, CampaignDto>();
+                cfg.CreateMap<Campaign, CampaignDto>()
+                    .ForPath(x => x.Channels, opt => opt.Ignore())
+                    .ForPath(x => x.StatisticOptions.Id, opt => opt.Ignore());
                 cfg.CreateMap<CampaignDto, Campaign>();
+
                 cfg.CreateMap<Character, CharacterDto>();
                 cfg.CreateMap<CharacterDto, Character>();
                 cfg.CreateMap<Effect, EffectDto>();
@@ -47,6 +50,16 @@ namespace Frags.Database.DataAccess
 
                 cfg.CreateMap<Attribute, AttributeDto>();
                 cfg.CreateMap<AttributeDto, Attribute>();
+
+                cfg.CreateMap<StatisticOptions, StatisticOptionsDto>()
+                    .ForMember(x => x.Id, opt => opt.Ignore())
+                    .ForMember(x => x.ExpEnabledChannels, opt => opt.Ignore());
+
+                cfg.CreateMap<StatisticOptionsDto, StatisticOptions>()
+                    .ForMember(x => x.ExpEnabledChannels, opt => opt.Ignore());
+
+                cfg.CreateMap<RollOptions, RollOptionsDto>()
+                    .ForMember(x => x.Id, opt => opt.Ignore());
             });
 
             _mapper = new Mapper(mapperConfig);
@@ -56,7 +69,7 @@ namespace Frags.Database.DataAccess
         {
             var campDto = _mapper.Map<CampaignDto>(campaign);
 
-            // Check the database for a character with the same ID as the new one
+            // Check the database for a campaign with the same ID as the new one
             // If one exists, don't add it
             if (await _context.Campaigns.CountAsync(x => x.Id.Equals(campDto.Id)) > 0)
                 return null;
@@ -105,10 +118,47 @@ namespace Frags.Database.DataAccess
             if (await _context.Campaigns.CountAsync(c => c.Id.Equals(campaign.Id)) <= 0)
                 return;
 
-            var dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
-            _mapper.Map(campaign, dto);
+            // Load related properties and get ready to manually map certain navigation props
+            var campDto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            var statOptDto = _mapper.Map<StatisticOptionsDto>(campaign.StatisticOptions);
+            var rollOptDto = _mapper.Map<RollOptionsDto>(campaign.RollOptions);
 
-            _context.Update(dto);
+            // Manually map ulong moderator id's to Moderator DTOs
+            campDto.Moderators = new List<Moderator>();
+            foreach (var modId in campaign.ModeratorUserIdentifiers)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == modId);
+                Moderator modDto;
+                if (user != null)
+                {
+                    modDto = new Moderator { Campaign = campDto, User = user };
+                    user.ModeratedCampaigns.Add(modDto);
+                    _context.Update(user);
+                }
+                else
+                {
+                    user = new User { UserIdentifier = modId };
+                    modDto = new Moderator { Campaign = campDto, User = user };
+                    user.ModeratedCampaigns = new List<Moderator> { modDto };
+                    _context.Add(user);
+                }
+
+                campDto.Moderators.Add(modDto);
+            }
+
+            // Manually map ulong channel ids to ChannelDto's
+            campDto.Channels = new List<ChannelDto>();
+            foreach (var channel in campaign.Channels)
+                campDto.Channels.Add(new ChannelDto { Id = channel, Campaign = campDto });
+
+            statOptDto.ExpEnabledChannels = new List<ChannelDto>();
+            foreach (var channel in campaign.StatisticOptions.ExpEnabledChannels)
+                statOptDto.ExpEnabledChannels.Add(new ChannelDto { Id = channel, Campaign = campDto });
+
+            _mapper.Map(campaign, campDto);
+            campDto.StatisticOptions = statOptDto;
+
+            _context.Update(campDto);
             await _context.SaveChangesAsync();
         }
 
@@ -160,7 +210,10 @@ namespace Frags.Database.DataAccess
         public async Task<StatisticOptions> GetStatisticOptionsAsync(int id)
         {
             var campaign = await _context.Campaigns.Where(x => x.Id == id).Include(y => y.StatisticOptions).FirstOrDefaultAsync();
-            return campaign.StatisticOptions;
+
+            var mapped = _mapper.Map<StatisticOptions>(campaign.StatisticOptions);
+            mapped.ExpEnabledChannels = campaign.StatisticOptions.ExpEnabledChannels.Select(x => x.Id).ToArray();
+            return mapped;
         }
     }
 }
