@@ -16,6 +16,7 @@ namespace Frags.Discord.Modules
     public class CharacterModule : ModuleBase<SocketCommandContext>
     {
         private readonly CharacterController _controller;
+        private static readonly TimeSpan MESSAGE_DELETION_DELAY = TimeSpan.FromSeconds(10);
 
         public CharacterModule(CharacterController controller)
         {
@@ -135,7 +136,15 @@ namespace Frags.Discord.Modules
         {
             ulong discordId = Context.User.Id;
             var result = await _controller.ActivateCharacterAsync(discordId, name);
-            await ReplyAsync(result.Message);
+
+            var message = await ReplyAsync(result.Message);
+            await Task.Delay(MESSAGE_DELETION_DELAY);
+
+            try
+            {
+                await message.DeleteAsync();
+            }
+            catch (Exception) { }
         }
 
         [Command("pay")]
