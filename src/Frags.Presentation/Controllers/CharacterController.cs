@@ -77,7 +77,7 @@ namespace Frags.Presentation.Controllers
             match.Active = true;
 
             await _provider.UpdateCharacterAsync(match);
-            return CharacterResult.CharacterActive(charName);
+            return CharacterResult.CharacterActive(match.Name);
         }
 
         public async Task<IResult> RenameCharacterAsync(ulong id, string newName)
