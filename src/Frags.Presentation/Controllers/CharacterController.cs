@@ -116,10 +116,10 @@ namespace Frags.Presentation.Controllers
             
             character.Money += money;
             await _provider.UpdateCharacterAsync(character);
-            return CharacterResult.CharacterUpdatedSuccessfully();
+            return CharacterResult.MoneyGiven(money, character.Name);
         }
 
-        public async Task<IResult> GiveMoneyToOtherAsync(ulong callerId, ulong targetId, int money)
+        public async Task<IResult> GiveMoneyToOtherAsync(ulong callerId, ulong targetId, int moneyToGive)
         {
             var caller = await _provider.GetActiveCharacterAsync(callerId);
             if (caller == null) return CharacterResult.CharacterNotFound();
@@ -127,15 +127,15 @@ namespace Frags.Presentation.Controllers
             var target = await _provider.GetActiveCharacterAsync(targetId);
             if (target == null) return CharacterResult.CharacterNotFound();
             
-            if (caller.Money - money >= 0)
+            if (caller.Money - moneyToGive >= 0)
             {
-                caller.Money -= money;
-                target.Money += money;
+                caller.Money -= moneyToGive;
+                target.Money += moneyToGive;
 
                 await _provider.UpdateCharacterAsync(caller);
                 await _provider.UpdateCharacterAsync(target);
 
-                return CharacterResult.CharacterUpdatedSuccessfully();
+                return CharacterResult.MoneyGiven(moneyToGive, target.Name);
             }
             else
             {

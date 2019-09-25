@@ -91,6 +91,12 @@ namespace Frags.Presentation.Results
         /// <summary>
         /// Returns a new <see cref="CharacterResult" />.
         /// </summary>
+        public static CharacterResult MoneyGiven(int amount, string recipient) =>
+            new CharacterResult(Messages.CHAR_UPDATE_SUCCESS, true);
+
+        /// <summary>
+        /// Returns a new <see cref="CharacterResult" />.
+        /// </summary>
         public static CharacterResult TooManyCharacters() =>
             new CharacterResult(Messages.CHAR_TOO_MANY, false);
     }
