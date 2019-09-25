@@ -8,7 +8,6 @@ using Frags.Presentation.ViewModels.Effects;
 
 namespace Frags.Discord.Modules
 {
-    [Group("effect")]
     public class EffectModule : ModuleBase
     {
         private readonly EffectController _controller;
@@ -18,14 +17,16 @@ namespace Frags.Discord.Modules
             _controller = controller;
         }
 
-        [Command("create")]
+        [Command("effect create")]
+        [Alias("effects create")]
         public async Task CreateEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.CreateEffectAsync(Context.User.Id, effectName);
             await ReplyAsync(result.Message);
         }
 
-        [Command("list")]
+        [Command("effect list")]
+        [Alias("effects list", "list effect", "list effects")]
         public async Task ListEffectsAsync()
         {
             var result = await _controller.ListCreatedEffectsAsync(Context.User.Id);
@@ -36,29 +37,32 @@ namespace Frags.Discord.Modules
             await ReplyAsync(embed: embed.Build());
         }
 
-        [Command("set")]
+        [Command("effect set")]
+        [Alias("effects set", "set effect", "set effects")]
         public async Task SetStatisticEffectAsync(string effectName, string statName, int value)
         {
             var result = await _controller.SetStatisticEffectAsync(effectName, statName, value);
             await ReplyAsync(result.Message);
         }
 
-        [Command("description")]
-        [Alias("desc")]
+        [Command("effect description")]
+        [Alias("effect desc", "effects desc", "effects description")]
         public async Task SetEffectDescriptionAsync(string effectName, [Remainder]string desc)
         {
             var result = await _controller.SetDescriptionAsync(effectName, desc);
             await ReplyAsync(result.Message);
         }
 
-        [Command("rename")]
+        [Command("effect rename")]
+        [Alias("effects rename")]
         public async Task RenameEffectAsync(string effectName, [Remainder]string newName)
         {
             var result = await _controller.RenameEffectAsync(effectName, newName);
             await ReplyAsync(result.Message);
         }
 
-        [Command("delete")]
+        [Command("effect delete")]
+        [Alias("effects delete")]
         public async Task DeleteEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.DeleteEffectAsync(effectName);
@@ -76,7 +80,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("effect add")]
-        [Alias("effect apply", "applyeffect")]
+        [Alias("effects add", "effect apply", "effects apply", "applyeffect", "apply")]
         public async Task AddEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.AddEffectAsync(Context.User.Id, effectName);
@@ -84,7 +88,7 @@ namespace Frags.Discord.Modules
         }
 
         [Command("effect remove")]
-        [Alias("effect unapply", "unapplyeffect")]
+        [Alias("effects remove", "effect unapply", "effects unapply", "unapplyeffect", "unapply")]
         public async Task RemoveEffectAsync([Remainder]string effectName)
         {
             var result = await _controller.RemoveEffectAsync(Context.User.Id, effectName);
