@@ -61,8 +61,8 @@ namespace Frags.Presentation.Results
         /// <summary>
         /// Returns a new <see cref="CharacterResult" />.
         /// </summary>
-        public static CharacterResult CharacterActive() =>
-            new CharacterResult(Messages.CHAR_ACTIVE, true);
+        public static CharacterResult CharacterActive(string charName) =>
+            new CharacterResult(string.Format(Messages.CHAR_ACTIVE, charName), true);
 
         /// <summary>
         /// Returns a new <see cref="CharacterResult" />.
