@@ -169,7 +169,7 @@ namespace Frags.Presentation.Controllers
             if (character == null) return CharacterResult.CharacterNotFound();
 
             if (character.Effects == null || character.Effects.Count <= 0)
-                return EffectResult.EffectNotFound();
+                return EffectResult.NoEffects();
 
             return EffectResult.ShowCharacterEffects(character);
         }

@@ -47,6 +47,9 @@ namespace Frags.Core.Common
         public static readonly string EFFECT_DELETE_SUCCESS = "Effect deleted successfully.";
         public static readonly string EFFECT_NAME_EXISTS = "Effect with that name already exists.";
         public static readonly string EFFECT_NOT_FOUND = "Effect not found.";
+
+        public static readonly string EFFECT_NO_EFFECTS = "Character has no effects applied.";
+
         public static readonly string EFFECT_ADDED = "Effect added sucessfully.";
         public static readonly string EFFECT_REMOVED = "Effect removed sucessfully.";
         public static readonly string EFFECT_ALREADY_ADDED = "Effect is already added.";
