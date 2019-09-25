@@ -190,7 +190,7 @@ namespace Frags.Presentation.Controllers
             if (character.Effects == null)
                 character.Effects = new List<Effect>();
 
-            if (character.Effects.Count(x => x.Equals(effect)) > 0)
+            if (character.Effects.Count(x => x.Id == effect.Id) > 0)
                 return EffectResult.EffectAlreadyAdded();
 
             character.Effects.Add(effect);
@@ -212,7 +212,7 @@ namespace Frags.Presentation.Controllers
             var effect = await _effectProvider.GetEffectAsync(effectName);
             if (effect == null) return EffectResult.EffectNotFound();
 
-            var match = character.Effects.FirstOrDefault(x => x.Equals(effect));
+            var match = character.Effects.FirstOrDefault(x => x.Id == effect.Id);
 
             if (match == null)
                 return EffectResult.EffectNotFound();
