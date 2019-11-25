@@ -31,11 +31,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<Campaign> CreateCampaignAsync(ulong userIdentifier, string name)
         {
-            // create campaign object first, add the user later to avoid circular dependency
             var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier);
-            // Entry<CustomerBaseInfo>(data).State = EntityState.Detached;
-            //_context.Entry<UserDto>(userDto).State = EntityState.Detached;
-            
 
             if (userDto == null)
             {
@@ -43,6 +39,7 @@ namespace Frags.Database.DataAccess
                 await _context.AddAsync(userDto);
             }
 
+            // create campaign object first, add the user later to avoid circular dependency
             var campDto = new CampaignDto();
 
             await _context.AddAsync(campDto);
@@ -96,10 +93,10 @@ namespace Frags.Database.DataAccess
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ICollection<User>> GetModeratorsAsync(int id)
+        public async Task<IEnumerable<User>> GetModeratorsAsync(int id)
         {
             var campaign = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == id);
-            return _mapper.Map<List<User>>(await _context.Entry(campaign).Collection(x => x.Moderators).Query().ToListAsync());
+            return _mapper.Map<List<User>>(await _context.Entry(campaign).Collection(x => x.ModeratedCampaigns).Query().Select(x => x.User).ToListAsync());
         }
 
         public async Task<ICollection<Channel>> GetChannelsAsync(int id)
@@ -114,6 +111,7 @@ namespace Frags.Database.DataAccess
 
             // TODO: make an extension method to do all this stuff for you
             var characterDtos = await _context.Entry(campaign).Collection(x => x.Characters).Query()
+                .Include(x => x.User)
                 .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
                 .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)

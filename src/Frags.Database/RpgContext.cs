@@ -58,8 +58,18 @@ namespace Frags.Database
                 .WithMany(c => c.EffectMappings)
                 .HasForeignKey(ec => ec.CharacterId);
 
-            //builder.Entity<Moderator>()
-                //.HasKey(mod => new { mod.UserId, mod.CampaignId });
+            builder.Entity<ModeratorDto>()
+                .HasKey(ec => new { ec.CampaignId, ec.UserId });
+
+            builder.Entity<ModeratorDto>()
+                .HasOne(ec => ec.Campaign)
+                .WithMany(e => e.ModeratedCampaigns)
+                .HasForeignKey(ec => ec.CampaignId);
+
+            builder.Entity<ModeratorDto>()
+                .HasOne(ec => ec.User)
+                .WithMany(c => c.ModeratedCampaigns)
+                .HasForeignKey(ec => ec.UserId);
         }
     }
 }

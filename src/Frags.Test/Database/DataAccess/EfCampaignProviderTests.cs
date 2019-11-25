@@ -10,6 +10,7 @@ using Frags.Database.AutoMapper;
 using Frags.Database.DataAccess;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -53,44 +54,27 @@ namespace Frags.Test.Database.DataAccess
                 await provider.CreateCampaignAsync(1, "bottom text");
             }
 
-            User bob;
-            User jane;
-            User cal;
-
-            using (var context = new RpgContext(genOptions))
-            {
-                var provider = new EfCampaignProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper);
-
-                bob = (await charProvider.GetActiveCharacterAsync(1)).User;
-                jane = (await charProvider.GetActiveCharacterAsync(2)).User;
-                cal = (await charProvider.GetActiveCharacterAsync(3)).User;
-            }
-
             Campaign campaign;
-            // using (var context = new RpgContext(genOptions))
-            // {
-            //     var provider = new EfCampaignProvider(context, mapper);
-            //     var charProvider = new EfCharacterProvider(context, mapper);
-
-            //     campaign = await provider.GetCampaignAsync(1);
-            // }
-
             using (var context = new RpgContext(genOptions))
             {
                 var provider = new EfCampaignProvider(context, mapper);
                 var charProvider = new EfCharacterProvider(context, mapper);
                 campaign = await provider.GetCampaignAsync(1);
 
+                User bob = await charProvider.JustGetTheDamnUser(1);
+                User jane = await charProvider.JustGetTheDamnUser(2);
+                User cal = await charProvider.JustGetTheDamnUser(3);
+
                 campaign.Channels = new List<Channel> { new Channel(21), new Channel(22), new Channel(23), new Channel(24) };
                 campaign.Characters = new List<Character> { new Character(4, bob, false, "bob jr."), new Character(5, jane, false, "jane jr."), new Character(6, cal, false, "cal jr.") };
                 campaign.Effects = new List<Effect> { new Effect(bob, "bob's effect") { Id = 10 }, new Effect(jane, "jane's effect") { Id = 20 }, new Effect(cal, "cal's effect") { Id = 30 }};
-                campaign.Moderators = new List<User> { jane, cal };
+                campaign.ModeratedCampaigns = new List<Moderator> { new Moderator { Campaign = campaign, User = jane }, new Moderator { Campaign = campaign, User = cal } };
                 campaign.Name = "coolcampaign";
                 campaign.Owner = bob;
                 campaign.RollOptions = new RollOptions { RollStrategy = "frags", Id = 11 };
                 campaign.Statistics = new List<Statistic> { new Attribute("Strength") { Id = 12 }, new Attribute("Intelligence") { Id = 22 } };
 
+                
                 var expChannels = new ulong[] { 27, 37, 47, 57 };
                 campaign.StatisticOptions = new StatisticOptions
                 {
@@ -99,6 +83,7 @@ namespace Frags.Test.Database.DataAccess
                     ExpEnabledChannels = expChannels,
                     ProgressionStrategy = "vegas",
                 };
+                
 
                 await provider.UpdateCampaignAsync(campaign);
             }
@@ -120,7 +105,7 @@ namespace Frags.Test.Database.DataAccess
                     campChannels.Count == 8 &&
                     characters.Count == 3 &&
                     effects.Count == 3 &&
-                    moderators.Count == 3 &&
+                    moderators.Count() == 2 &&
                     rollOptions.RollStrategy == "frags" &&
                     statistics.Count == 2 &&
                     statOptions.ExpEnabledChannels.Length == 4);

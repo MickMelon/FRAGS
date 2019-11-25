@@ -15,8 +15,8 @@ namespace Frags.Database.Campaigns
 
         public UserDto Owner { get; set; }
 
-        // Many to one
-        public ICollection<UserDto> Moderators { get; set; }
+        // Many to many
+        public ICollection<ModeratorDto> ModeratedCampaigns { get; set; }
 
         // Many to one
         public ICollection<ChannelDto> Channels { get; set; }
@@ -38,7 +38,7 @@ namespace Frags.Database.Campaigns
 
         public CampaignDto()
         {
-            Moderators = new List<UserDto>();
+            ModeratedCampaigns = new List<ModeratorDto>();
             Channels = new List<ChannelDto>();
             Characters = new List<CharacterDto>();
             Effects = new List<EffectDto>();

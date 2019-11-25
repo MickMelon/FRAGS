@@ -30,6 +30,7 @@ namespace Frags.Database.Characters
         public ulong UserIdentifier { get; set; }
 
         public ICollection<CharacterDto> Characters { get; set; }
+        public ICollection<ModeratorDto> ModeratedCampaigns { get; set; }
         public CharacterDto ActiveCharacter { get; set; }
     }
 }

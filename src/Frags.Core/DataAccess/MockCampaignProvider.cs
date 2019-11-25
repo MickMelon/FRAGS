@@ -48,9 +48,9 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).Effects);
         }
 
-        public Task<ICollection<User>> GetModeratorsAsync(int id)
+        public Task<IEnumerable<User>> GetModeratorsAsync(int id)
         {
-            return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).Moderators);
+            return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).ModeratedCampaigns.Select(x => x.User));
         }
 
         public Task<RollOptions> GetRollOptionsAsync(int id)

@@ -14,7 +14,7 @@ namespace Frags.Core.Campaigns
         public string Name { get; set; }
 
         public User Owner { get; set; }
-        public ICollection<User> Moderators { get; set; }
+        public ICollection<Moderator> ModeratedCampaigns { get; set; }
 
         public ICollection<Channel> Channels { get; set; }
 
@@ -35,7 +35,7 @@ namespace Frags.Core.Campaigns
             Owner = owner;
             Name = name;
 
-            Moderators = new List<User> { owner };
+            ModeratedCampaigns = new List<Moderator>();
             Channels = new List<Channel>();
             Characters = new List<Character>();
             Statistics = new List<Statistic>();

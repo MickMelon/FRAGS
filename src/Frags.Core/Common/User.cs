@@ -14,6 +14,7 @@ namespace Frags.Core.Common
             UserIdentifier = userIdentifier;
             ActiveCharacter = activeCharacter;
             Characters = new List<Character>();
+            ModeratedCampaigns = new List<Moderator>();
 
             if (activeCharacter != null)
                 Characters.Add(activeCharacter);
@@ -24,6 +25,7 @@ namespace Frags.Core.Common
         public ulong UserIdentifier { get; set; }
 
         public ICollection<Character> Characters { get; set; }
+        public ICollection<Moderator> ModeratedCampaigns { get; set; }
 
         public Character ActiveCharacter { get; set; }
 

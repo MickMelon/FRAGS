@@ -31,7 +31,7 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="id">Campaigns's id.</param>
         /// <returns>A collection of matching moderators or an empty collection if none found.</returns>
-        Task<ICollection<User>> GetModeratorsAsync(int id);
+        Task<IEnumerable<User>> GetModeratorsAsync(int id);
 
         /// <summary>
         /// Gets the Channels of a Campaign from the database.
