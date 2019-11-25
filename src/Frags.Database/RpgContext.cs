@@ -27,7 +27,6 @@ namespace Frags.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.EnableSensitiveDataLogging(true);
             if (_options.UseInMemoryDatabase)
             {
                 optionsBuilder.UseInMemoryDatabase(_options.DatabaseName);
