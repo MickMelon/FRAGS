@@ -33,11 +33,10 @@ namespace Frags.Test.Database.DataAccess
         {
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
-            var genOptions = new GeneralOptions { UseInMemoryDatabase = true, DatabaseName = "CreateCampaign_EntityMatchesInput" };
+            var genOptions = new GeneralOptions { UseInMemoryDatabase = true, DatabaseName = "CreateCampaign_EntityMatchesInput0" };
 
             using (var context = new RpgContext(genOptions))
             {
-                context.Database.EnsureCreated();
                 var provider = new EfCampaignProvider(context, mapper);
                 var charProvider = new EfCharacterProvider(context, mapper);
 
@@ -66,7 +65,7 @@ namespace Frags.Test.Database.DataAccess
                 User cal = await userProvider.GetUserAsync(3);
 
                 campaign.Channels = new List<Channel> { new Channel(21), new Channel(22), new Channel(23), new Channel(24) };
-                campaign.Characters = new List<Character> { new Character(4, bob, false, "bob jr."), new Character(5, jane, false, "jane jr."), new Character(6, cal, false, "cal jr.") };
+                campaign.Characters = new List<Character> { new Character(4, bob, false, "bob jr."), new Character(599, jane, false, "jane jr."), new Character(699, cal, false, "cal jr.") };
                 campaign.Effects = new List<Effect> { new Effect(bob, "bob's effect") { Id = 10 }, new Effect(jane, "jane's effect") { Id = 20 }, new Effect(cal, "cal's effect") { Id = 30 }};
                 campaign.ModeratedCampaigns = new List<Moderator> { new Moderator { Campaign = campaign, User = jane }, new Moderator { Campaign = campaign, User = cal } };
                 campaign.Name = "coolcampaign";
@@ -88,7 +87,7 @@ namespace Frags.Test.Database.DataAccess
                 await provider.UpdateCampaignAsync(campaign);
             }
 
-            using (var context = new RpgContext(new GeneralOptions { UseInMemoryDatabase = true, DatabaseName = "CreateCampaign_EntityMatchesInput" }))
+            using (var context = new RpgContext(genOptions))
             {
                 var provider = new EfCampaignProvider(context, mapper);
                 var charProvider = new EfCharacterProvider(context, mapper);
