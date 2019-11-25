@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
+using Frags.Core.Common;
 using Frags.Core.Effects;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
@@ -15,7 +16,7 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="name">Campaign's name.</param>
         /// <returns>The added campaign if successful, null if not.</returns>
-        Task<Campaign> CreateCampaignAsync(ulong ownerId, string name);
+        Task<Campaign> CreateCampaignAsync(ulong userIdentifier, string name);
 
         /// <summary>
         /// Gets the Campaign with the matching id from the database.
@@ -30,14 +31,14 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="id">Campaigns's id.</param>
         /// <returns>A collection of matching moderators or an empty collection if none found.</returns>
-        Task<ICollection<ulong>> GetModeratorsAsync(int id);
+        Task<ICollection<User>> GetModeratorsAsync(int id);
 
         /// <summary>
         /// Gets the Channels of a Campaign from the database.
         /// </summary>
         /// <param name="id">Campaigns's id.</param>
         /// <returns>A collection of matching channels or an empty collection if none found.</returns>
-        Task<ICollection<ulong>> GetChannelsAsync(int id);
+        Task<ICollection<Channel>> GetChannelsAsync(int id);
 
         /// <summary>
         /// Gets the Characters of a Campaign from the database.

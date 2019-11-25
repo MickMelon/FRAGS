@@ -56,7 +56,7 @@ namespace Frags.Presentation.Controllers
             if (await _effectProvider.GetEffectAsync(effectName) != null)
                 return EffectResult.NameAlreadyExists();
 
-            if ((await _effectProvider.GetUserEffectsAsync(callerId)).Count() >= _options.EffectsLimit)
+            if ((await _effectProvider.GetOwnedEffectsAsync(callerId)).Count() >= _options.EffectsLimit)
                 return EffectResult.TooManyEffects();
 
             var result = await _effectProvider.CreateEffectAsync(callerId, effectName);
@@ -72,7 +72,7 @@ namespace Frags.Presentation.Controllers
         /// <returns>A GenericResult with a Message property containing the user's created effects.</returns>
         public async Task<IResult> ListCreatedEffectsAsync(ulong callerId)
         {
-            var effects = await _effectProvider.GetUserEffectsAsync(callerId);
+            var effects = await _effectProvider.GetOwnedEffectsAsync(callerId);
             return GenericResult.Generic(string.Join("\n", effects.OrderBy(x => x.Id).Select(x => x.Name)));
         }
 

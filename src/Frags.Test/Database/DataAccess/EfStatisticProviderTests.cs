@@ -85,8 +85,10 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "DeleteStatistic_ValidInput_CharacterNoLongerHasValue"
             });
 
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
             var provider = new EfStatisticProvider(context);
-            var charProvider = new EfCharacterProvider(context);
+            var charProvider = new EfCharacterProvider(context, mapper);
 
             var strength = await provider.CreateAttributeAsync("strength");
             await charProvider.CreateCharacterAsync(1, "bob");

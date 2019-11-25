@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Frags.Core.Campaigns;
+using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Rolling;
@@ -179,7 +180,7 @@ namespace Frags.Test.Presentation.Controllers
             var statProvider = new MockStatisticProvider();
             var strength = await statProvider.GetStatisticAsync("Strength");
 
-            var campaign = new Campaign(1, "myCampaign")
+            var campaign = new Campaign(new User(1), "myCampaign")
             {
                 Statistics = new List<Statistic>() { strength },
                 RollOptions = new RollOptions { RollStrategy = "frags" }

@@ -310,7 +310,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
-            var character = await charProvider.CreateCharacterAsync(100, "TooHigh");
+            await charProvider.CreateCharacterAsync(100, "TooHigh");
+            var character = await charProvider.GetActiveCharacterAsync(100);
             // the important bit
             character.Experience = 50000;
 
@@ -337,7 +338,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
-            var character = await charProvider.CreateCharacterAsync(100, "TooHigh");
+            await charProvider.CreateCharacterAsync(100, "TooHigh");
+            var character = await charProvider.GetActiveCharacterAsync(100);
 
             var statProvider = new MockStatisticProvider();
             var statOptions = new StatisticOptions
@@ -377,7 +379,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var charProvider = new MockCharacterProvider();
-            var character = await charProvider.CreateCharacterAsync(100, "TooHigh");
+            await charProvider.CreateCharacterAsync(100, "TooHigh");
+            var character = await charProvider.GetActiveCharacterAsync(100);
 
             var statProvider = new MockStatisticProvider();
             var statOptions = new StatisticOptions

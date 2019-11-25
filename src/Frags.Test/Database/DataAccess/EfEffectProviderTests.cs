@@ -25,12 +25,17 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "MakeSureCharacterHasTheEffects"
             });
 
-            var effectProvider = new EfEffectProvider(context);
-            var charProvider = new EfCharacterProvider(context);
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
 
+            var effectProvider = new EfEffectProvider(context, mapper);
+            var charProvider = new EfCharacterProvider(context, mapper);
+
+            await charProvider.CreateCharacterAsync(1, "Char1");
+            var char1 = await charProvider.GetActiveCharacterAsync(1);
             var effect1 = await effectProvider.CreateEffectAsync(1, "Effect1");
             var effect2 = await effectProvider.CreateEffectAsync(1, "Effect2");
-            var char1 = await charProvider.CreateCharacterAsync(1, "Char1");
+            
             char1.Active = true;
             char1.Effects.Add(effect1);
             char1.Effects.Add(effect2);

@@ -1,4 +1,5 @@
 using Frags.Core.Characters;
+using Frags.Core.Common;
 using Frags.Presentation.Attributes;
 using Frags.Presentation.ViewModels.Characters;
 using Xunit;
@@ -24,7 +25,7 @@ namespace Frags.Test.Presentation.Attributes
         public void IsViewModel_InvalidViewModel_ReturnFalse()
         {
             // Arrange
-            var notViewModel = new Character(1, "C");
+            var notViewModel = new Character(new User(1), "C");
 
             // Act
             bool result = ViewModelAttribute.IsViewModel(notViewModel);

@@ -1,8 +1,12 @@
-﻿using Frags.Core.Characters;
+﻿using AutoMapper;
+using Frags.Core.Campaigns;
+using Frags.Core.Characters;
+using Frags.Core.Common;
 using Frags.Core.Effects;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Database;
+using Frags.Database.AutoMapper;
 using Frags.Database.DataAccess;
 using System;
 using System.Collections.Generic;
@@ -26,50 +30,101 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CreateCampaign_EntityMatchesInput()
         {
-            var context = new RpgContext(new GeneralOptions
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+            var genOptions = new GeneralOptions { UseInMemoryDatabase = true, DatabaseName = "CreateCampaign_EntityMatchesInput" };
+
+            using (var context = new RpgContext(genOptions))
             {
-                UseInMemoryDatabase = true,
-                DatabaseName = "CreateCampaign_EntityMatchesInput"
-            });
+                context.Database.EnsureCreated();
+                var provider = new EfCampaignProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper);
 
-            var provider = new EfCampaignProvider(context);
+                await charProvider.CreateCharacterAsync(1, "bob");
+                await charProvider.CreateCharacterAsync(2, "jane");
+                await charProvider.CreateCharacterAsync(3, "cal");
+            }
 
-            var campaign = await provider.CreateCampaignAsync(1, "bottom text");
-            campaign.Channels = new List<ulong> { 21, 22, 23, 24 };
-            campaign.Characters = new List<Character> { new Character(1, "bob"), new Character(2, "jane"), new Character(3, "cal") };
-            campaign.Effects = new List<Effect> { new Effect(1, "bob's effect"), new Effect(2, "jane's effect"), new Effect(3, "cal's effect") };
-            campaign.ModeratorUserIdentifiers = new List<ulong> { 31, 32, 33 };
-            campaign.Name = "coolcampaign";
-            campaign.OwnerUserIdentifier = 42;
-            campaign.RollOptions = new RollOptions { RollStrategy = "frags" };
-            campaign.Statistics = new List<Statistic> { new Attribute("Strength"), new Attribute("Intelligence") };
-
-            var expChannels = new ulong[] { 2, 3, 4, 5 };
-            campaign.StatisticOptions = new StatisticOptions
+            using (var context = new RpgContext(genOptions))
             {
-                AttributeMax = 1,
-                ExpEnabledChannels = expChannels,
-                ProgressionStrategy = "vegas",
-            };
-            await provider.UpdateCampaignAsync(campaign);
+                var provider = new EfCampaignProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper);
 
-            campaign = await provider.GetCampaignAsync(1);
-            var campChannels = await provider.GetChannelsAsync(1);
-            var characters = await provider.GetCharactersAsync(1);
-            var effects = await provider.GetEffectsAsync(1);
-            var moderators = await provider.GetModeratorsAsync(1);
-            var rollOptions = await provider.GetRollOptionsAsync(1);
-            var statistics = await provider.GetStatisticsAsync(1);
-            var statOptions = await provider.GetStatisticOptionsAsync(1);
+                await provider.CreateCampaignAsync(1, "bottom text");
+            }
 
-            Assert.True(campaign.Name == "coolcampaign" &&
-                campChannels.Count == 8 &&
-                characters.Count == 3 &&
-                effects.Count == 3 &&
-                moderators.Count == 3 &&
-                rollOptions.RollStrategy == "frags" &&
-                statistics.Count == 2 &&
-                statOptions.ExpEnabledChannels.Length == 4);
+            User bob;
+            User jane;
+            User cal;
+
+            using (var context = new RpgContext(genOptions))
+            {
+                var provider = new EfCampaignProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper);
+
+                bob = (await charProvider.GetActiveCharacterAsync(1)).User;
+                jane = (await charProvider.GetActiveCharacterAsync(2)).User;
+                cal = (await charProvider.GetActiveCharacterAsync(3)).User;
+            }
+
+            Campaign campaign;
+            // using (var context = new RpgContext(genOptions))
+            // {
+            //     var provider = new EfCampaignProvider(context, mapper);
+            //     var charProvider = new EfCharacterProvider(context, mapper);
+
+            //     campaign = await provider.GetCampaignAsync(1);
+            // }
+
+            using (var context = new RpgContext(genOptions))
+            {
+                var provider = new EfCampaignProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper);
+                campaign = await provider.GetCampaignAsync(1);
+
+                campaign.Channels = new List<Channel> { new Channel(21), new Channel(22), new Channel(23), new Channel(24) };
+                campaign.Characters = new List<Character> { new Character(4, bob, false, "bob jr."), new Character(5, jane, false, "jane jr."), new Character(6, cal, false, "cal jr.") };
+                campaign.Effects = new List<Effect> { new Effect(bob, "bob's effect") { Id = 10 }, new Effect(jane, "jane's effect") { Id = 20 }, new Effect(cal, "cal's effect") { Id = 30 }};
+                campaign.Moderators = new List<User> { jane, cal };
+                campaign.Name = "coolcampaign";
+                campaign.Owner = bob;
+                campaign.RollOptions = new RollOptions { RollStrategy = "frags", Id = 11 };
+                campaign.Statistics = new List<Statistic> { new Attribute("Strength") { Id = 12 }, new Attribute("Intelligence") { Id = 22 } };
+
+                var expChannels = new ulong[] { 27, 37, 47, 57 };
+                campaign.StatisticOptions = new StatisticOptions
+                {
+                    Id = 14,
+                    AttributeMax = 1,
+                    ExpEnabledChannels = expChannels,
+                    ProgressionStrategy = "vegas",
+                };
+
+                await provider.UpdateCampaignAsync(campaign);
+            }
+
+            using (var context = new RpgContext(new GeneralOptions { UseInMemoryDatabase = true, DatabaseName = "CreateCampaign_EntityMatchesInput" }))
+            {
+                var provider = new EfCampaignProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper);
+                campaign = await provider.GetCampaignAsync(1);
+                var campChannels = await provider.GetChannelsAsync(1);
+                var characters = await provider.GetCharactersAsync(1);
+                var effects = await provider.GetEffectsAsync(1);
+                var moderators = await provider.GetModeratorsAsync(1);
+                var rollOptions = await provider.GetRollOptionsAsync(1);
+                var statistics = await provider.GetStatisticsAsync(1);
+                var statOptions = await provider.GetStatisticOptionsAsync(1);
+
+                Assert.True(campaign.Name == "coolcampaign" &&
+                    campChannels.Count == 8 &&
+                    characters.Count == 3 &&
+                    effects.Count == 3 &&
+                    moderators.Count == 3 &&
+                    rollOptions.RollStrategy == "frags" &&
+                    statistics.Count == 2 &&
+                    statOptions.ExpEnabledChannels.Length == 4);
+            }
         }
     }
 }

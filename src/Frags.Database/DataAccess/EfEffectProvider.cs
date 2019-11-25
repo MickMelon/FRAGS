@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
@@ -16,21 +17,19 @@ namespace Frags.Database.DataAccess
 
         private readonly IMapper _mapper;
 
-        public EfEffectProvider(RpgContext context)
+        public EfEffectProvider(RpgContext context, IMapper mapper)
         {
             _context = context;
-
-            var mapperConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Effect, EffectDto>();
-                cfg.CreateMap<EffectDto, Effect>();
-            });
             
-            _mapper = new Mapper(mapperConfig);
+            _mapper = mapper;
         }
 
         public async Task<Effect> CreateEffectAsync(ulong ownerId, string name)
         {
-            var effect = new Effect(ownerId, name);
+            var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == ownerId);
+            var userMapped = _mapper.Map<User>(userDto);
+
+            var effect = new Effect(userMapped, name);
             var dto = _mapper.Map<EffectDto>(effect);
 
             await _context.Effects.AddAsync(dto);
@@ -67,10 +66,10 @@ namespace Frags.Database.DataAccess
                 .FirstOrDefaultAsync());
         }
 
-        public async Task<IEnumerable<Effect>> GetUserEffectsAsync(ulong userId)
+        public async Task<IEnumerable<Effect>> GetOwnedEffectsAsync(ulong userId)
         {
             return _mapper.Map<List<Effect>>(await _context.Effects
-                .Where(x => x.OwnerUserIdentifier == userId)
+                .Where(x => x.Owner.UserIdentifier == userId)
                 .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
                 .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
                 .ToListAsync());

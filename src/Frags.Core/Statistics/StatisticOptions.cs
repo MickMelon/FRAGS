@@ -2,6 +2,8 @@ namespace Frags.Core.Statistics
 {
     public class StatisticOptions
     {
+        public int Id { get; set; }
+
         public string ProgressionStrategy { get; set; }
 
         public int AttributeMax { get; set; }

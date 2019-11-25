@@ -6,6 +6,7 @@ using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
 using Frags.Core.Statistics;
+using Frags.Core.Common;
 using Frags.Database.Characters;
 using Frags.Database.Effects;
 using Frags.Database.Statistics;
@@ -19,70 +20,32 @@ namespace Frags.Database.DataAccess
 
         private readonly IMapper _mapper;
 
-        public EfCharacterProvider(RpgContext context)
+        public EfCharacterProvider(RpgContext context, IMapper mapper)
         {
             _context = context;
-            
-            var mapperConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Character, CharacterDto>()
-                    .ForMember(x => x.Statistics, opt => opt.Ignore());
-                cfg.CreateMap<CharacterDto, Character>()
-                    .ForMember(x => x.Statistics, opt => opt.Ignore());
-                cfg.CreateMap<Effect, EffectDto>();
-                cfg.CreateMap<EffectDto, Effect>();
 
-                cfg.CreateMap<Statistic, StatisticDto>()
-                    .Include<Attribute, AttributeDto>()
-                    .Include<Skill, SkillDto>();
-
-                cfg.CreateMap<StatisticDto, Statistic>()
-                    .Include<AttributeDto, Attribute>()
-                    .Include<SkillDto, Skill>();
-
-                cfg.CreateMap<Skill, SkillDto>();
-                cfg.CreateMap<SkillDto, Skill>();
-
-                cfg.CreateMap<Attribute, AttributeDto>();
-                cfg.CreateMap<AttributeDto, Attribute>();
-            });
-
-            _mapper = new Mapper(mapperConfig);
+            _mapper = mapper;
         }
 
-        private async Task<Character> CreateCharacterAsync(Character character)
+        public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
         {
-            var charDto = _mapper.Map<CharacterDto>(character);
+            var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId);
 
-            // Check the database for a character with the same ID as the new one
-            // If one exists, don't add it
-            if (await _context.Characters.CountAsync(x => x.Id.Equals(charDto.Id)) > 0)
-                return null;
+            if (userDto == null)
+            {
+                userDto = new UserDto(discordId);
+                await _context.AddAsync(userDto);
+            }
 
+            var charDto = _mapper.Map<CharacterDto>(new Character(_mapper.Map<User>(userDto), name));
             await _context.AddAsync(charDto);
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
-
-            if (user == null)
-            {
-                await _context.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = charDto });
-            }
-            else if (character.Active)
-            {
-                user.ActiveCharacter = charDto;
-            }
-
+            userDto.Characters.Add(charDto);
+            userDto.ActiveCharacter = charDto;
+            
             await _context.SaveChangesAsync();
-            return _mapper.Map<Character>(charDto);
+            return true;
         }
-
-        /// <inheritdoc/>
-        public async Task<Character> CreateCharacterAsync(ulong userIdentifier, string name) =>
-            await CreateCharacterAsync(new Character(userIdentifier, name));
-
-        /// <inheritdoc/>
-        public async Task<Character> CreateCharacterAsync(int id, ulong userIdentifier, bool active, string name,
-            string description = "", string story = "") =>
-            await CreateCharacterAsync(new Character(id, userIdentifier, active, name, description, story));
 
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
@@ -90,6 +53,7 @@ namespace Frags.Database.DataAccess
             // Guess we still need the holy water, damn.
             var dto = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Select(usr => usr.ActiveCharacter)
+                .Include(x => x.User)
                 .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
                 .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
@@ -101,6 +65,7 @@ namespace Frags.Database.DataAccess
 
             var mapped = _mapper.Map<Character>(dto);
 
+            // TODO: move this to automapper configuration
             // Convert from StatisticMapping list to Dictionary
             mapped.Statistics.Clear();
             foreach (var stat in dto.Statistics)
@@ -113,16 +78,19 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier)
         {
-            var charDtos = await _context.Characters.Where(c => c.UserIdentifier == userIdentifier)
-                .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
-                .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
-                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
-                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
-                .ToListAsync();
+            ICollection<CharacterDto> charDtos = (await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
+                .Include(x => x.Characters).ThenInclude(x => x.User)
+                .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.Statistic)
+                .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.StatisticValue)
+                .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
+                .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
+                .FirstOrDefaultAsync()).Characters;
 
             if (charDtos == null) return null;
 
-            charDtos.ForEach(x => x.Active = false);
+
+            // This sets CharacterDto.Active properly
+            foreach (var x in charDtos) x.Active = false;
             var activeChar = (await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier))?.ActiveCharacter;
             if (activeChar != null)
             {
@@ -184,7 +152,7 @@ namespace Frags.Database.DataAccess
 
             if (character.Active)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.UserIdentifier);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.User.UserIdentifier);
                 
                 if (user != null)
                 {
@@ -193,7 +161,7 @@ namespace Frags.Database.DataAccess
                 }
                 else
                 {
-                    await _context.AddAsync(new User { UserIdentifier = character.UserIdentifier, ActiveCharacter = dbChar });
+                    await _context.AddAsync(new UserDto(character.User.UserIdentifier, dbChar));
                 }
             }
 

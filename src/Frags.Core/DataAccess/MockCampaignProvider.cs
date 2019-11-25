@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
+using Frags.Core.Common;
 using Frags.Core.Effects;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
@@ -14,9 +15,9 @@ namespace Frags.Core.DataAccess
         private List<Campaign> _campaigns = new List<Campaign>();
         private int _id = 1;
         
-        public Task<Campaign> CreateCampaignAsync(ulong ownerId, string name)
+        public Task<Campaign> CreateCampaignAsync(ulong userIdentifier, string name)
         {
-            var campaign = new Campaign(ownerId, name);
+            var campaign = new Campaign(new User(userIdentifier), name);
             campaign.Id = _id++;
             _campaigns.Add(campaign);
             return Task.FromResult(campaign);
@@ -32,7 +33,7 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id));
         }
 
-        public Task<ICollection<ulong>> GetChannelsAsync(int id)
+        public Task<ICollection<Channel>> GetChannelsAsync(int id)
         {
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).Channels);
         }
@@ -47,9 +48,9 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).Effects);
         }
 
-        public Task<ICollection<ulong>> GetModeratorsAsync(int id)
+        public Task<ICollection<User>> GetModeratorsAsync(int id)
         {
-            return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).ModeratorUserIdentifiers);
+            return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).Moderators);
         }
 
         public Task<RollOptions> GetRollOptionsAsync(int id)

@@ -31,12 +31,14 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "CreateCharacter_EntityMatchesInput"
             });
             
-            var provider = new EfCharacterProvider(context);
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+            var provider = new EfCharacterProvider(context, mapper);
 
-            await provider.CreateCharacterAsync(1, 305847674974896128, true, "Melon Head");
+            await provider.CreateCharacterAsync(305847674974896128, "Melon Head");
             var result = await provider.GetActiveCharacterAsync(305847674974896128);
 
-            Assert.True(result.UserIdentifier == 305847674974896128);
+            Assert.True(result.User.UserIdentifier == 305847674974896128);
         }
 
         [Fact]
@@ -48,16 +50,18 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "CharacterStatistics_EntityMatchesInput"
             });
 
-            var provider = new EfCharacterProvider(context);
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+            var provider = new EfCharacterProvider(context, mapper);
             var statProvider = new EfStatisticProvider(context);
 
             ulong userIdentifier = 305847674974896128;
             string name = "Melon Head";
-            int id = 1;
+            //int id = 1;
             
             var strength = await statProvider.CreateAttributeAsync("Strength");
             var value = new StatisticValue(5);
-            await provider.CreateCharacterAsync(id, userIdentifier, true, name);
+            await provider.CreateCharacterAsync(userIdentifier, name);
             var result = await provider.GetActiveCharacterAsync(userIdentifier);
 
             result.SetStatistic(strength, value);
@@ -76,13 +80,16 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "UpdateCharacter_EntityMatchesInput"
             });
 
-            var provider = new EfCharacterProvider(context);
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+            var provider = new EfCharacterProvider(context, mapper);
             
             ulong userIdentifier = 305847674974896128;
             string oldName = "Melon Head", newName = "Mr. Melon";
-            int id = 1;
+            //int id = 1;
 
-            var result = await provider.CreateCharacterAsync(id, userIdentifier, true, oldName);
+            await provider.CreateCharacterAsync(userIdentifier, oldName);
+            var result = await provider.GetActiveCharacterAsync(userIdentifier);
 
             result.Name = newName;
             await provider.UpdateCharacterAsync(result);

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.Effects;
 
@@ -14,7 +15,7 @@ namespace Frags.Core.DataAccess
 
         public Task<Effect> CreateEffectAsync(ulong ownerId, string name)
         {
-            var effect = new Effect(ownerId, name) { Id = id++ };
+            var effect = new Effect(new User(ownerId), name) { Id = id++ };
             _effects.Add(effect);
             return Task.FromResult(effect);
         }
@@ -35,9 +36,9 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_effects.FirstOrDefault(x => x.Name.EqualsIgnoreCase(name)));
         }
 
-        public Task<IEnumerable<Effect>> GetUserEffectsAsync(ulong userId)
+        public Task<IEnumerable<Effect>> GetOwnedEffectsAsync(ulong userId)
         {
-            return Task.FromResult<IEnumerable<Effect>>(_effects.Where(x => x.OwnerUserIdentifier == userId).ToList());
+            return Task.FromResult<IEnumerable<Effect>>(_effects.Where(x => x.Owner.UserIdentifier == userId).ToList());
         }
 
         public Task UpdateEffectAsync(Effect effect)

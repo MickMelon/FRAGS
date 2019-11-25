@@ -1,4 +1,5 @@
 using Frags.Core.Characters;
+using Frags.Core.Common;
 using Xunit;
 
 namespace Frags.Test.Core.Models.Characters
@@ -9,10 +10,10 @@ namespace Frags.Test.Core.Models.Characters
         [Fact]
         public void CanCreateCharacter()
         {
-            var character = new Character(1, 2, true, "C", "Description", "Story");
+            var character = new Character(1, new User(2), true, "C", "Description", "Story");
 
             Assert.True(character.Id == 1
-                && character.UserIdentifier == 2
+                && character.User.UserIdentifier == 2
                 && character.Active == true
                 && character.Name.Equals("C")
                 && character.Description.Equals("Description")

@@ -13,10 +13,10 @@ namespace Frags.Database.Campaigns
 
         public string Name { get; set; }
 
-        public ulong OwnerUserIdentifier { get; set; }
+        public UserDto Owner { get; set; }
 
-        // Many to Many
-        public ICollection<Moderator> Moderators { get; set; }
+        // Many to one
+        public ICollection<UserDto> Moderators { get; set; }
 
         // Many to one
         public ICollection<ChannelDto> Channels { get; set; }
@@ -38,7 +38,7 @@ namespace Frags.Database.Campaigns
 
         public CampaignDto()
         {
-            Moderators = new List<Moderator>();
+            Moderators = new List<UserDto>();
             Channels = new List<ChannelDto>();
             Characters = new List<CharacterDto>();
             Effects = new List<EffectDto>();

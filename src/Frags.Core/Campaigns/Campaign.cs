@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Frags.Core.Characters;
+using Frags.Core.Common;
 using Frags.Core.Effects;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
@@ -12,10 +13,10 @@ namespace Frags.Core.Campaigns
 
         public string Name { get; set; }
 
-        public ulong OwnerUserIdentifier { get; set; }
-        public ICollection<ulong> ModeratorUserIdentifiers { get; set; }
+        public User Owner { get; set; }
+        public ICollection<User> Moderators { get; set; }
 
-        public ICollection<ulong> Channels { get; set; }
+        public ICollection<Channel> Channels { get; set; }
 
         public ICollection<Character> Characters { get; set; }
         public ICollection<Effect> Effects { get; set; }
@@ -27,15 +28,15 @@ namespace Frags.Core.Campaigns
         /// <summary>
         /// Initializes a new instance of the <see cref="Campaign" /> class.
         /// </summary>
-        /// <param name="ownerIdentifier">The unique identifier of user that owns the campaign.</param>
+        /// <param name="owner">The unique identifier of user that owns the campaign.</param>
         /// <param name="name">The campaigns's name.</param>
-        public Campaign(ulong ownerIdentifier, string name)
+        public Campaign(User owner, string name)
         {
-            OwnerUserIdentifier = ownerIdentifier;
+            Owner = owner;
             Name = name;
 
-            ModeratorUserIdentifiers = new List<ulong>();
-            Channels = new List<ulong>();
+            Moderators = new List<User> { owner };
+            Channels = new List<Channel>();
             Characters = new List<Character>();
             Statistics = new List<Statistic>();
             Effects = new List<Effect>();

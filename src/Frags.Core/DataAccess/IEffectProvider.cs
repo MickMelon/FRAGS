@@ -32,7 +32,7 @@ namespace Frags.Core.DataAccess
         /// Gets every Effect created by the given user identifier.
         /// </summary>
         /// <returns>An Enumerable of Effects created by the specified user.</returns>
-        Task<IEnumerable<Effect>> GetUserEffectsAsync(ulong userId);
+        Task<IEnumerable<Effect>> GetOwnedEffectsAsync(ulong userId);
 
         /// <summary>
         /// Gets every Effect currently in use.

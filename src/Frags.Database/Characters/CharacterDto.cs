@@ -1,12 +1,14 @@
 using Frags.Core.Common;
 using Frags.Core.Effects;
 using Frags.Core.Statistics;
+using Frags.Database.Campaigns;
 using Frags.Database.Effects;
 using Frags.Database.Statistics;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace Frags.Database.Characters
@@ -17,8 +19,6 @@ namespace Frags.Database.Characters
     public class CharacterDto : BaseModel
     {
         public int Id { get; set; }
-
-        public ulong UserIdentifier { get; set; }
 
         public bool Active { get; set; }
         
@@ -41,6 +41,12 @@ namespace Frags.Database.Characters
         /// The character's current experience.
         /// </summary>
         public int Experience { get; set; }
+
+        public CampaignDto Campaign { get; set; }
+
+        
+        [InverseProperty("Characters")]
+        public UserDto User { get; private set; }
 
         /// <summary>
         /// The character's current amount of money.

@@ -29,7 +29,7 @@ namespace Frags.Core.Characters
         /// Currently it's the DiscordID, but has been named UserIdentifier just
         /// in case Discord is changed for something else one day.
         /// </remarks>
-        public ulong UserIdentifier { get; private set; }
+        public User User { get; private set; }
 
         /// <summary>
         /// Whether this character is the user's active character.
@@ -105,11 +105,11 @@ namespace Frags.Core.Characters
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.
         /// </summary>
-        /// <param name="userIdentifier">The unique identifier of user that owns character.</param>
+        /// <param name="user">The unique identifier of user that owns character.</param>
         /// <param name="name">The character's name.</param>
-        public Character(ulong userIdentifier, string name)
+        public Character(User user, string name)
         {
-            UserIdentifier = userIdentifier;
+            User = user;
             Name = name;
 
             Statistics = new Dictionary<Statistic, StatisticValue>();
@@ -120,21 +120,27 @@ namespace Frags.Core.Characters
         /// Initializes a new instance of the <see cref="Character" /> class.
         /// </summary>
         /// <param name="id">The character's unique identifier.</param>
-        /// <param name="userIdentifier">The unique identifier of user that owns character.</param>
+        /// <param name="user">The unique identifier of user that owns character.</param>
         /// <param name="active">Whether this is the active character.</param>
         /// <param name="name">The character's name.</param>
         /// <param name="description">The character's description.</param>
         /// <param name="story">The character's story.</param>
-        public Character(int id, ulong userIdentifier, bool active, string name,
+        public Character(int id, User user, bool active, string name,
             string description = "", string story = "")
         {
             Id = id;
-            UserIdentifier = userIdentifier;
+            User = user;
             Active = active;
             Name = name;
             Description = description;
             Story = story;
 
+            Statistics = new Dictionary<Statistic, StatisticValue>();
+            Effects = new List<Effect>();
+        }
+
+        private Character() 
+        {
             Statistics = new Dictionary<Statistic, StatisticValue>();
             Effects = new List<Effect>();
         }

@@ -16,7 +16,7 @@ namespace Frags.Database
         public DbSet<EffectDto> Effects { get; set; }
         public DbSet<SkillDto> Skills { get; set; }
         public DbSet<StatisticDto> Statistics { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<UserDto> Users { get; set; }
 
         private readonly GeneralOptions _options;
 
@@ -27,6 +27,7 @@ namespace Frags.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.EnableSensitiveDataLogging(true);
             if (_options.UseInMemoryDatabase)
             {
                 optionsBuilder.UseInMemoryDatabase(_options.DatabaseName);
@@ -57,18 +58,8 @@ namespace Frags.Database
                 .WithMany(c => c.EffectMappings)
                 .HasForeignKey(ec => ec.CharacterId);
 
-            builder.Entity<Moderator>()
-                .HasKey(mod => new { mod.UserId, mod.CampaignId });  
-
-            builder.Entity<Moderator>()
-                .HasOne(mod => mod.Campaign)
-                .WithMany(c => c.Moderators)
-                .HasForeignKey(mod => mod.CampaignId);  
-
-            builder.Entity<Moderator>()
-                .HasOne(mod => mod.User)
-                .WithMany(u => u.ModeratedCampaigns)
-                .HasForeignKey(mod => mod.UserId);
+            //builder.Entity<Moderator>()
+                //.HasKey(mod => new { mod.UserId, mod.CampaignId });
         }
     }
 }
