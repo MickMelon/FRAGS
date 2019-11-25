@@ -35,6 +35,7 @@ namespace Frags.Database.DataAccess
             {
                 userDto = new UserDto(discordId);
                 await _context.AddAsync(userDto);
+                await _context.SaveChangesAsync();
             }
 
             var charDto = _mapper.Map<CharacterDto>(new Character(_mapper.Map<User>(userDto), name));
