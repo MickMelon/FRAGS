@@ -27,11 +27,6 @@ namespace Frags.Database.DataAccess
             _mapper = mapper;
         }
 
-        public async Task<User> JustGetTheDamnUser(ulong discordId)
-        {
-            return _mapper.Map<User>(await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId));
-        }
-
         public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
         {
             var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId);

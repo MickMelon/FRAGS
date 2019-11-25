@@ -58,12 +58,12 @@ namespace Frags.Test.Database.DataAccess
             using (var context = new RpgContext(genOptions))
             {
                 var provider = new EfCampaignProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper);
+                var userProvider = new EfUserProvider(context, mapper);
                 campaign = await provider.GetCampaignAsync(1);
 
-                User bob = await charProvider.JustGetTheDamnUser(1);
-                User jane = await charProvider.JustGetTheDamnUser(2);
-                User cal = await charProvider.JustGetTheDamnUser(3);
+                User bob = await userProvider.GetUserAsync(1);
+                User jane = await userProvider.GetUserAsync(2);
+                User cal = await userProvider.GetUserAsync(3);
 
                 campaign.Channels = new List<Channel> { new Channel(21), new Channel(22), new Channel(23), new Channel(24) };
                 campaign.Characters = new List<Character> { new Character(4, bob, false, "bob jr."), new Character(5, jane, false, "jane jr."), new Character(6, cal, false, "cal jr.") };
