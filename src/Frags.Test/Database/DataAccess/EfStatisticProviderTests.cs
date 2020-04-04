@@ -88,7 +88,8 @@ namespace Frags.Test.Database.DataAccess
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
             var provider = new EfStatisticProvider(context);
-            var charProvider = new EfCharacterProvider(context, mapper);
+            var userProvider = new EfUserProvider(context, mapper);
+            var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 
             var strength = await provider.CreateAttributeAsync("strength");
             await charProvider.CreateCharacterAsync(1, "bob");

@@ -29,7 +29,8 @@ namespace Frags.Test.Database.DataAccess
             var mapper = new Mapper(mapperConfig);
 
             var effectProvider = new EfEffectProvider(context, mapper);
-            var charProvider = new EfCharacterProvider(context, mapper);
+            var userProvider = new EfUserProvider(context, mapper);
+            var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 
             await charProvider.CreateCharacterAsync(1, "Char1");
             var char1 = await charProvider.GetActiveCharacterAsync(1);

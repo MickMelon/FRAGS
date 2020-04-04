@@ -38,7 +38,8 @@ namespace Frags.Test.Database.DataAccess
             using (var context = new RpgContext(genOptions))
             {
                 var provider = new EfCampaignProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper);
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 
                 await charProvider.CreateCharacterAsync(1, "bob");
                 await charProvider.CreateCharacterAsync(2, "jane");
@@ -48,7 +49,8 @@ namespace Frags.Test.Database.DataAccess
             using (var context = new RpgContext(genOptions))
             {
                 var provider = new EfCampaignProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper);
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 
                 await provider.CreateCampaignAsync(1, "bottom text");
             }
@@ -90,7 +92,8 @@ namespace Frags.Test.Database.DataAccess
             using (var context = new RpgContext(genOptions))
             {
                 var provider = new EfCampaignProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper);
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
                 campaign = await provider.GetCampaignAsync(1);
                 var campChannels = await provider.GetChannelsAsync(1);
                 var characters = await provider.GetCharactersAsync(1);

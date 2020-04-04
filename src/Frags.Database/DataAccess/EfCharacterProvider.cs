@@ -20,11 +20,15 @@ namespace Frags.Database.DataAccess
 
         private readonly IMapper _mapper;
 
-        public EfCharacterProvider(RpgContext context, IMapper mapper)
+        private readonly EfUserProvider _userProvider;
+
+        public EfCharacterProvider(RpgContext context, IMapper mapper, EfUserProvider userProvider)
         {
             _context = context;
 
             _mapper = mapper;
+
+            _userProvider = userProvider;
         }
 
         public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
@@ -33,9 +37,8 @@ namespace Frags.Database.DataAccess
 
             if (userDto == null)
             {
-                userDto = new UserDto(discordId);
-                await _context.AddAsync(userDto);
-                await _context.SaveChangesAsync();
+                await _userProvider.CreateUserAsync(discordId);
+                userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId);
             }
 
             var charDto = _mapper.Map<CharacterDto>(new Character(_mapper.Map<User>(userDto), name));

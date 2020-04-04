@@ -33,7 +33,8 @@ namespace Frags.Test.Database.DataAccess
             
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
-            var provider = new EfCharacterProvider(context, mapper);
+            var userProvider = new EfUserProvider(context, mapper);
+            var provider = new EfCharacterProvider(context, mapper, userProvider);
 
             await provider.CreateCharacterAsync(305847674974896128, "Melon Head");
             var result = await provider.GetActiveCharacterAsync(305847674974896128);
@@ -52,7 +53,8 @@ namespace Frags.Test.Database.DataAccess
 
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
-            var provider = new EfCharacterProvider(context, mapper);
+            var userProvider = new EfUserProvider(context, mapper);
+            var provider = new EfCharacterProvider(context, mapper, userProvider);
             var statProvider = new EfStatisticProvider(context);
 
             ulong userIdentifier = 305847674974896128;
@@ -82,7 +84,8 @@ namespace Frags.Test.Database.DataAccess
 
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
-            var provider = new EfCharacterProvider(context, mapper);
+            var userProvider = new EfUserProvider(context, mapper);
+            var provider = new EfCharacterProvider(context, mapper, userProvider);
             
             ulong userIdentifier = 305847674974896128;
             string oldName = "Melon Head", newName = "Mr. Melon";
