@@ -18,27 +18,10 @@ namespace Frags.Database.DataAccess
         private readonly RpgContext _context;
         private readonly IMapper _mapper;
 
-        public EfStatisticProvider(RpgContext context)
+        public EfStatisticProvider(RpgContext context, IMapper mapper)
         {
             _context = context;
-
-            var mapperConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Statistic, StatisticDto>()
-                    .Include<Attribute, AttributeDto>()
-                    .Include<Skill, SkillDto>();
-
-                cfg.CreateMap<StatisticDto, Statistic>()
-                    .Include<AttributeDto, Attribute>()
-                    .Include<SkillDto, Skill>();
-
-                cfg.CreateMap<Skill, SkillDto>();
-                cfg.CreateMap<SkillDto, Skill>();
-
-                cfg.CreateMap<Attribute, AttributeDto>();
-                cfg.CreateMap<AttributeDto, Attribute>();
-            });
-
-            _mapper = new Mapper(mapperConfig);
+            _mapper = mapper;
         }
         
         public async Task<Attribute> CreateAttributeAsync(string name)

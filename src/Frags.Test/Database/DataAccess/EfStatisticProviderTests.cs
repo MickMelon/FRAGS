@@ -5,6 +5,7 @@ using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 using Frags.Database;
+using Frags.Database.AutoMapper;
 using Frags.Database.Characters;
 using Frags.Database.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,9 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "CreateStatistic_EntityMatchesInput"
             });
 
-            var provider = new EfStatisticProvider(context);
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+            var provider = new EfStatisticProvider(context, mapper);
 
             await provider.CreateAttributeAsync("Strength");
             var result = await provider.GetStatisticAsync("Strength");
@@ -42,7 +45,9 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "GetAllStatistics_EntityMatchesInput"
             });
 
-            var statProvider = new EfStatisticProvider(context);
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+            var statProvider = new EfStatisticProvider(context, mapper);
 
             await statProvider.CreateAttributeAsync("Strength");
             await statProvider.CreateSkillAsync("Powerlifting", "Strength");
@@ -61,7 +66,9 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "UpdateStatistic_EntityMatchesInput"
             });
 
-            var provider = new EfStatisticProvider(context);
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+            var provider = new EfStatisticProvider(context, mapper);
             
             await provider.CreateAttributeAsync("Strength");
             var result = await provider.GetStatisticAsync("Strength");
@@ -85,9 +92,9 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "DeleteStatistic_ValidInput_CharacterNoLongerHasValue"
             });
 
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
-            var provider = new EfStatisticProvider(context);
+            var provider = new EfStatisticProvider(context, mapper);
             var userProvider = new EfUserProvider(context, mapper);
             var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 

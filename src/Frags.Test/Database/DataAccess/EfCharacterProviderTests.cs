@@ -4,6 +4,7 @@ using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 using Frags.Database;
+using Frags.Database.AutoMapper;
 using Frags.Database.Characters;
 using Frags.Database.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,7 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "CreateCharacter_EntityMatchesInput"
             });
             
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
             var userProvider = new EfUserProvider(context, mapper);
             var provider = new EfCharacterProvider(context, mapper, userProvider);
@@ -51,11 +52,11 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "CharacterStatistics_EntityMatchesInput"
             });
 
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
             var userProvider = new EfUserProvider(context, mapper);
             var provider = new EfCharacterProvider(context, mapper, userProvider);
-            var statProvider = new EfStatisticProvider(context);
+            var statProvider = new EfStatisticProvider(context, mapper);
 
             ulong userIdentifier = 305847674974896128;
             string name = "Melon Head";
@@ -82,7 +83,7 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "UpdateCharacter_EntityMatchesInput"
             });
 
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
             var userProvider = new EfUserProvider(context, mapper);
             var provider = new EfCharacterProvider(context, mapper, userProvider);
