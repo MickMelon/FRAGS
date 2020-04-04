@@ -28,8 +28,8 @@ namespace Frags.Test.Database.DataAccess
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
 
-            var effectProvider = new EfEffectProvider(context, mapper);
             var userProvider = new EfUserProvider(context, mapper);
+            var effectProvider = new EfEffectProvider(context, mapper, userProvider);
             var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 
             await charProvider.CreateCharacterAsync(1, "Char1");

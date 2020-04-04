@@ -17,23 +17,33 @@ namespace Frags.Database.DataAccess
 
         private readonly IMapper _mapper;
 
-        public EfEffectProvider(RpgContext context, IMapper mapper)
+        private readonly IUserProvider _userProvider;
+
+        public EfEffectProvider(RpgContext context, IMapper mapper, IUserProvider userProvider)
         {
             _context = context;
             
             _mapper = mapper;
+
+            _userProvider = userProvider;
         }
 
         public async Task<Effect> CreateEffectAsync(ulong ownerId, string name)
         {
             var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == ownerId);
-            var userMapped = _mapper.Map<User>(userDto);
+            User userMapped;
+
+            if (userDto == null)
+                userMapped = await _userProvider.CreateUserAsync(ownerId);
+            else
+                userMapped = _mapper.Map<User>(userDto);
 
             var effect = new Effect(userMapped, name);
-            var dto = _mapper.Map<EffectDto>(effect);
 
+            var dto = _mapper.Map<EffectDto>(effect);
             await _context.Effects.AddAsync(dto);
             await _context.SaveChangesAsync();
+            
             return effect;
         }
 
