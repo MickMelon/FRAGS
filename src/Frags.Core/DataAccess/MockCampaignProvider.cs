@@ -33,6 +33,11 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id));
         }
 
+        public Task<Campaign> GetCampaignAsync(string name)
+        {
+            return Task.FromResult(_campaigns.FirstOrDefault(x => x.Name.Equals(name)));
+        }
+
         public Task<ICollection<Channel>> GetChannelsAsync(int id)
         {
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).Channels);

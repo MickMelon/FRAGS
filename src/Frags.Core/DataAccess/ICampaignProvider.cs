@@ -26,6 +26,9 @@ namespace Frags.Core.DataAccess
         /// <returns>The matching campaign or null if none.</returns>
         Task<Campaign> GetCampaignAsync(int id);
 
+        ///<inheritdoc cref="GetCampaignAsync"/>
+        Task<Campaign> GetCampaignAsync(string name);
+
         /// <summary>
         /// Gets the Moderators of a Campaign from the database.
         /// </summary>

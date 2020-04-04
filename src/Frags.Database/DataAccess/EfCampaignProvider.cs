@@ -70,6 +70,11 @@ namespace Frags.Database.DataAccess
             return _mapper.Map<Campaign>(await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == id));
         }
 
+        public async Task<Campaign> GetCampaignAsync(string name)
+        {
+            return _mapper.Map<Campaign>(await _context.Campaigns.FirstOrDefaultAsync(x => x.Name.Equals(name)));
+        }
+
         public async Task UpdateCampaignAsync(Campaign campaign)
         {
             // If the campaign does not exist in the database, abort
