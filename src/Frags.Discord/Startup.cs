@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using AutoMapper;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -13,6 +14,7 @@ using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Database;
+using Frags.Database.AutoMapper;
 using Frags.Database.DataAccess;
 using Frags.Discord.Services;
 using Frags.Presentation.Controllers;
@@ -93,6 +95,7 @@ namespace Frags.Discord
         private static IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
                 .AddDbContext<RpgContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
+                .AddTransient<IUserProvider, EfUserProvider>()
                 .AddTransient<ICharacterProvider, EfCharacterProvider>()
                 .AddTransient<IEffectProvider, EfEffectProvider>()
                 .AddTransient<IStatisticProvider, EfStatisticProvider>();
@@ -102,14 +105,11 @@ namespace Frags.Discord
         /// </summary>
         private static IServiceCollection AddGameServices(IServiceCollection services) =>
             services
-                .AddTransient<MockProgressionStrategy>()
-                .AddTransient<NewVegasProgressionStrategy>()
-                .AddTransient<FragsRollStrategy>()
-                .AddTransient<MockRollStrategy>()
                 .AddTransient<CharacterController>()
                 .AddTransient<EffectController>()
                 .AddTransient<RollController>()
-                .AddTransient<StatisticController>();
+                .AddTransient<StatisticController>()
+                .AddAutoMapper(typeof(GeneralProfile));
 
         private static IServiceCollection AddConfiguredServices(IServiceCollection services)
         {
@@ -126,8 +126,26 @@ namespace Frags.Discord
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<GeneralOptions>>().Value)
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value)
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
+                .AddTransient<FragsRollStrategy>()
+                .AddTransient<MockRollStrategy>()
+                .AddTransient<GenericProgressionStrategy>()
+                .AddTransient<NewVegasProgressionStrategy>()
+                .AddTransient(provider =>
+                    ResolveServices<IRollStrategy>(provider, provider.GetRequiredService<RollOptions>().RollStrategy))
+                .AddTransient(provider =>
+                    ResolveServices<IProgressionStrategy>(provider, provider.GetRequiredService<StatisticOptions>().ProgressionStrategy))
                 .AddTransient(provider => provider.GetServices<IRollStrategy>().ToList())
                 .AddTransient(provider => provider.GetServices<IProgressionStrategy>().ToList());
+        }
+
+        private static T ResolveServices<T>(IServiceProvider provider, string typeName)
+        {
+            // Search plugins & the interface's assembly's types
+            var type = _pluginTypes.Union(typeof(T).Assembly.ExportedTypes)
+                .Where(x => typeof(T).IsAssignableFrom(x))
+                .Single(x => x.Name.ContainsIgnoreCase(typeName));
+
+            return (T)provider.GetRequiredService(type);
         }
 
         private static readonly List<Type> _pluginTypes = new List<Type>();
