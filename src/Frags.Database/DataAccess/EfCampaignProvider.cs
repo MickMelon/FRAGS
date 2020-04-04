@@ -138,7 +138,7 @@ namespace Frags.Database.DataAccess
         public async Task<RollOptions> GetRollOptionsAsync(int id)
         {
             var campaign = await _context.Campaigns.Where(x => x.Id == id).Include(y => y.RollOptions).FirstOrDefaultAsync();
-            return campaign.RollOptions;
+            return _mapper.Map<RollOptions>(campaign.RollOptions);
         }
 
         public async Task<StatisticOptions> GetStatisticOptionsAsync(int id)
