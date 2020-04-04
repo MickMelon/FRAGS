@@ -23,9 +23,9 @@ namespace Frags.Database.DataAccess
 
         private readonly IMapper _mapper;
 
-        private readonly EfUserProvider _userProvider;
+        private readonly IUserProvider _userProvider;
 
-        public EfCampaignProvider(RpgContext context, IMapper mapper, EfUserProvider userProvider)
+        public EfCampaignProvider(RpgContext context, IMapper mapper, IUserProvider userProvider)
         {
             _context = context;
             _mapper = mapper;
