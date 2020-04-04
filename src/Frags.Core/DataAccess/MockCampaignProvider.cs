@@ -38,6 +38,22 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Name.Equals(name)));
         }
 
+        public Task<Campaign> GetCampaignFromChannelAsync(ulong channelId)
+        {
+            foreach (var campaign in _campaigns)
+            {
+                foreach (var channel in campaign.Channels)
+                {
+                    if (channel.Id == channelId)
+                    {
+                        return Task.FromResult(campaign);
+                    }
+                }
+            }
+
+            return Task.FromResult<Campaign>(null);
+        }
+
         public Task<ICollection<Channel>> GetChannelsAsync(int id)
         {
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).Channels);

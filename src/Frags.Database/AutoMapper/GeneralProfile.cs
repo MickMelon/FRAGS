@@ -59,6 +59,9 @@ namespace Frags.Database.AutoMapper
                
             CreateMap<RollOptions, RollOptionsDto>();
             CreateMap<RollOptionsDto, RollOptions>();
+
+            CreateMap<Channel, ChannelDto>();
+            CreateMap<ChannelDto, Channel>();
         }
     }
 }

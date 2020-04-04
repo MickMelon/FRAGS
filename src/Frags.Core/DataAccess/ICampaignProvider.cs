@@ -26,8 +26,21 @@ namespace Frags.Core.DataAccess
         /// <returns>The matching campaign or null if none.</returns>
         Task<Campaign> GetCampaignAsync(int id);
 
-        ///<inheritdoc cref="GetCampaignAsync"/>
+        /// <summary>
+        /// Gets the Campaign with the matching name from the database.
+        /// The returned Campaign object may not have navigation properties (Collections, Options, and certain complex types) included with it.
+        /// </summary>
+        /// <param name="name">Campaigns's name.</param>
+        /// <returns>The matching campaign or null if none.</returns>
         Task<Campaign> GetCampaignAsync(string name);
+
+        /// <summary>
+        /// Gets the Campaign associated with the given channel if applicable.
+        /// The returned Campaign object may not have navigation properties (Collections, Options, and certain complex types) included with it.
+        /// </summary>
+        /// <param name="channelId">Channel ID.</param>
+        /// <returns>The matching campaign or <c>null</c> if the channel does not exist OR there is no Campaign associated.</returns>
+        Task<Campaign> GetCampaignFromChannelAsync(ulong channelId);
 
         /// <summary>
         /// Gets the Moderators of a Campaign from the database.

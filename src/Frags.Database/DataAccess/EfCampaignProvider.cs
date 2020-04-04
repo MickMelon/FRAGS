@@ -75,6 +75,13 @@ namespace Frags.Database.DataAccess
             return _mapper.Map<Campaign>(await _context.Campaigns.FirstOrDefaultAsync(x => x.Name.Equals(name)));
         }
 
+        public async Task<Campaign> GetCampaignFromChannelAsync(ulong channelId)
+        {
+            var channel = await _context.Set<ChannelDto>().Where(x => x.Id == channelId).Include(y => y.Campaign).FirstOrDefaultAsync();
+
+            return _mapper.Map<Campaign>(channel?.Campaign);
+        }
+
         public async Task UpdateCampaignAsync(Campaign campaign)
         {
             // If the campaign does not exist in the database, abort
@@ -143,12 +150,13 @@ namespace Frags.Database.DataAccess
         public async Task<RollOptions> GetRollOptionsAsync(int id)
         {
             var campaign = await _context.Campaigns.Where(x => x.Id == id).Include(y => y.RollOptions).FirstOrDefaultAsync();
-            return _mapper.Map<RollOptions>(campaign.RollOptions);
+            return _mapper.Map<RollOptions>(campaign?.RollOptions);
         }
 
         public async Task<StatisticOptions> GetStatisticOptionsAsync(int id)
         {
             var campaign = await _context.Campaigns.Where(x => x.Id == id).Include(y => y.StatisticOptions).FirstOrDefaultAsync();
+            if (campaign == null) return null;
 
             var mapped = _mapper.Map<StatisticOptions>(campaign.StatisticOptions);
             mapped.ExpEnabledChannels = campaign.StatisticOptions.ExpEnabledChannels.Select(x => x.Id).ToArray();
