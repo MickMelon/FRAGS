@@ -23,10 +23,13 @@ namespace Frags.Database.DataAccess
 
         private readonly IMapper _mapper;
 
-        public EfCampaignProvider(RpgContext context, IMapper mapper)
+        private readonly EfUserProvider _userProvider;
+
+        public EfCampaignProvider(RpgContext context, IMapper mapper, EfUserProvider userProvider)
         {
             _context = context;
             _mapper = mapper;
+            _userProvider = userProvider;
         }
 
         public async Task<Campaign> CreateCampaignAsync(ulong userIdentifier, string name)
@@ -35,8 +38,7 @@ namespace Frags.Database.DataAccess
 
             if (userDto == null)
             {
-                userDto = new UserDto(userIdentifier);
-                await _context.AddAsync(userDto);
+                await _userProvider.CreateUserAsync(userIdentifier);
             }
 
             // create campaign object first, add the user later to avoid circular dependency

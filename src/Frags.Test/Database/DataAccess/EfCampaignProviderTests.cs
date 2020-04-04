@@ -33,12 +33,18 @@ namespace Frags.Test.Database.DataAccess
         {
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
-            var genOptions = new GeneralOptions { UseInMemoryDatabase = true, DatabaseName = "CreateCampaign_EntityMatchesInput0" };
+            var genOptions = new GeneralOptions { UseInMemoryDatabase = true, DatabaseName = "CreateCampaign_EntityMatchesInput" };
 
             using (var context = new RpgContext(genOptions))
             {
-                var provider = new EfCampaignProvider(context, mapper);
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+            }
+
+            using (var context = new RpgContext(genOptions))
+            {
                 var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCampaignProvider(context, mapper, userProvider);
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 
                 await charProvider.CreateCharacterAsync(1, "bob");
@@ -48,8 +54,8 @@ namespace Frags.Test.Database.DataAccess
 
             using (var context = new RpgContext(genOptions))
             {
-                var provider = new EfCampaignProvider(context, mapper);
                 var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCampaignProvider(context, mapper, userProvider);
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
 
                 await provider.CreateCampaignAsync(1, "bottom text");
@@ -58,8 +64,8 @@ namespace Frags.Test.Database.DataAccess
             Campaign campaign;
             using (var context = new RpgContext(genOptions))
             {
-                var provider = new EfCampaignProvider(context, mapper);
                 var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCampaignProvider(context, mapper, userProvider);
                 campaign = await provider.GetCampaignAsync(1);
 
                 User bob = await userProvider.GetUserAsync(1);
@@ -91,8 +97,8 @@ namespace Frags.Test.Database.DataAccess
 
             using (var context = new RpgContext(genOptions))
             {
-                var provider = new EfCampaignProvider(context, mapper);
                 var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCampaignProvider(context, mapper, userProvider);
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
                 campaign = await provider.GetCampaignAsync(1);
                 var campChannels = await provider.GetChannelsAsync(1);
