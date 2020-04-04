@@ -3,6 +3,7 @@ using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.Common;
 using Frags.Core.DataAccess;
+using Frags.Database.Characters;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -20,12 +21,12 @@ namespace Frags.Database.DataAccess
 
         public async Task<User> CreateUserAsync(ulong userId)
         {
-            var user = new User(userId);
+            var dto = new UserDto(userId);
             
-            await _context.AddAsync(user);
+            await _context.AddAsync(dto);
             await _context.SaveChangesAsync();
 
-            return user;
+            return _mapper.Map<User>(dto);
         }
 
         public async Task<User> GetUserAsync(ulong userId)
