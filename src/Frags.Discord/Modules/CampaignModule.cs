@@ -10,10 +10,12 @@ namespace Frags.Discord
     public class CampaignModule : ModuleBase
     {
         private readonly CampaignController _controller;
+        private readonly CharacterController _charController;
 
-        public CampaignModule(CampaignController controller)
+        public CampaignModule(CampaignController controller, CharacterController charController)
         {
             _controller = controller;
+            _charController = charController;
         }
 
         [Command("create")]

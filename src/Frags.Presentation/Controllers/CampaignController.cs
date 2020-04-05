@@ -12,14 +12,22 @@ namespace Frags.Presentation.Controllers
     public class CampaignController
     {
         private readonly ICampaignProvider _provider;
+        private readonly IUserProvider _userProvider;
+        private readonly GeneralOptions _generalOptions;
 
-        public CampaignController(ICampaignProvider provider)
+        public CampaignController(ICampaignProvider provider, IUserProvider userProvider, GeneralOptions generalOptions)
         {
             _provider = provider;
+            _userProvider = userProvider;
+            _generalOptions = generalOptions;
         }
 
         public async Task<IResult> CreateCampaignAsync(ulong callerId, string name)
         {
+            var ownedCampaigns = await _provider.GetOwnedCampaignsAsync(callerId);
+            if (ownedCampaigns != null && ownedCampaigns.Count >= _generalOptions.CampaignLimit)
+                return GenericResult.Failure("Too many campaigns!");
+
             await _provider.CreateCampaignAsync(callerId, name);
             return GenericResult.Generic("Campaign created.");
         }
@@ -72,13 +80,13 @@ namespace Frags.Presentation.Controllers
             sb.Append(campaign.Name + "\n\n");
             
             var moderators = await _provider.GetModeratorsAsync(campaign.Id);
-            sb.Append("**Moderators:** " + String.Join(", ", moderators.Select(x => x.UserIdentifier)) + "\n\n");
+            sb.Append("**Moderators:** " + String.Join(", ", moderators.Select(x => x.UserIdentifier)) + "\n");
 
             var channels = await _provider.GetChannelsAsync(campaign.Id);
-            sb.Append("**Channels:** " + String.Join(", ", channels.Select(x => x.Id)) + "\n\n");
+            sb.Append("**Channels:** " + String.Join(", ", channels.Select(x => x.Id)) + "\n");
 
             var characters = await _provider.GetCharactersAsync(campaign.Id);
-            sb.Append("**Characters:** " + String.Join(", ", characters.Select(x => x.Name)) + "\n\n");
+            sb.Append("**Characters:** " + String.Join(", ", characters.Select(x => x.Name)) + "\n");
 
             return GenericResult.Generic(sb.ToString());
         }

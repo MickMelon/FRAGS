@@ -38,6 +38,7 @@ namespace Frags.Discord.Modules
             var embed = new EmbedBuilder();
             embed.WithTitle(view.Name);
             embed.WithDescription($"**Description:** {view.Description}\n" +
+                $"**Campaign:** {view.CampaignName}\n" +
                 $"**Level:** {view.Level}\n" +
                 $"**Money:** {view.Money}\n" +
                 $"**Experience:** {view.Experience}\n" +

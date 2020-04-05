@@ -9,4 +9,6 @@ public class GeneralOptions
 
     public int CharacterLimit { get; set; } = 25;
     public int EffectsLimit { get; set; } = 25;
+
+    public int CampaignLimit { get; set; } = 10;
 }

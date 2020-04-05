@@ -74,6 +74,11 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).ModeratedCampaigns.Select(x => x.User));
         }
 
+        public Task<List<Campaign>> GetOwnedCampaignsAsync(ulong userIdentifier)
+        {
+            return Task.FromResult(_campaigns.Where(x => x.Owner.UserIdentifier == userIdentifier).ToList());
+        }
+
         public Task<RollOptions> GetRollOptionsAsync(int id)
         {
             return Task.FromResult(_campaigns.FirstOrDefault(x => x.Id == id).RollOptions);

@@ -14,6 +14,11 @@ namespace Frags.Presentation.ViewModels.Characters
         public string Name { get; set; }
 
         /// <summary>
+        /// The character's optional campaign.
+        /// </summary>
+        public string CampaignName { get; set; }
+
+        /// <summary>
         /// The character's description.
         /// </summary>
         public string Description { get; set; }

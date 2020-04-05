@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
@@ -20,7 +21,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
             var dbChar = await provider.GetActiveCharacterAsync(1);
 
             // Act
@@ -40,7 +42,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null, new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.ShowCharacterAsync(0);
@@ -56,7 +59,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null, new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c");
@@ -70,7 +74,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null, new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c1"); // Existing
@@ -84,7 +89,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, null, new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.CreateCharacterAsync(1, "c2"); // Existing
@@ -100,7 +106,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.SetCharacterDescriptionAsync(1, "description"); // Existing
@@ -116,7 +123,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.SetCharacterDescriptionAsync(1000, "description");
@@ -130,7 +138,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.SetCharacterDescriptionAsync(1, null); // Existing
@@ -145,7 +154,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.SetCharacterStoryAsync(1, "story"); // Existing
@@ -161,7 +171,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.SetCharacterStoryAsync(1000, "description");
@@ -175,7 +186,8 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var provider = new MockCharacterProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             // Act
             var result = await controller.SetCharacterStoryAsync(1, null); // Existing
@@ -198,7 +210,8 @@ namespace Frags.Test.Presentation.Controllers
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
-            var controller = new CharacterController(provider, strategy, new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             await controller.GiveExperienceAsync(1, 1, "12345");
             var character = await provider.GetActiveCharacterAsync(1);
@@ -217,7 +230,8 @@ namespace Frags.Test.Presentation.Controllers
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
-            var controller = new CharacterController(provider, strategy, new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             await controller.GiveExperienceAsync(1, 1, "               ");
             var character = await provider.GetActiveCharacterAsync(1);
@@ -236,7 +250,8 @@ namespace Frags.Test.Presentation.Controllers
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
-            var controller = new CharacterController(provider, strategy, new GeneralOptions());
+            var campaignProvider = new MockCampaignProvider();
+            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
 
             await controller.GiveExperienceAsync(1, 2, "12345");
             var character = await provider.GetActiveCharacterAsync(1);

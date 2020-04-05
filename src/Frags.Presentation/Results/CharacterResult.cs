@@ -26,6 +26,7 @@ namespace Frags.Presentation.Results
                 viewModel: new ShowCharacterViewModel()
                 {
                     Name = character.Name,
+                    CampaignName = character.Campaign?.Name ?? "None",
                     Story = character.Story,
                     Description = character.Description,
                     Level = level,

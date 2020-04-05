@@ -162,5 +162,14 @@ namespace Frags.Database.DataAccess
             mapped.ExpEnabledChannels = campaign.StatisticOptions.ExpEnabledChannels.Select(x => x.Id).ToArray();
             return mapped;
         }
+
+        /// <inheritdoc/>
+        public async Task<List<Campaign>> GetOwnedCampaignsAsync(ulong userIdentifier)
+        {
+            var user = await _userProvider.GetUserAsync(userIdentifier);
+            if(user == null) return null;
+
+            return _mapper.Map<List<Campaign>>(await _context.Campaigns.Where(x => x.Owner.UserIdentifier == userIdentifier).ToListAsync());
+        }
     }
 }

@@ -44,7 +44,7 @@ namespace Frags.Database.DataAccess
             var charDto = _mapper.Map<CharacterDto>(new Character(_mapper.Map<User>(userDto), name));
             await _context.AddAsync(charDto);
 
-            userDto.Characters.Add(charDto);
+            //userDto.Characters.Add(charDto);
             userDto.ActiveCharacter = charDto;
             
             await _context.SaveChangesAsync();
@@ -88,7 +88,7 @@ namespace Frags.Database.DataAccess
                 .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
                 .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
-                .FirstOrDefaultAsync()).Characters;
+                .FirstOrDefaultAsync())?.Characters;
 
             if (charDtos == null) return null;
 

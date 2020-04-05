@@ -31,15 +31,18 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly GeneralOptions _options;
 
+        private readonly ICampaignProvider _campProvider;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options)
+        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options, ICampaignProvider campProvider)
         {
             _provider = provider;
             _progStrategy = progStrategy;
             _options = options;
+            _campProvider = campProvider;
         }
 
         /// <summary>
@@ -100,9 +103,9 @@ namespace Frags.Presentation.Controllers
         public async Task<IResult> CreateCharacterAsync(ulong callerId, string name)
         {
             var characters = await _provider.GetAllCharactersAsync(callerId);
-            if (characters.Count >= _options.CharacterLimit) return CharacterResult.TooManyCharacters();
+            if (characters != null && characters.Count >= _options.CharacterLimit) return CharacterResult.TooManyCharacters();
 
-            var existing = characters.Where(c => c.Name.EqualsIgnoreCase(name)).FirstOrDefault();
+            var existing = characters?.Where(c => c.Name.EqualsIgnoreCase(name)).FirstOrDefault();
             if (existing != null) return CharacterResult.NameAlreadyExists();
 
             await _provider.CreateCharacterAsync(callerId, name);

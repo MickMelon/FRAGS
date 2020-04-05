@@ -14,6 +14,7 @@ namespace Frags.Core.DataAccess
         /// <summary>
         /// Adds a new campaign to the database.
         /// </summary>
+        /// <param name="userIdentifier">The user's Id.</param>
         /// <param name="name">Campaign's name.</param>
         /// <returns>The added campaign if successful, null if not.</returns>
         Task<Campaign> CreateCampaignAsync(ulong userIdentifier, string name);
@@ -41,6 +42,14 @@ namespace Frags.Core.DataAccess
         /// <param name="channelId">Channel ID.</param>
         /// <returns>The matching campaign or <c>null</c> if the channel does not exist OR there is no Campaign associated.</returns>
         Task<Campaign> GetCampaignFromChannelAsync(ulong channelId);
+
+        /// <summary>
+        /// Returns a list of all campaigns created by a specific user.
+        /// The returned Campaign object may not have navigation properties (Collections, Options, and certain complex types) included with it.
+        /// </summary>
+        /// <param name="userIdentifier">The user's Id.</param>
+        /// <returns>A populated list of campaigns if successful, an empty list if the user does not own any campaigns, null if the User does not exist.</returns>
+        Task<List<Campaign>> GetOwnedCampaignsAsync(ulong userIdentifier);
 
         /// <summary>
         /// Gets the Moderators of a Campaign from the database.

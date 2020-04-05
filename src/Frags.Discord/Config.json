@@ -8,7 +8,8 @@
     "AdminRole": "FragsAdmin",
 
     "CharacterLimit": 25,
-    "EffectsLimit": 25
+    "EffectsLimit": 25,
+    "CampaignLimit": 10
   },
 
   "StatisticOptions": {
