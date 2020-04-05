@@ -231,7 +231,7 @@ namespace Frags.Test.Presentation.Controllers
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
             var campaignProvider = new MockCampaignProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
+            var controller = new CharacterController(provider, strategy, new GeneralOptions(), campaignProvider);
 
             await controller.GiveExperienceAsync(1, 1, "               ");
             var character = await provider.GetActiveCharacterAsync(1);
@@ -251,7 +251,7 @@ namespace Frags.Test.Presentation.Controllers
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
             var campaignProvider = new MockCampaignProvider();
-            var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), campaignProvider);
+            var controller = new CharacterController(provider, strategy, new GeneralOptions(), campaignProvider);
 
             await controller.GiveExperienceAsync(1, 2, "12345");
             var character = await provider.GetActiveCharacterAsync(1);
