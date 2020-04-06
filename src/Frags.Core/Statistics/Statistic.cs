@@ -46,12 +46,16 @@ namespace Frags.Core.Statistics
                 return false;
             }
 
-            return Id == ((Statistic)obj).Id;
+            Statistic stat = (Statistic)obj;
+
+            return Name.Equals(stat.Name) && 
+            Description.Equals(stat.Description) && 
+            Aliases.Equals(stat.Aliases);
         }
         
         public override int GetHashCode()
         {
-            return Id;
+            return ("" + Name + Description + Aliases).GetHashCode();
         }
 
         protected Statistic(string name, string description = "")
