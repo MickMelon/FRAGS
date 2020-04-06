@@ -1,13 +1,17 @@
+using System;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Frags.Discord.Modules.Preconditions;
+using Frags.Core.Common.Extensions;
 using Frags.Presentation.Controllers;
+using Frags.Presentation.ViewModels.Characters;
 
 namespace Frags.Discord
 {
     [Group("campaign")]
     [Alias("camp")]
-    public class CampaignModule : ModuleBase
+    public class CampaignModule : InteractiveBase
     {
         private readonly CampaignController _controller;
         private readonly CharacterController _charController;
@@ -16,6 +20,31 @@ namespace Frags.Discord
         {
             _controller = controller;
             _charController = charController;
+        }
+
+        [Command("convert")]
+        public async Task ConvertCharacterToCampaignAsync()
+        {
+            var showResult = await _charController.ShowCharacterAsync(Context.User.Id);
+            if (!showResult.IsSuccess)
+            {
+                await ReplyAsync(showResult.Message);
+                return;
+            }
+
+            var view = (ShowCharacterViewModel)showResult.ViewModel;
+            var charName = view.Name;
+
+            await ReplyAsync($"This command will permanently convert your active character (\"{charName}\") to the Campaign associated with this channel. To continue please type the name of your character.");
+
+            var nextMessage = await NextMessageAsync(fromSourceUser: true, inSourceChannel: true, timeout: TimeSpan.FromMinutes(1));
+            if (!nextMessage.Content.EqualsIgnoreCase(charName))
+            {
+                return;
+            }
+
+            var result = await _controller.ConvertCharacterAsync(Context.User.Id, Context.Channel.Id);
+            await ReplyAsync(result.Message);
         }
 
         [Command("create")]

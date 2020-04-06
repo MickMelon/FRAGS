@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Frags.Core.Campaigns;
 using Frags.Core.Common;
+using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
+using Frags.Core.Game.Progression;
+using Frags.Core.Statistics;
 using Frags.Presentation.Results;
 
 namespace Frags.Presentation.Controllers
@@ -14,12 +18,42 @@ namespace Frags.Presentation.Controllers
         private readonly ICampaignProvider _provider;
         private readonly IUserProvider _userProvider;
         private readonly GeneralOptions _generalOptions;
+        private readonly ICharacterProvider _charProvider;
+        private readonly List<IProgressionStrategy> _progStrategies;
 
-        public CampaignController(ICampaignProvider provider, IUserProvider userProvider, GeneralOptions generalOptions)
+        public CampaignController(
+            ICampaignProvider provider,
+            IUserProvider userProvider,
+            GeneralOptions generalOptions,
+            ICharacterProvider charProvider,
+            List<IProgressionStrategy> progStrategies)
         {
             _provider = provider;
             _userProvider = userProvider;
             _generalOptions = generalOptions;
+            _charProvider = charProvider;
+            _progStrategies = progStrategies;
+        }
+
+        public async Task<IResult> ConvertCharacterAsync(ulong callerId, ulong channelId)
+        {
+            var campaign = await _provider.GetCampaignFromChannelAsync(channelId);
+            if (campaign == null) return GenericResult.Failure("Channel not associated with Campaign.");
+
+            var character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            var statOptions = await _provider.GetStatisticOptionsAsync(campaign.Id);
+            if (statOptions == null) return GenericResult.Failure("Campaign has not set its StatisticOptions!");
+
+            var strategy = GetProgressionStrategy(statOptions);
+            if (strategy == null) return GenericResult.Failure("Campaign has not set its ProgressionStrategy (or it's invalid!)");
+
+            await strategy.ResetCharacter(character);
+            character.Campaign = campaign;
+
+            await _charProvider.UpdateCharacterAsync(character);
+            return GenericResult.Generic("Character converted.");
         }
 
         public async Task<IResult> CreateCampaignAsync(ulong callerId, string name)
@@ -30,6 +64,32 @@ namespace Frags.Presentation.Controllers
 
             await _provider.CreateCampaignAsync(callerId, name);
             return GenericResult.Generic("Campaign created.");
+        }
+
+        public async Task<IResult> ConfigureCampaignAsync(ulong callerId, ulong channelId)
+        {
+            var user = await _userProvider.GetUserAsync(callerId);
+            if (user == null) return GenericResult.Failure("User does not exist and therefore does not moderate or own any Campaigns.");
+
+            var campaign = await _provider.GetCampaignFromChannelAsync(channelId);
+            if (campaign == null) return GenericResult.Failure("Channel not associated with a Campaign.");
+
+            var moderators = await _provider.GetModeratorsAsync(campaign.Id);
+
+            // Caller is a moderator or owner of this campaign
+            if (campaign.Owner.Id == user.Id || (moderators != null && moderators.Any(x => x.Id == user.Id)))
+            {
+                campaign.StatisticOptions = new StatisticOptions
+                {
+                    ExpEnabledChannels = new ulong[] { channelId },
+                    ProgressionStrategy = "Generic"
+                };
+                return GenericResult.Generic("Done.");
+            }
+            else
+            {
+                return GenericResult.Failure("You don't have permission to do that.");
+            }
         }
 
         /// <summary>
@@ -90,5 +150,8 @@ namespace Frags.Presentation.Controllers
 
             return GenericResult.Generic(sb.ToString());
         }
+
+        private IProgressionStrategy GetProgressionStrategy(StatisticOptions options) =>
+            _progStrategies.Find(x => x.GetType().Name.ContainsIgnoreCase(options.ProgressionStrategy));
     }
 }
