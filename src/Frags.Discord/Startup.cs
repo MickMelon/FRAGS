@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Frags.Core.Common.Extensions;
@@ -85,6 +86,7 @@ namespace Frags.Discord
                     CaseSensitiveCommands = false,
                     DefaultRunMode = RunMode.Async
                 }))
+                .AddScoped<InteractiveService>()
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<LogService>()
                 .AddSingleton<ReliabilityService>();
@@ -106,6 +108,7 @@ namespace Frags.Discord
         /// </summary>
         private static IServiceCollection AddGameServices(IServiceCollection services) =>
             services
+                .AddTransient<SeedService>()
                 .AddTransient<CampaignController>()
                 .AddTransient<CharacterController>()
                 .AddTransient<EffectController>()

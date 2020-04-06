@@ -154,7 +154,7 @@ namespace Frags.Core.Characters
         {
             if (stat == null) return null;
 
-            StatisticValue result;
+            StatisticValue result = null;
 
             if (useEffects)
             {

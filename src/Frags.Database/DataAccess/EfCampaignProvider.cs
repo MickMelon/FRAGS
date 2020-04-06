@@ -39,16 +39,14 @@ namespace Frags.Database.DataAccess
             if (userDto == null)
             {
                 await _userProvider.CreateUserAsync(userIdentifier);
+                userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier);
             }
 
-            // create campaign object first, add the user later to avoid circular dependency
             var campDto = new CampaignDto();
-
-            await _context.AddAsync(campDto);
-            await _context.SaveChangesAsync();
-
             campDto.Name = name;
             campDto.Owner = userDto;
+
+            await _context.AddAsync(campDto);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<Campaign>(campDto);
@@ -67,17 +65,17 @@ namespace Frags.Database.DataAccess
 
         public async Task<Campaign> GetCampaignAsync(int id)
         {
-            return _mapper.Map<Campaign>(await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == id));
+            return _mapper.Map<Campaign>(await _context.Campaigns.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Id == id));
         }
 
         public async Task<Campaign> GetCampaignAsync(string name)
         {
-            return _mapper.Map<Campaign>(await _context.Campaigns.FirstOrDefaultAsync(x => x.Name.Equals(name)));
+            return _mapper.Map<Campaign>(await _context.Campaigns.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Name.Equals(name)));
         }
 
         public async Task<Campaign> GetCampaignFromChannelAsync(ulong channelId)
         {
-            var channel = await _context.Set<ChannelDto>().Where(x => x.Id == channelId).Include(y => y.Campaign).FirstOrDefaultAsync();
+            var channel = await _context.Set<ChannelDto>().Where(x => x.Id == channelId).Include(y => y.Campaign).ThenInclude(z => z.Owner).FirstOrDefaultAsync();
 
             return _mapper.Map<Campaign>(channel?.Campaign);
         }
@@ -159,6 +157,8 @@ namespace Frags.Database.DataAccess
             if (campaign == null) return null;
 
             var mapped = _mapper.Map<StatisticOptions>(campaign.StatisticOptions);
+            if (mapped == null) return null;
+
             mapped.ExpEnabledChannels = campaign.StatisticOptions.ExpEnabledChannels.Select(x => x.Id).ToArray();
             return mapped;
         }

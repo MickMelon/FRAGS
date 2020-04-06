@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Frags.Discord.Modules.Preconditions;
+using Frags.Discord.Services;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.ViewModels.Statistics;
 
@@ -15,17 +16,19 @@ namespace Frags.Discord.Modules
     public class StatisticModule : ModuleBase
     {
         private readonly StatisticController _statController;
+        private readonly SeedService _seedService;
 
-        public StatisticModule(StatisticController statController)
+        public StatisticModule(StatisticController statController, SeedService seedService)
         {
             _statController = statController;
+            _seedService = seedService;
         }
 
         [Command("seed")]
         public async Task SeedDatabaseAsync()
         {
             await ReplyAsync("Beginning to seed the database.");
-            await Services.SeedService.Seed(_statController);
+            await _seedService.Seed();
             await ReplyAsync("Completed seeding the database.");
         }
 

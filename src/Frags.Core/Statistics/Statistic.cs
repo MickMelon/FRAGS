@@ -39,6 +39,21 @@ namespace Frags.Core.Statistics
         /// </summary>
         public string Description { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            return Id == ((Statistic)obj).Id;
+        }
+        
+        public override int GetHashCode()
+        {
+            return Id;
+        }
+
         protected Statistic(string name, string description = "")
         {
             Name = name;

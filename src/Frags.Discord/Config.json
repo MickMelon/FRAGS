@@ -13,7 +13,7 @@
   },
 
   "StatisticOptions": {
-    "ProgressionStrategy": "GenericProgressionStrategy",
+    "ProgressionStrategy": "Vegas",
 
     "AttributeMax": 10,
     "SkillMax": 200,

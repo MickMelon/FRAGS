@@ -75,7 +75,7 @@ namespace Frags.Presentation.Results
                 message += "*";
 
             return new StatisticResult(message,
-                viewModel: stat);
+                viewModel: statModel);
         }
 
         public static IResult ShowCharacter(Character character, string progressionInfo)
