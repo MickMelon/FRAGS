@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Frags.Core.Statistics;
 using Frags.Database.Campaigns;
 
@@ -37,6 +38,7 @@ namespace Frags.Database.Statistics
 
         public int ExpMessageLengthDivisor { get; set; }
 
-        public ICollection<ChannelDto> ExpEnabledChannels { get; set; }
+        [NotMapped]
+        public ulong[] ExpEnabledChannels { get; set; }
     }
 }

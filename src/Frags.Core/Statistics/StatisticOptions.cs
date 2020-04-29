@@ -32,6 +32,8 @@ namespace Frags.Core.Statistics
         public double ProficientSkillMultiplier { get; set; }
 
         public int ExpMessageLengthDivisor { get; set; }
+
+        // Only used by the configuration JSON, i.e. not Campaigns (they use the Channel object instead.)
         public ulong[] ExpEnabledChannels { get; set; }
     }
 }

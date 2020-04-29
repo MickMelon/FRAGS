@@ -87,19 +87,15 @@ namespace Frags.Database.DataAccess
                 return;
 
             // Load related properties and get ready to manually map certain navigation props
-            var campDto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            var campDto = await _context.Campaigns
+                .Include(x => x.Channels)
+                .Include(x => x.Characters)
+                .Include(x => x.Effects)
+                .Include(x => x.ModeratedCampaigns)
+                .Include(x => x.StatisticOptions)
+                .Include(x => x.Statistics)
+                .FirstOrDefaultAsync(x => x.Id == campaign.Id);
             _mapper.Map(campaign, campDto);
-
-            // Manually map Exp enabled channels
-            var channelsToMap = campaign.StatisticOptions?.ExpEnabledChannels;
-            if (channelsToMap != null)
-            {
-                campDto.StatisticOptions.ExpEnabledChannels = new List<ChannelDto>();
-                foreach (var channelId in channelsToMap)
-                {
-                    campDto.StatisticOptions.ExpEnabledChannels.Add(new ChannelDto { Campaign = campDto, Id = channelId });
-                }
-            }
 
             _context.Update(campDto);
             await _context.SaveChangesAsync();
@@ -153,13 +149,13 @@ namespace Frags.Database.DataAccess
 
         public async Task<StatisticOptions> GetStatisticOptionsAsync(int id)
         {
-            var campaign = await _context.Campaigns.Where(x => x.Id == id).Include(y => y.StatisticOptions).FirstOrDefaultAsync();
+            var campaign = await _context.Campaigns.Where(x => x.Id == id).Include(y => y.StatisticOptions).Include(y => y.Channels).FirstOrDefaultAsync();
             if (campaign == null) return null;
 
             var mapped = _mapper.Map<StatisticOptions>(campaign.StatisticOptions);
             if (mapped == null) return null;
 
-            mapped.ExpEnabledChannels = campaign.StatisticOptions.ExpEnabledChannels.Select(x => x.Id).ToArray();
+            mapped.ExpEnabledChannels = campaign.Channels.Where(x => x.IsExperienceEnabled).Select(y => y.Id).ToArray();
             return mapped;
         }
 

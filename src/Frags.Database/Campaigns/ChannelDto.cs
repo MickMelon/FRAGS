@@ -9,5 +9,7 @@ namespace Frags.Database.Campaigns
         public ulong Id { get; set; }
 
         public CampaignDto Campaign { get; set; }
+
+        public bool IsExperienceEnabled { get; set; }
     }
 }

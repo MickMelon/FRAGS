@@ -51,11 +51,8 @@ namespace Frags.Database.AutoMapper
             CreateMap<Attribute, AttributeDto>();
             CreateMap<AttributeDto, Attribute>();
 
-            CreateMap<StatisticOptions, StatisticOptionsDto>()
-               .ForMember(dto => dto.ExpEnabledChannels, opt => opt.Ignore());
-
-            CreateMap<StatisticOptionsDto, StatisticOptions>()
-               .ForMember(poco => poco.ExpEnabledChannels, opt => opt.MapFrom(dto => dto.ExpEnabledChannels.Select(ch => ch.Id)));
+            CreateMap<StatisticOptions, StatisticOptionsDto>();
+            CreateMap<StatisticOptionsDto, StatisticOptions>();
                
             CreateMap<RollOptions, RollOptionsDto>();
             CreateMap<RollOptionsDto, RollOptions>();
