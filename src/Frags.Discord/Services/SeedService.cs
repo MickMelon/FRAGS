@@ -45,10 +45,6 @@ namespace Frags.Discord.Services
             await _statController.CreateSkillAsync("Speech", "Charisma");
             await _statController.CreateSkillAsync("Survival", "Endurance");
             await _statController.CreateSkillAsync("Unarmed", "Endurance");
-
-            await _campController.CreateCampaignAsync(129306645548367872, "111");
-            await _campController.AddCampaignChannelAsync("111", 462426554492911629);
-            await _campController.ConfigureCampaignAsync(129306645548367872, 462426554492911629);
         }
     }
 }
