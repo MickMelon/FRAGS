@@ -69,6 +69,12 @@ namespace Frags.Database
                 .HasOne(ec => ec.User)
                 .WithMany(c => c.ModeratedCampaigns)
                 .HasForeignKey(ec => ec.UserId);
+
+            builder.Entity<CharacterDto>()
+                .HasOne(ch => ch.Campaign)
+                .WithMany(camp => camp.Characters);
+
+            
         }
     }
 }

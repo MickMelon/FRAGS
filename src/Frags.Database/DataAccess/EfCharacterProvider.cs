@@ -58,6 +58,7 @@ namespace Frags.Database.DataAccess
             var dto = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Select(usr => usr.ActiveCharacter)
                 .Include(x => x.User)
+                .Include(x => x.Campaign)
                 .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
                 .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
@@ -84,6 +85,7 @@ namespace Frags.Database.DataAccess
         {
             ICollection<CharacterDto> charDtos = (await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
                 .Include(x => x.Characters).ThenInclude(x => x.User)
+                .Include(x => x.Characters).ThenInclude(x => x.Campaign)
                 .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.Statistic)
                 .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)

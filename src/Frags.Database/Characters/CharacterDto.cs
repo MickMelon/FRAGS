@@ -43,6 +43,7 @@ namespace Frags.Database.Characters
         public int Experience { get; set; }
 
         public CampaignDto Campaign { get; set; }
+        public int CampaignId { get; set; }
 
         
         [InverseProperty("Characters")]

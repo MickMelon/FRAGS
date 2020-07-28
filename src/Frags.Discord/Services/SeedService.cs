@@ -6,12 +6,10 @@ namespace Frags.Discord.Services
     public class SeedService
     {
         private readonly StatisticController _statController;
-        private readonly CampaignController _campController;
 
-        public SeedService(StatisticController statController, CampaignController campController)
+        public SeedService(StatisticController statController)
         {
             _statController = statController;
-            _campController = campController;
         }
 
         public async Task Seed()

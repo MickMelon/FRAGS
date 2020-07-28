@@ -97,7 +97,7 @@ namespace Frags.Discord
         private static IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
                 .AddDbContext<RpgContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
-                .AddTransient<ICampaignProvider, EfCampaignProvider>()
+                .AddTransient<ICampaignController, EfCampaignController>()
                 .AddTransient<IUserProvider, EfUserProvider>()
                 .AddTransient<ICharacterProvider, EfCharacterProvider>()
                 .AddTransient<IEffectProvider, EfEffectProvider>()
@@ -109,7 +109,6 @@ namespace Frags.Discord
         private static IServiceCollection AddGameServices(IServiceCollection services) =>
             services
                 .AddTransient<SeedService>()
-                .AddTransient<CampaignController>()
                 .AddTransient<CharacterController>()
                 .AddTransient<EffectController>()
                 .AddTransient<RollController>()
@@ -134,13 +133,14 @@ namespace Frags.Discord
                 .AddTransient<FragsRollStrategy>()
                 .AddTransient<MockRollStrategy>()
                 .AddTransient<GenericProgressionStrategy>()
+                .AddTransient<MockProgressionStrategy>()
                 .AddTransient<NewVegasProgressionStrategy>()
                 .AddTransient(provider =>
                     ResolveServices<IRollStrategy>(provider, provider.GetRequiredService<RollOptions>().RollStrategy))
                 .AddTransient(provider =>
                     ResolveServices<IProgressionStrategy>(provider, provider.GetRequiredService<StatisticOptions>().ProgressionStrategy))
-                .AddTransient(provider => provider.GetServices<IRollStrategy>().ToList())
-                .AddTransient(provider => provider.GetServices<IProgressionStrategy>().ToList());
+                .AddTransient(provider => AddServiceLists<IRollStrategy>(provider))
+                .AddTransient(provider => AddServiceLists<IProgressionStrategy>(provider));
         }
 
         private static T ResolveServices<T>(IServiceProvider provider, string typeName)
@@ -151,6 +151,20 @@ namespace Frags.Discord
                 .Single(x => x.Name.ContainsIgnoreCase(typeName));
 
             return (T)provider.GetRequiredService(type);
+        }
+
+        private static List<T> AddServiceLists<T>(IServiceProvider provider)
+        {
+            // Search plugins & the interface's assembly's types
+            var matchingTypes = _pluginTypes.Union(typeof(T).Assembly.ExportedTypes)
+                .Where(x => typeof(T).IsAssignableFrom(x));
+
+            var list = new List<T>();
+
+            foreach (var type in matchingTypes)
+                list.Add((T)provider.GetRequiredService(type));
+
+            return list;
         }
 
         private static readonly List<Type> _pluginTypes = new List<Type>();

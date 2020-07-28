@@ -40,6 +40,7 @@ namespace Frags.Core.Characters
         /// The optional campaign this character is a part of.
         /// </summary>
         public Campaign Campaign { get; set; }
+        public int CampaignId { get; set; }
 
         /// <summary>
         /// The character's name.
