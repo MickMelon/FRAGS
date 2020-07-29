@@ -186,7 +186,7 @@ namespace Frags.Database.DataAccess
                 var optionsProps = campDto.StatisticOptions.GetType().GetProperties();
                 foreach (var prop in optionsProps)
                 {
-                    if (prop.Name == "Id") continue;
+                    if (prop.Name == "Id" || prop.Name == "ExpEnabledChannels") continue;
                     sb.Append($"*{prop.Name}:* {prop.GetValue(campDto.StatisticOptions)}\n");
                 }
             }
