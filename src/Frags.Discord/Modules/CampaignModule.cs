@@ -32,9 +32,10 @@ namespace Frags.Discord
         }
 
         [Command("configure")]
-        public async Task ConfigureCampaignAsync()
+        [Alias("config", "set")]
+        public async Task ConfigureCampaignAsync(string property, string value)
         {
-            await ReplyAsync(await _controller.ConfigureCampaignAsync(Context.User.Id, Context.Channel.Id));
+            await ReplyAsync(await _controller.ConfigureCampaignAsync(Context.User.Id, Context.Channel.Id, property, (object)value));
         }
 
         [Command("create")]

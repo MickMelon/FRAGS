@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,7 +60,7 @@ namespace Frags.Database.DataAccess
             return "Success";
         }
 
-        public async Task<string> ConfigureCampaignAsync(ulong callerId, ulong channelId)
+        public async Task<string> ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value)
         {
             var user = await _userProvider.GetUserAsync(callerId);
             if (user == null) return "User does not exist and therefore does not moderate or own any Campaigns.";
@@ -72,13 +73,29 @@ namespace Frags.Database.DataAccess
             // Caller is a moderator or owner of this campaign
             if (campaignDto.Owner.Id == user.Id || (moderators != null && moderators.Any(x => x.UserId == user.Id)))
             {
-                campaignDto.StatisticOptions = new StatisticOptionsDto
+                await _context.Entry(campaignDto).Reference(x => x.StatisticOptions).LoadAsync();
+
+                if (campaignDto.StatisticOptions == null) campaignDto.StatisticOptions = new StatisticOptionsDto();
+
+                var propertyInfo = campaignDto.StatisticOptions.GetType().GetProperty(propName);
+                if (propertyInfo == null || propertyInfo.Name == "Id" || propertyInfo.Name == "ExpEnabledChannels") 
+                    return "Invalid setting name!";
+
+                var propertyType = propertyInfo.PropertyType;
+                value = Convert.ChangeType(value, propertyType);
+
+                try
                 {
-                    ProgressionStrategy = "Generic"
-                };
+                    propertyInfo.SetValue(campaignDto.StatisticOptions, value);
+                }
+                catch (System.Exception e)
+                {
+                    return e.Message;
+                }
+                
                 _context.Update(campaignDto);
                 await _context.SaveChangesAsync();
-                return "Done.";
+                return $"Property '{propertyInfo.Name}' is now set to: {propertyInfo.GetValue(campaignDto.StatisticOptions)}.";
             }
             else
             {
@@ -154,13 +171,25 @@ namespace Frags.Database.DataAccess
             await _context.Entry(campDto).Reference(x => x.Owner).LoadAsync();
             await _context.Entry(campDto).Collection(x => x.Channels).LoadAsync();
             await _context.Entry(campDto).Collection(x => x.Characters).LoadAsync();
+            await _context.Entry(campDto).Reference(x => x.StatisticOptions).LoadAsync();
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append($"Name: {campDto.Name}\n");
-            sb.Append($"Owner: {campDto.Owner.UserIdentifier}\n");
-            sb.Append($"Channels: {string.Join(" ", campDto.Channels?.Select(x => x.Id)) ?? "None"}\n");
-            sb.Append($"Characters: {string.Join(" ", campDto.Characters?.Select(x => x.Name)) ?? "None"}\n");
+            sb.Append($"**Name:** {campDto.Name}\n");
+            sb.Append($"**Owner:** {campDto.Owner.UserIdentifier}\n");
+            sb.Append($"**Channels:** {string.Join(" ", campDto.Channels?.Select(x => x.Id)) ?? "None"}\n");
+            sb.Append($"**Characters:** {string.Join(" ", campDto.Characters?.Select(x => x.Name)) ?? "None"}\n");
+
+            if (campDto.StatisticOptions != null)
+            {
+                sb.Append($"**StatisticOptions:**\n");
+                var optionsProps = campDto.StatisticOptions.GetType().GetProperties();
+                foreach (var prop in optionsProps)
+                {
+                    if (prop.Name == "Id") continue;
+                    sb.Append($"*{prop.Name}:* {prop.GetValue(campDto.StatisticOptions)}\n");
+                }
+            }
 
             return sb.ToString();
         }

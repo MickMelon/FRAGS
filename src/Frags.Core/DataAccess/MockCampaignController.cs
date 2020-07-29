@@ -25,7 +25,7 @@ namespace Frags.Core.DataAccess
             return Task.FromResult("done");
         }
 
-        public Task<string> ConfigureCampaignAsync(ulong callerId, ulong channelId)
+        public Task<string> ConfigureCampaignAsync(ulong callerId, ulong channelId, string property, object value)
         {
             throw new System.NotImplementedException();
         }

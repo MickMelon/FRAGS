@@ -16,6 +16,6 @@ namespace Frags.Core.DataAccess
         Task<string> AddCampaignChannelAsync(string campaignName, ulong channelId);
         Task<string> GetCampaignInfoAsync(ulong channelId);
         Task<string> GetCampaignInfoAsync(string name);
-        Task<string> ConfigureCampaignAsync(ulong callerId, ulong channelId);
+        Task<string> ConfigureCampaignAsync(ulong callerId, ulong channelId, string property, object value);
     }
 }
