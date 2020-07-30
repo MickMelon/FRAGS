@@ -14,7 +14,6 @@ namespace Frags.Core.DataAccess
     public class MockCampaignController : ICampaignController
     {
         private List<Campaign> _campaigns = new List<Campaign>();
-        private int _id = 1;
 
         public Task<string> AddCampaignChannelAsync(string campaignName, ulong channelId)
         {
