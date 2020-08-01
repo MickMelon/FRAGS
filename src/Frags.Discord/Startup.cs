@@ -97,7 +97,7 @@ namespace Frags.Discord
         private static IServiceCollection AddDatabaseServices(IServiceCollection services) =>
             services
                 .AddDbContext<RpgContext>(contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped)
-                .AddTransient<ICampaignController, EfCampaignController>()
+                .AddTransient<ICampaignProvider, EfCampaignProvider>()
                 .AddTransient<IUserProvider, EfUserProvider>()
                 .AddTransient<ICharacterProvider, EfCharacterProvider>()
                 .AddTransient<IEffectProvider, EfEffectProvider>()
@@ -109,6 +109,7 @@ namespace Frags.Discord
         private static IServiceCollection AddGameServices(IServiceCollection services) =>
             services
                 .AddTransient<SeedService>()
+                .AddTransient<CampaignController>()
                 .AddTransient<CharacterController>()
                 .AddTransient<EffectController>()
                 .AddTransient<RollController>()

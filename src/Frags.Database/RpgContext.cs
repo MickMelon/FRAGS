@@ -35,6 +35,8 @@ namespace Frags.Database
             {
                 optionsBuilder.UseSqlite($"Filename={_options.DatabaseName}.db");
             }
+
+            optionsBuilder.EnableSensitiveDataLogging(true);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

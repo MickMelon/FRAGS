@@ -16,19 +16,19 @@ namespace Frags.Database.Campaigns
         public UserDto Owner { get; set; }
 
         // Many to many
-        public ICollection<ModeratorDto> ModeratedCampaigns { get; set; }
+        public List<ModeratorDto> ModeratedCampaigns { get; set; }
 
         // Many to one
-        public ICollection<ChannelDto> Channels { get; set; }
+        public List<ChannelDto> Channels { get; set; }
 
         // Many to one
-        public ICollection<CharacterDto> Characters { get; set; }
+        public List<CharacterDto> Characters { get; set; }
 
         // Many to one
-        public ICollection<EffectDto> Effects { get; set; }
+        public List<EffectDto> Effects { get; set; }
 
         // Many to one
-        public ICollection<StatisticDto> Statistics { get; set; }
+        public List<StatisticDto> Statistics { get; set; }
 
         // One to one
         public RollOptionsDto RollOptions { get; set; }

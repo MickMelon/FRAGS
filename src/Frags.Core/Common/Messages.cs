@@ -53,6 +53,26 @@ namespace Frags.Core.Common
         public static readonly string EFFECT_TOO_MANY = "You have reached the limit of effects.";
         #endregion
 
+        #region Campaigns
+
+        public static readonly string CAMP_CHANNEL_ADDED = "Channel successfully added.";
+        public static readonly string CAMP_CREATED = "Campaign successfully created.";
+        public static readonly string CAMP_CHANNEL_ALREADY_ADDED = "Channel already added, action failed.";
+        public static readonly string CAMP_NOT_FOUND_NAME = "A Campaign with that name was not found.";
+        public static readonly string CAMP_EXISTING_NAME = "A Campaign with that name already exists.";
+        public static readonly string CAMP_NOT_FOUND_CHANNEL = "This channel is not associated with a Campaign.";
+        public static readonly string CAMP_PROPERTY_VALUECHANGED = "Setting successfully changed.";
+        public static readonly string CAMP_PROPERTY_INVALID = "A setting with that name does not exist.";
+        public static readonly string CAMP_PROPERTY_INVALID_VALUE = "Invalid input was given for that setting. Error: {0}";
+        public static readonly string CAMP_ACCESS_DENIED = "You don't have permission to do that.";
+        public static readonly string CAMP_STATOPTIONS_NOT_FOUND = "Campaign has not set its Statistic Options.";
+        public static readonly string CAMP_PROGSTRATEGY_INVALID = "Campaign is missing or has an invalid setting for its Progression Strategy.";
+        public static readonly string CAMP_CHARACTER_CONVERTED = "Character successfully reset and added to the Campaign.";
+        public static readonly string CAMP_CHARACTER_ALREADY_ADDED = "Character has already been added to the Campaign.";
+
+
+        #endregion
+
         #region Other
         public static readonly string REQUIRE_ROLE_FAIL = "You must be have the {0} role to use this command.";
         public static readonly string NOT_IN_GUILD = "You must be in a server to use this command.";
@@ -60,6 +80,7 @@ namespace Frags.Core.Common
         public static readonly string NOT_ENOUGH_POINTS = "Not enough points.";
         public static readonly string TOO_LOW = "The value was too low.";
         public static readonly string TOO_HIGH = "The value was too high.";
+        public static readonly string USER_NOT_FOUND = "User not found.";
         #endregion
     }
 }

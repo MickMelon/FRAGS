@@ -35,7 +35,8 @@ namespace Frags.Core.Game.Progression
 
         public Task<bool> ResetCharacter(Character character)
         {
-            throw new System.NotImplementedException();
+            character.Experience = 0;
+            return Task.FromResult(true);
         }
 
         public Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)

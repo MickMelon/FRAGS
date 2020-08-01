@@ -14,13 +14,13 @@ namespace Frags.Core.Campaigns
         public string Name { get; set; }
 
         public User Owner { get; set; }
-        public ICollection<Moderator> ModeratedCampaigns { get; set; }
+        public List<Moderator> ModeratedCampaigns { get; set; }
 
-        public ICollection<Channel> Channels { get; set; }
+        public List<Channel> Channels { get; set; }
 
-        public ICollection<Character> Characters { get; set; }
-        public ICollection<Effect> Effects { get; set; }
-        public ICollection<Statistic> Statistics { get; set; }
+        public List<Character> Characters { get; set; }
+        public List<Effect> Effects { get; set; }
+        public List<Statistic> Statistics { get; set; }
 
         public RollOptions RollOptions { get; set; }
         public StatisticOptions StatisticOptions { get; set; }

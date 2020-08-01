@@ -31,13 +31,13 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly GeneralOptions _options;
 
-        private readonly ICampaignController _campProvider;
+        private readonly ICampaignProvider _campProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options, ICampaignController campProvider)
+        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options, ICampaignProvider campProvider = null)
         {
             _provider = provider;
             _progStrategy = progStrategy;
