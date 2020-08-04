@@ -47,8 +47,10 @@ namespace Frags.Core.DataAccess
         public Task<Campaign> GetCampaignAsync(ulong channelId)
         {
             foreach (var campaign in _campaigns)
-                if (campaign.Channels.Any(x => x.Id == channelId))
+            {
+                if (campaign.Channels != null && campaign.Channels.Any(x => x.Id == channelId))
                     return Task.FromResult(campaign);
+            }
 
             return null;
         }
