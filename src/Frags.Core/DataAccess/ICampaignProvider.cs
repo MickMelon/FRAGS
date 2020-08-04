@@ -24,5 +24,6 @@ namespace Frags.Core.DataAccess
         Task ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value);
         Task ConvertCharacterAsync(ulong callerId, ulong channelId);
         Task AddChannelAsync(string campaignName, ulong channelId);
+        Task RenameCampaignAsync(ulong callerId, string newName, ulong channelId);
     }
 }

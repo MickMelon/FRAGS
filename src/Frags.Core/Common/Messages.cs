@@ -69,7 +69,7 @@ namespace Frags.Core.Common
         public static readonly string CAMP_PROGSTRATEGY_INVALID = "Campaign is missing or has an invalid setting for its Progression Strategy.";
         public static readonly string CAMP_CHARACTER_CONVERTED = "Character successfully reset and added to the Campaign.";
         public static readonly string CAMP_CHARACTER_ALREADY_ADDED = "Character has already been added to the Campaign.";
-
+        public static readonly string CAMP_NAME_CHANGED = "Name successfully changed.";
 
         #endregion
 

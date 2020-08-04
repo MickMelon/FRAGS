@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
+using Frags.Core.Common.Exceptions;
 using Frags.Core.Common.Extensions;
 using Frags.Core.Effects;
 using Frags.Core.Game.Rolling;
@@ -108,6 +109,23 @@ namespace Frags.Core.DataAccess
             if (camp.Channels == null) camp.Channels = new List<Channel>();
 
             camp.Channels.Add(new Channel(channelId, camp));
+            return Task.CompletedTask;
+        }
+
+        public Task RenameCampaignAsync(ulong callerId, string newName, ulong channelId)
+        {
+            if (GetCampaignAsync(newName).Result != null)
+                return Task.FromException(new CampaignException(Messages.CAMP_EXISTING_NAME));
+
+            Campaign campaign = GetCampaignAsync(channelId).Result;
+            if (campaign == null) return Task.FromException(new CampaignException(Messages.CAMP_NOT_FOUND_CHANNEL));
+
+            // Caller must be owner or present in Moderators
+            if (campaign.Owner.UserIdentifier != callerId || (campaign.ModeratedCampaigns != null && !campaign.ModeratedCampaigns.Select(x => x.User).Any(x => x.UserIdentifier == callerId)))
+                return Task.FromException(new CampaignException(Messages.CAMP_ACCESS_DENIED));
+
+            campaign.Name = newName;
+            UpdateCampaignAsync(campaign);
             return Task.CompletedTask;
         }
     }

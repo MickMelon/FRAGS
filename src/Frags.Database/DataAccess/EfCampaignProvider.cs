@@ -82,7 +82,7 @@ namespace Frags.Database.DataAccess
                 }
                 catch (System.Exception e)
                 {
-                    throw e;
+                    throw new CampaignException(e.Message);
                 }
                 
                 _context.Update(campaignDto);
@@ -190,6 +190,29 @@ namespace Frags.Database.DataAccess
             StatisticOptionsDto optDto = campDto?.StatisticOptions;
 
             return _mapper.Map<StatisticOptions>(optDto);
+        }
+
+        public async Task RenameCampaignAsync(ulong callerId, string newName, ulong channelId)
+        {
+            if (await _context.Campaigns.CountAsync(x => x.Name.EqualsIgnoreCase(newName)) > 0)
+                throw new CampaignException(Messages.CAMP_EXISTING_NAME);
+
+            CampaignDto dto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).FirstOrDefaultAsync(x => x.Id == channelId))?.Campaign;
+            if (dto == null) throw new CampaignException(Messages.CAMP_NOT_FOUND_CHANNEL);
+
+            await _context.Entry(dto).Reference(x => x.Owner).LoadAsync();
+            await _context.Entry(dto).Collection(x => x.ModeratedCampaigns).LoadAsync();
+            IEnumerable<UserDto> users = dto.ModeratedCampaigns?.Select(x => x.User);
+
+            if (dto.Owner.UserIdentifier == callerId || (users != null && users.Any(x => x.UserIdentifier == callerId)))
+            {
+                dto.Name = newName;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new CampaignException(Messages.CAMP_ACCESS_DENIED);
+            }
         }
 
         public async Task UpdateCampaignAsync(Campaign campaign)

@@ -14,6 +14,7 @@ using Frags.Database.DataAccess;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels.Campaigns;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,76 @@ namespace Frags.Test.Database.DataAccess
         public EfCampaignProviderTests(ITestOutputHelper output)
         {
             _output = output;
+        }
+
+        [Fact]
+        public async Task RenameCampaignAsync_ValidInput_ReturnSuccess()
+        {
+            ulong userId = 69;
+            ulong channelId = 420;
+
+            _output.WriteLine("User id: " + userId);
+            _output.WriteLine("Channel id: " + channelId);
+
+            string baseName = nameof(EfCampaignProviderTests.RenameCampaignAsync_ValidInput_ReturnSuccess);
+            string campName = baseName += "_Campaign";
+
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
+            IMapper mapper = new Mapper(mapperConfig);
+
+            var options = new GeneralOptions
+            {
+                UseInMemoryDatabase = true,
+                DatabaseName = baseName + "_DB"
+            };
+
+            // $camp create
+            using (var context = new RpgContext(options))
+            {
+                var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
+                var campProvider = new EfCampaignProvider(context, mapper, progStrats);
+                await campProvider.CreateCampaignAsync(userId, campName);
+            }
+
+            // $camp addchannel
+            using (var context = new RpgContext(options))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
+                var campProvider = new EfCampaignProvider(context, mapper, progStrats);
+                var campController = new CampaignController(userProvider, charProvider, campProvider);
+
+                var result = await campController.AddCampaignChannelAsync(campName, channelId);
+                if (!result.IsSuccess) throw new CampaignException(result.Message);
+            }
+
+            // $camp rename
+            string newName = "the new name";
+            using (var context = new RpgContext(options))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
+                var campProvider = new EfCampaignProvider(context, mapper, progStrats);
+                var campController = new CampaignController(userProvider, charProvider, campProvider);
+                
+                var result = await campController.RenameCampaignAsync(userId, newName, channelId);
+                if (!result.IsSuccess) throw new CampaignException(result.Message);
+            }
+
+            using (var context = new RpgContext(options))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
+                var campProvider = new EfCampaignProvider(context, mapper, progStrats);
+                var campController = new CampaignController(userProvider, charProvider, campProvider);
+
+                Campaign campaign = await campProvider.GetCampaignAsync(channelId);
+
+                Assert.Equal(newName, campaign.Name);
+            }
         }
 
         [Fact]

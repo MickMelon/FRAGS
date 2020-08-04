@@ -48,6 +48,12 @@ namespace Frags.Discord
             await ReplyAsync((await _controller.CreateCampaignAsync(Context.User.Id, name)).Message);
         }
 
+        [Command("rename")]
+        public async Task RenameCampaignAsync([Remainder]string newName)
+        {
+            await ReplyAsync((await _controller.RenameCampaignAsync(Context.User.Id, newName, Context.Channel.Id)).Message);
+        }
+
         [Command("channeladd")]
         [Alias("addchannel", "chanadd", "addchan")]
         [RequireAdminRole]

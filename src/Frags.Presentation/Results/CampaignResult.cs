@@ -4,6 +4,7 @@ using Frags.Core.Common;
 using Frags.Core.Statistics;
 using Frags.Presentation.ViewModels.Campaigns;
 using Frags.Presentation.ViewModels.Characters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,9 @@ namespace Frags.Presentation.Results
         /// </summary>
         public static CampaignResult ChannelAlreadyPresent() =>
             new CampaignResult(Messages.CAMP_CHANNEL_ALREADY_ADDED, success: false);
+
+        public static  CampaignResult NameChanged() =>
+            new CampaignResult(Messages.CAMP_NAME_CHANGED);
 
         public static CampaignResult NameAlreadyExists() =>
             new CampaignResult(Messages.CAMP_EXISTING_NAME, success: false);

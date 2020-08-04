@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
+using Frags.Core.Common.Exceptions;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
@@ -35,13 +36,27 @@ namespace Frags.Presentation.Controllers
             _campProvider = campProvider;
         }
 
+        public async Task<IResult> RenameCampaignAsync(ulong callerId, string newName, ulong channelId)
+        {
+            try
+            {
+                await _campProvider.RenameCampaignAsync(callerId, newName, channelId);
+            }
+            catch (CampaignException e)
+            {
+                return GenericResult.Failure(e.Message);
+            }
+
+            return CampaignResult.NameChanged();
+        }
+
         public async Task<IResult> AddCampaignChannelAsync(string campaignName, ulong channelId)
         {
             try
             {
                 await _campProvider.AddChannelAsync(campaignName, channelId);   
             }
-            catch (System.Exception e)
+            catch (CampaignException e)
             {
                 return GenericResult.Failure(e.Message);
             }
@@ -55,7 +70,7 @@ namespace Frags.Presentation.Controllers
             {
                 await _campProvider.ConfigureCampaignAsync(callerId, channelId, propName, value);
             }
-            catch (System.Exception e)
+            catch (CampaignException e)
             {
                 return GenericResult.Failure(e.Message);
             }
@@ -69,7 +84,7 @@ namespace Frags.Presentation.Controllers
             {
                 await _campProvider.ConvertCharacterAsync(callerId, channelId);    
             }
-            catch (System.Exception e)
+            catch (CampaignException e)
             {
                 return GenericResult.Failure(e.Message);
             }
