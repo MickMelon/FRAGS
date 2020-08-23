@@ -11,9 +11,9 @@ namespace Frags.Discord.Modules
 {
     public class StatisticCharacterModule : ModuleBase
     {
-        private readonly StatisticController _statController;
+        private readonly StatisticCharacterController _statController;
 
-        public StatisticCharacterModule(StatisticController statController)
+        public StatisticCharacterModule(StatisticCharacterController statController)
         {
             _statController = statController;
         }
