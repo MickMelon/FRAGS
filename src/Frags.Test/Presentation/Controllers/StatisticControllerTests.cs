@@ -28,7 +28,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, null);
+            var controller = new StatisticController(charProvider, statProvider, null, null);
 
             var result = await controller.CreateAttributeAsync("Wisdom");
 
@@ -40,7 +40,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, null);
+            var controller = new StatisticController(charProvider, statProvider, null, null);
 
             var result = await controller.CreateAttributeAsync("Strength");
 
@@ -52,7 +52,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, null);
+            var controller = new StatisticController(charProvider, statProvider, null, null);
 
             var result = await controller.CreateSkillAsync("Intimidation", "Strength");
 
@@ -64,7 +64,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, null);
+            var controller = new StatisticController(charProvider, statProvider, null, null);
 
             var result = await controller.CreateSkillAsync("Powerlifting", "Strength");
 
@@ -76,7 +76,7 @@ namespace Frags.Test.Presentation.Controllers
         {
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, null);
+            var controller = new StatisticController(charProvider, statProvider, null, null);
 
             var result = await controller.CreateSkillAsync("Intimidation", "STR");
 
@@ -100,7 +100,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributesAtMax = 7
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
             var character = await charProvider.GetActiveCharacterAsync(1);
 
             // Act
@@ -146,7 +146,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributesProficient = 1
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
             var character = await charProvider.GetActiveCharacterAsync(1);
             Statistic str = await statProvider.GetStatisticAsync("strength");
             await controller.SetStatisticAsync(1, "strength", 10);
@@ -174,7 +174,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributesProficient = 0
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
             var character = await charProvider.GetActiveCharacterAsync(1);
             await controller.SetStatisticAsync(1, "strength", 10);
 
@@ -201,7 +201,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributesProficient = 0
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
             var character = await charProvider.GetActiveCharacterAsync(1);
             await controller.SetStatisticAsync(1, "strength", 10);
 
@@ -227,7 +227,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributePoints = points
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             var result = await controller.SetStatisticAsync(1, "luck", 2);
@@ -250,7 +250,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributePoints = 12,
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             var result = await controller.SetStatisticAsync(1, "strength", 11);
@@ -272,7 +272,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributePoints = 10
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             var result = await controller.SetStatisticAsync(1, "strength", 0);
@@ -294,7 +294,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialAttributesAtMax = 2
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             await controller.SetStatisticAsync(1, "strength", 2);
@@ -324,7 +324,7 @@ namespace Frags.Test.Presentation.Controllers
                 InitialSetupMaxLevel = 1
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             var result = await controller.SetStatisticAsync(100, "strength", 3);
@@ -352,7 +352,7 @@ namespace Frags.Test.Presentation.Controllers
                 AttributePointsOnLevelUp = 0
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
 
@@ -392,7 +392,7 @@ namespace Frags.Test.Presentation.Controllers
                 AttributePointsOnLevelUp = 0
             };
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             // Set initial special
@@ -421,7 +421,7 @@ namespace Frags.Test.Presentation.Controllers
             var statProvider = new MockStatisticProvider();
             StatisticOptions statOptions = new StatisticOptions();
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             var result = await controller.SetStatisticAsync(ulong.MaxValue, "strength", 5);
@@ -438,7 +438,7 @@ namespace Frags.Test.Presentation.Controllers
             var statProvider = new MockStatisticProvider();
             StatisticOptions statOptions = new StatisticOptions();
 
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, statOptions), null);
 
             // Act
             var result = await controller.SetStatisticAsync(1, "invalid", 5);
@@ -456,7 +456,7 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()), null);
 
             // Act
             var result = await controller.DeleteStatisticAsync("strength");
@@ -471,7 +471,7 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()));
+            var controller = new StatisticController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, new StatisticOptions()), null);
 
             // Act
             var result = await controller.DeleteStatisticAsync("bacon");

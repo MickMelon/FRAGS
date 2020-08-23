@@ -49,14 +49,14 @@ namespace Frags.Presentation.Results
         public static StatisticResult TooManyAtMax(int limit) =>
             new StatisticResult(string.Format(Messages.STAT_TOO_MANY_AT_MAX, limit), false);
 
-        public static IResult Show(Statistic stat, StatisticValue statVal)
+        public static IResult ShowStatAndValue(Statistic stat, StatisticValue statVal)
         {
             ShowStatisticViewModel statModel;
 
             if (stat is Attribute attrib)
             {
                 statModel = new ShowAttributeViewModel(attrib.Name, attrib.Description, attrib.AliasesArray, attrib.Id, statVal?.Value,
-                    statVal?.IsProficient, statVal.Proficiency);
+                    statVal?.IsProficient, statVal?.Proficiency);
             }
             else if (stat is Skill s)
             {
@@ -91,7 +91,7 @@ namespace Frags.Presentation.Results
             var stats = new List<ShowStatisticViewModel>();
             foreach (var stat in character.Statistics)
             {
-                var viewModel = (ShowStatisticViewModel)Show(stat.Key, stat.Value).ViewModel;
+                var viewModel = (ShowStatisticViewModel)ShowStatAndValue(stat.Key, stat.Value).ViewModel;
 
                 if (viewModel != null)
                     stats.Add(viewModel);

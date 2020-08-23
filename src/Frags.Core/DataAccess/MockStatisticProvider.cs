@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common.Extensions;
 using Frags.Core.Statistics;
@@ -38,7 +39,7 @@ namespace Frags.Core.DataAccess
             id = _statistics.Count + 1;
         }
 
-        public async Task<Attribute> CreateAttributeAsync(string name)
+        public async Task<Attribute> CreateAttributeAsync(string name, Campaign campaign = null)
         {
             if (await GetStatisticAsync(name) != null) throw new ArgumentException("Statistic name was not unique.");
 
@@ -47,7 +48,7 @@ namespace Frags.Core.DataAccess
             return await Task.FromResult(stat);
         }
 
-        public async Task<Skill> CreateSkillAsync(string name, string attribName)
+        public async Task<Skill> CreateSkillAsync(string name, string attribName, Campaign campaign = null)
         {
             if (await GetStatisticAsync(name) != null) throw new ArgumentException("Statistic name was not unique.");
 
@@ -69,6 +70,11 @@ namespace Frags.Core.DataAccess
         public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync()
         {
             return await Task.FromResult(_statistics);
+        }
+
+        public Task<IEnumerable<Statistic>> GetAllStatisticsFromCampaignAsync(Campaign campaign)
+        {
+            return Task.FromResult(campaign.Statistics.AsEnumerable());
         }
 
         public async Task<Statistic> GetStatisticAsync(string name)

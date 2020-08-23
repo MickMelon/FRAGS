@@ -75,6 +75,9 @@ namespace Frags.Presentation.Controllers
                 strategy = GetCampaignStrategy(character.Campaign);
             }
 
+            if (strategy == null)
+                return RollResult.RollFailed();
+
             if (stat == null) return StatisticResult.StatisticNotFound();
 
             string result = strategy.GetRollMessage(stat, character, useEffects);
@@ -110,6 +113,9 @@ namespace Frags.Presentation.Controllers
                 stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign.Id);
                 strategy = GetCampaignStrategy(character.Campaign);
             }
+
+            if (strategy == null)
+                return RollResult.RollFailed();
 
             if (displayName != null)
                 character.Name = displayName;
@@ -158,6 +164,9 @@ namespace Frags.Presentation.Controllers
                 strategy = GetCampaignStrategy(caller.Campaign);
             }
 
+            if (strategy == null)
+                return RollResult.RollFailed();
+
             if (stat == null) return StatisticResult.StatisticNotFound();
 
             double? callerRoll = strategy.RollStatistic(stat, caller, useEffects);
@@ -170,6 +179,6 @@ namespace Frags.Presentation.Controllers
         }
 
         private IRollStrategy GetCampaignStrategy(Campaign campaign) =>
-            _strategies.Find(x => x.GetType().Name.ContainsIgnoreCase(campaign.RollOptions.RollStrategy));
+            _strategies.Find(x => x.GetType().Name.ContainsIgnoreCase(campaign.RollOptions?.RollStrategy));
     }
 }

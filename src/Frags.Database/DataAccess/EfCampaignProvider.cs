@@ -39,58 +39,78 @@ namespace Frags.Database.DataAccess
             CampaignDto campDto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(campaignName));
             if (campDto == null) throw new CampaignException(Messages.CAMP_NOT_FOUND_NAME);
 
-            await _context.Entry(campDto).Collection(x => x.Channels).LoadAsync();
-            var campChannels = campDto.Channels;
-            if (campChannels == null) campChannels = new List<ChannelDto>();
+            // We need to see if the channel is already associated with a Campaign
+            ChannelDto channelDto = await _context.Set<ChannelDto>().FirstOrDefaultAsync(x => x.Id == channelId);
+            if (channelDto == null)
+            {
+                channelDto = new ChannelDto { Id = channelId, Campaign = campDto };
+                await _context.AddAsync(channelDto);
+            }
+            else
+            {
+                if (channelDto.CampaignId > 0)
+                    throw new CampaignException(Messages.CAMP_CHANNEL_ALREADY_ADDED);
+                else
+                    channelDto.CampaignId = campDto.Id;
+            }
+            
+            await _context.SaveChangesAsync();
+        }
 
-            if (campChannels.Any(x => x.Id == channelId))
-                throw new CampaignException(Messages.CAMP_CHANNEL_ALREADY_ADDED);
+        public async Task RemoveChannelAsync(ulong channelId)
+        {
+            ChannelDto channelDto = await _context.Set<ChannelDto>().FirstOrDefaultAsync(x => x.Id == channelId);
+            if (channelDto == null)
+                throw new CampaignException(Messages.CAMP_NOT_FOUND_CHANNEL);
 
-            var chanDto = new ChannelDto { Id = channelId, Campaign = campDto };
+            channelDto.Campaign = null;
+            channelDto.CampaignId = 0;
 
-            await _context.AddAsync(chanDto);
             await _context.SaveChangesAsync();
         }
 
         public async Task ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == callerId);
-            if (user == null) throw new CampaignException("User does not exist and therefore does not moderate or own any Campaigns.");
+            var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == callerId);
+            if (userDto == null) throw new CampaignException(Messages.USER_NOT_FOUND);
 
+            // Since we want the DTO, we can't just use GetCampaignAsync
             var campaignDto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).FirstOrDefaultAsync(x => x.Id == channelId))?.Campaign;
-            if (campaignDto == null) throw new CampaignException("Channel not associated with a Campaign.");
-
-            var moderators = await _context.Entry(campaignDto).Collection(x => x.ModeratedCampaigns).Query().ToListAsync();
+            if (campaignDto == null) throw new CampaignException(Messages.CAMP_NOT_FOUND_CHANNEL);
 
             // Caller is a moderator or owner of this campaign
-            if (campaignDto.Owner.Id == user.Id || (moderators != null && moderators.Any(x => x.UserId == user.Id)))
+            if (await HasPermissionAsync(callerId, campaignDto))
             {
                 await _context.Entry(campaignDto).Reference(x => x.StatisticOptions).LoadAsync();
+                var options = campaignDto.StatisticOptions;
 
-                if (campaignDto.StatisticOptions == null) campaignDto.StatisticOptions = new StatisticOptionsDto();
+                if (options == null) options = new StatisticOptionsDto();
 
-                var propertyInfo = campaignDto.StatisticOptions.GetType().GetProperty(propName);
-                if (propertyInfo == null || propertyInfo.Name == "Id" || propertyInfo.Name == "ExpEnabledChannels") 
-                    throw new CampaignException("Invalid setting name!");
-
-                var propertyType = propertyInfo.PropertyType;
-                value = Convert.ChangeType(value, propertyType);
+                // Try to match propName to a property in StatisticOptions
+                var propertyInfo = options.GetType().GetProperty(propName);
+                if (propertyInfo == null || propertyInfo.Name == nameof(options.Id) || propertyInfo.Name == nameof(options.ExpEnabledChannels)) 
+                    throw new CampaignException(Messages.CAMP_PROPERTY_INVALID);
 
                 try
                 {
-                    propertyInfo.SetValue(campaignDto.StatisticOptions, value);
+                    // Try to convert our given object (probably a string or int) to the same type as the property
+                    var propertyType = propertyInfo.PropertyType;
+                    value = Convert.ChangeType(value, propertyType);
+
+                    propertyInfo.SetValue(options, value);
                 }
-                catch (System.Exception e)
+                catch (System.Exception)
                 {
-                    throw new CampaignException(e.Message);
+                    throw new CampaignException(Messages.CAMP_PROPERTY_INVALID_VALUE);
                 }
                 
+                campaignDto.StatisticOptions = options;
                 _context.Update(campaignDto);
                 await _context.SaveChangesAsync();
             }
             else
             {
-                throw new CampaignException("You don't have permission to do that.");
+                throw new CampaignException(Messages.CAMP_ACCESS_DENIED);
             }
         }
 
@@ -106,11 +126,8 @@ namespace Frags.Database.DataAccess
             if (charDto == null) throw new CampaignException(Messages.CHAR_NOT_FOUND);
 
             // Since we want the DTO, we can't just use GetCampaignAsync
-            var campDto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).FirstOrDefaultAsync(x => x.Id == channelId)).Campaign;
+            var campDto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).ThenInclude(x => x.StatisticOptions).FirstOrDefaultAsync(x => x.Id == channelId)).Campaign;
             if (campDto == null) throw new CampaignException(Messages.CAMP_NOT_FOUND_CHANNEL);
-
-            // Load StatisticOptions
-            await _context.Entry(campDto).Reference(x => x.StatisticOptions).LoadAsync();
 
             var statOptions = campDto.StatisticOptions;
             if (statOptions == null) throw new CampaignException(Messages.CAMP_STATOPTIONS_NOT_FOUND);
@@ -155,8 +172,18 @@ namespace Frags.Database.DataAccess
 
         public async Task<Campaign> GetCampaignAsync(ulong channelId)
         {
-            CampaignDto campDto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).ThenInclude(x => x.Owner).FirstOrDefaultAsync(x => x.Id == channelId))?.Campaign;
+            ChannelDto channelDto = await _context.Set<ChannelDto>().FirstOrDefaultAsync(x => x.Id == channelId);
+            if (channelDto == null) return null;
+            await _context.Entry(channelDto).Reference(x => x.Campaign).LoadAsync();
+            _context.Entry(channelDto).State = EntityState.Detached;
 
+            CampaignDto campDto = channelDto.Campaign;
+            if (campDto == null) return null;
+
+            await _context.Entry(campDto).Reference(x => x.Owner).LoadAsync();
+            _context.Entry(campDto.Owner).State = EntityState.Detached;
+            _context.Entry(campDto).State = EntityState.Detached;
+            
             return _mapper.Map<Campaign>(campDto);
         }
 
@@ -192,19 +219,40 @@ namespace Frags.Database.DataAccess
             return _mapper.Map<StatisticOptions>(optDto);
         }
 
+        public async Task<bool> HasPermissionAsync(ulong userIdentifier, ulong channelId)
+        {
+            CampaignDto campDto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).ThenInclude(x => x.Owner).AsNoTracking().FirstOrDefaultAsync(x => x.Id == channelId))?.Campaign;
+            return await HasPermissionAsync(userIdentifier, campDto);
+        }
+
+        public async Task<bool> HasPermissionAsync(ulong userIdentifier, string name)
+        {
+            CampaignDto campDto = await _context.Campaigns.Include(x => x.Owner).AsNoTracking().FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
+            return await HasPermissionAsync(userIdentifier, campDto);
+        }
+
+        private async Task<bool> HasPermissionAsync(ulong userIdentifier, CampaignDto campDto)
+        {
+            if (campDto == null) return false;
+            if (campDto.Owner?.UserIdentifier == userIdentifier) return true;
+            await _context.Entry(campDto).Collection(x => x.ModeratedCampaigns).LoadAsync();
+            if (campDto.ModeratedCampaigns == null) return false;
+
+            foreach (ModeratorDto modDto in campDto.ModeratedCampaigns)
+                _context.Entry(modDto).State = EntityState.Detached;
+            
+            return campDto.ModeratedCampaigns.Select(x => x.User.UserIdentifier).Contains(userIdentifier);
+        }
+
         public async Task RenameCampaignAsync(ulong callerId, string newName, ulong channelId)
         {
             if (await _context.Campaigns.CountAsync(x => x.Name.EqualsIgnoreCase(newName)) > 0)
                 throw new CampaignException(Messages.CAMP_EXISTING_NAME);
 
-            CampaignDto dto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).FirstOrDefaultAsync(x => x.Id == channelId))?.Campaign;
+            CampaignDto dto = (await _context.Set<ChannelDto>().Include(x => x.Campaign).ThenInclude(x => x.Owner).FirstOrDefaultAsync(x => x.Id == channelId))?.Campaign;
             if (dto == null) throw new CampaignException(Messages.CAMP_NOT_FOUND_CHANNEL);
 
-            await _context.Entry(dto).Reference(x => x.Owner).LoadAsync();
-            await _context.Entry(dto).Collection(x => x.ModeratedCampaigns).LoadAsync();
-            IEnumerable<UserDto> users = dto.ModeratedCampaigns?.Select(x => x.User);
-
-            if (dto.Owner.UserIdentifier == callerId || (users != null && users.Any(x => x.UserIdentifier == callerId)))
+            if (await HasPermissionAsync(callerId, dto))
             {
                 dto.Name = newName;
                 await _context.SaveChangesAsync();

@@ -4,10 +4,12 @@ using Frags.Core.Common;
 using Frags.Core.Statistics;
 using Frags.Presentation.ViewModels.Campaigns;
 using Frags.Presentation.ViewModels.Characters;
+using Frags.Presentation.ViewModels.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Attribute = Frags.Core.Statistics.Attribute;
 
 namespace Frags.Presentation.Results
 {
@@ -29,6 +31,12 @@ namespace Frags.Presentation.Results
         /// </summary>
         public static CampaignResult ChannelAdded() =>
             new CampaignResult(Messages.CAMP_CHANNEL_ADDED);
+
+        /// <summary>
+        /// Used after remove a Channel from a Campaign successfully.
+        /// </summary>
+        public static CampaignResult ChannelRemoved() =>
+            new CampaignResult(Messages.CAMP_CHANNEL_REMOVED);
 
         public static CampaignResult CampaignCreated() =>
             new CampaignResult(Messages.CAMP_CREATED);
@@ -75,7 +83,7 @@ namespace Frags.Presentation.Results
         public static CampaignResult InvalidPropertyValue(string exceptionMessage) =>
             new CampaignResult(string.Format(Messages.CAMP_PROPERTY_INVALID_VALUE, exceptionMessage), success: false);
 
-        public static IResult Show(Campaign campaign, List<Channel> channels, List<Character> characters, StatisticOptions statOptions)
+        public static IResult Show(Campaign campaign, List<Channel> channels, List<Character> characters, StatisticOptions statOptions, IEnumerable<Statistic> statistics)
         {
             ShowCampaignViewModel vm = new ShowCampaignViewModel
             {
@@ -87,6 +95,18 @@ namespace Frags.Presentation.Results
 
             if (characters != null) 
                 vm.CharacterNames = characters.Select(x => x.Name);
+
+            List<ShowStatisticViewModel> statViewModels = new List<ShowStatisticViewModel>();
+            if (statistics != null)
+                foreach (Statistic stat in statistics)
+                {
+                    if (stat is Attribute)
+                        statViewModels.Add((ShowAttributeViewModel)StatisticResult.ShowStatAndValue(stat, null).ViewModel);
+                    else if (stat is Skill)
+                        statViewModels.Add((ShowSkillViewModel)StatisticResult.ShowStatAndValue(stat, null).ViewModel);
+                }
+
+            vm.Statistics = statViewModels;
 
             return new CampaignResult(campaign.Name, true, vm);
         }

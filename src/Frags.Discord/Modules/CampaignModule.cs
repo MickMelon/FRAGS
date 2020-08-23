@@ -14,6 +14,8 @@ using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Text;
 using Frags.Core.Common;
+using System.Linq;
+using Frags.Presentation.ViewModels.Statistics;
 
 namespace Frags.Discord
 {
@@ -62,19 +64,23 @@ namespace Frags.Discord
             await ReplyAsync((await _controller.AddCampaignChannelAsync(name, Context.Channel.Id)).Message);
         }
 
+        [Command("channelremove")]
+        [Alias("removechannel", "chanrem", "remchan")]
+        [RequireAdminRole]
+        public async Task RemoveChannelFromCampaign()
+        {
+            await ReplyAsync((await _controller.RemoveCampaignChannelAsync(Context.Channel.Id)).Message);
+        }
+
         [Command("info")]
         public async Task GetCampaignInfoAsync([Remainder]string name = null)
         {
             Presentation.Results.IResult result;
 
             if (name == null)
-            {
                 result = await _controller.GetCampaignInfoAsync(Context.Channel.Id);
-            }
             else
-            {
                 result = await _controller.GetCampaignInfoAsync(name);
-            }
 
             if (result.ViewModel == null)
             {
@@ -145,6 +151,51 @@ namespace Frags.Discord
                 desc += statOpts;
             }
             
+            embed.WithDescription(desc);
+            await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
+        }
+
+        [Command("showstats")]
+        public async Task ShowCampaignStatisticsAsync([Remainder]string name = null)
+        {
+            Presentation.Results.IResult result;
+
+            if (name == null)
+                result = await _controller.GetCampaignInfoAsync(Context.Channel.Id);
+            else
+                result = await _controller.GetCampaignInfoAsync(name);
+
+            var view = (ShowCampaignViewModel) result.ViewModel;
+            var embed = new EmbedBuilder();
+
+            embed.WithTitle(view.Name + " Campaign");
+            string desc = "";
+
+            if (view.Statistics != null)
+            {
+                StringBuilder output = new StringBuilder("**Statistics:**\n");
+                var attributes = view.Statistics.OfType<ShowAttributeViewModel>();
+                var skills = view.Statistics.OfType<ShowSkillViewModel>();
+
+                // Group skills by their associated attribute, sort it out pretty
+                foreach (var attrib in attributes.OrderByDescending(x => x.Order))
+                {
+                    output.Append($"__**{attrib.Name}**__\n");
+
+                    // Loop through associated skills with attribute
+                    foreach (var skill in skills.Where(x => x.Attribute.Name == attrib.Name).OrderByDescending(x => x.Order))
+                        output.Append($"**{skill.Name}**\n");
+
+                    output.Append("\n");
+                }
+
+                desc += output;
+            }
+            else
+            {
+                desc = "No Statistics found!";
+            }
+
             embed.WithDescription(desc);
             await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
         }

@@ -114,6 +114,7 @@ namespace Frags.Discord
                 .AddTransient<EffectController>()
                 .AddTransient<RollController>()
                 .AddTransient<StatisticController>()
+                .AddTransient<CampaignStatisticController>()
                 .AddAutoMapper(typeof(GeneralProfile));
 
         private static IServiceCollection AddConfiguredServices(IServiceCollection services)

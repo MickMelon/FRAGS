@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common.Exceptions;
 using Frags.Core.DataAccess;
@@ -31,13 +32,14 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly IProgressionStrategy _strategy;
 
+        private readonly ICampaignProvider _campProvider;
 
-
-        public StatisticController(ICharacterProvider charProvider, IStatisticProvider statProvider, IProgressionStrategy strategy)
+        public StatisticController(ICharacterProvider charProvider, IStatisticProvider statProvider, IProgressionStrategy strategy, ICampaignProvider campProvider)
         {
             _charProvider = charProvider;
             _statProvider = statProvider;
             _strategy = strategy;
+            _campProvider = campProvider;
         }
 
         /// <summary>
@@ -62,6 +64,7 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         /// <param name="statName">The name for the new skill.</param>
         /// <param name="attribName">The name of the attribute to go with the skill. Must exist in the database beforehand.</param>
+        /// <param name="channelId">The optional id of the channel the command was executed in. Used to associate the new statistic with a campaign.</param>
         /// <returns>
         /// A result detailing if the operation was successful or why it failed.
         /// </returns>
@@ -167,6 +170,23 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
+        /// Sets the order of an already existing statistic.
+        /// </summary>
+        /// <param name="statName">The name of the statistic to set its order.</param>
+        /// <param name="order">An integer representing where the statistic should be placed in a sorted list.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        public async Task<IResult> OrderStatisticAsync(string statName, int order)
+        {
+            Statistic stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            stat.Order = order;
+            await _statProvider.UpdateStatisticAsync(stat);
+
+            return StatisticResult.StatisticUpdatedSucessfully();
+        }
+
+        /// <summary>
         /// Adds an alias to an already existing statistic.
         /// </summary>
         /// <param name="statName">The name of the statistic to add an alias to.</param>
@@ -185,6 +205,8 @@ namespace Frags.Presentation.Controllers
 
             return StatisticResult.StatisticUpdatedSucessfully();
         }
+
+        
 
         /// <summary>
         /// Clears the aliases of an already existing statistic.

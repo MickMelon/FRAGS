@@ -19,11 +19,14 @@ namespace Frags.Core.DataAccess
         Task UpdateCampaignAsync(Campaign campaign);
         Task<List<Channel>> GetChannelsAsync(Campaign campaign);
         Task<List<Character>> GetCharactersAsync(Campaign campaign);
+        Task<bool> HasPermissionAsync(ulong userIdentifier, ulong channelId);
+        Task<bool> HasPermissionAsync(ulong userIdentifier, string name);
         Task CreateCampaignAsync(ulong userIdentifier, string name);
         Task DeleteCampaignAsync(string campaignName);
         Task ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value);
         Task ConvertCharacterAsync(ulong callerId, ulong channelId);
         Task AddChannelAsync(string campaignName, ulong channelId);
+        Task RemoveChannelAsync(ulong channelId);
         Task RenameCampaignAsync(ulong callerId, string newName, ulong channelId);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 
@@ -15,8 +16,9 @@ namespace Frags.Core.DataAccess
         /// Statistic names should be unique.
         /// </summary>
         /// <param name="name">Attributes's name.</param>
+        /// <param name="campaign">The optional campaign to associate this Statistic with.</param>
         /// <returns>The added attribute if successful, null if not.</returns>
-        Task<Attribute> CreateAttributeAsync(string name);
+        Task<Attribute> CreateAttributeAsync(string name, Campaign campaign = null);
 
         /// <summary>
         /// Adds a new skill to the database.
@@ -24,8 +26,9 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="name">Skill's name.</param>
         /// <param name="attribName">Attributes's name.</param>
+        /// <param name="campaign">The optional campaign to associate this Statistic with.</param>
         /// <returns>The added skill if successful, null if not.</returns>
-        Task<Skill> CreateSkillAsync(string name, string attribName);
+        Task<Skill> CreateSkillAsync(string name, string attribName, Campaign campaign = null);
 
         /// <summary>
         /// Deletes a statistic from the database. 
@@ -54,6 +57,12 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <returns>An Enumerable of statistics currently in use.</returns>
         Task<IEnumerable<Statistic>> GetAllStatisticsAsync();
+
+        /// <summary>
+        /// Gets every statistic currently in use in the specified Campaign.
+        /// </summary>
+        /// <returns>An Enumerable of statistics currently in use.</returns>
+        Task<IEnumerable<Statistic>> GetAllStatisticsFromCampaignAsync(Campaign campaign);
 
         /// <summary>
         /// Updates a statistic in the database.

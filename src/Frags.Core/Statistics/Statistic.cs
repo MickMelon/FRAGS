@@ -23,6 +23,11 @@ namespace Frags.Core.Statistics
 
         public Campaign Campaign { get; set; }
 
+        /// <summary>
+        /// An integer representing where the statistic should be placed in a sorted list.
+        /// </summary>
+        public int Order { get; set; }
+
         public string[] AliasesArray
         {
             get

@@ -56,6 +56,7 @@ namespace Frags.Core.Common
         #region Campaigns
 
         public static readonly string CAMP_CHANNEL_ADDED = "Channel successfully added.";
+        public static readonly string CAMP_CHANNEL_REMOVED = "Channel successfully removed.";
         public static readonly string CAMP_CREATED = "Campaign successfully created.";
         public static readonly string CAMP_CHANNEL_ALREADY_ADDED = "Channel already added, action failed.";
         public static readonly string CAMP_NOT_FOUND_NAME = "A Campaign with that name was not found.";

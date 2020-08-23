@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Frags.Core.Campaigns;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Statistics;
+using Frags.Database.Campaigns;
 using Frags.Database.Statistics;
 using Microsoft.EntityFrameworkCore;
 using Attribute = Frags.Core.Statistics.Attribute;
@@ -24,9 +26,15 @@ namespace Frags.Database.DataAccess
             _mapper = mapper;
         }
         
-        public async Task<Attribute> CreateAttributeAsync(string name)
+        public async Task<Attribute> CreateAttributeAsync(string name, Campaign campaign = null)
         {
             var dto = new AttributeDto(name);
+            CampaignDto campDto = null;
+
+            if (campaign != null)
+                campDto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+
+            dto.Campaign = campDto;
 
             await _context.AddAsync(dto);
             await _context.SaveChangesAsync();
@@ -34,12 +42,18 @@ namespace Frags.Database.DataAccess
             return _mapper.Map<Attribute>(dto);
         }
 
-        public async Task<Skill> CreateSkillAsync(string name, string attribName)
+        public async Task<Skill> CreateSkillAsync(string name, string attribName, Campaign campaign = null)
         {
             var attribDto = await _context.Attributes.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(attribName));
             if (attribDto == null) return null;
 
             var dto = new SkillDto(attribDto, name);
+            CampaignDto campDto = null;
+
+            if (campaign != null)
+                campDto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+
+            dto.Campaign = campDto;
 
             await _context.AddAsync(dto);
             await _context.SaveChangesAsync();
@@ -63,6 +77,11 @@ namespace Frags.Database.DataAccess
             return _mapper.Map<List<Statistic>>(await _context.Statistics.ToListAsync());
         }
 
+        public async Task<IEnumerable<Statistic>> GetAllStatisticsFromCampaignAsync(Campaign campaign)
+        {
+            return _mapper.Map<IEnumerable<Statistic>>(await _context.Statistics.Where(x => x.Campaign.Id == campaign.Id).ToListAsync());
+        }
+
         public async Task<Statistic> GetStatisticAsync(string name)
         {
             return _mapper.Map<Statistic>(await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
@@ -70,7 +89,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<Statistic> GetStatisticFromCampaignAsync(string name, int campaignId)
         {
-            return _mapper.Map<Statistic>(await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaignId));
+            return _mapper.Map<Statistic>(await _context.Statistics.AsNoTracking().FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaignId));
         }
 
         public async Task UpdateStatisticAsync(Statistic statistic)

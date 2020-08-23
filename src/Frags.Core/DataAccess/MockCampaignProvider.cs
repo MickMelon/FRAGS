@@ -128,5 +128,33 @@ namespace Frags.Core.DataAccess
             UpdateCampaignAsync(campaign);
             return Task.CompletedTask;
         }
+
+        public Task<bool> HasPermissionAsync(ulong userIdentifier, ulong channelId)
+        {
+            Campaign camp = GetCampaignAsync(channelId).Result;
+            return Task.FromResult(camp.Owner.UserIdentifier == userIdentifier || (camp.ModeratedCampaigns?.Select(x => x.User.UserIdentifier)?.Contains(userIdentifier) ?? false));
+        }
+
+        public Task<bool> HasPermissionAsync(ulong userIdentifier, string name)
+        {
+            Campaign camp = GetCampaignAsync(name).Result;
+            return Task.FromResult(camp.Owner.UserIdentifier == userIdentifier || (camp.ModeratedCampaigns?.Select(x => x.User.UserIdentifier)?.Contains(userIdentifier) ?? false));
+        }
+
+        public Task RemoveChannelAsync(ulong channelId)
+        {
+            foreach (var campaign in _campaigns)
+            {
+                foreach (var channel in campaign.Channels)
+                {
+                    if (channel.Id == channelId)
+                    {
+                        campaign.Channels.Remove(channel);
+                    }
+                }
+            }
+            
+            return Task.CompletedTask;
+        }
     }
 }

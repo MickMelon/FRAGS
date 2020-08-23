@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 using Frags.Database;
@@ -112,6 +113,67 @@ namespace Frags.Test.Database.DataAccess
 
             // Assert
             Assert.True(valueDidExist && valueNoLongerExists);
+        }
+        #endregion
+
+        #region Campaign Statistic Tests
+        [Fact]
+        public async Task GetStatisticFromCampaignAsync_ValidInput_ReturnSuccess()
+        {
+            // Arrange
+            var genOptions = new GeneralOptions
+            {
+                UseInMemoryDatabase = true,
+                DatabaseName = "GetStatisticFromCampaignAsync_ValidInput_ReturnSuccess"
+            };
+
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+
+            // Simulate injected DbContext and dependencies with Scoped lifetime (One instance per "request", i.e. a command)
+            using (var context = new RpgContext(genOptions))
+            {
+                var campProvider = new EfCampaignProvider(context, mapper, null);
+                await campProvider.CreateCampaignAsync(1, "campaign");
+            }
+
+            using (var context = new RpgContext(genOptions))
+            {
+                var provider = new EfStatisticProvider(context, mapper);
+                var userProvider = new EfUserProvider(context, mapper);
+                var campProvider = new EfCampaignProvider(context, mapper, null);
+
+                Campaign campaign = await campProvider.GetCampaignAsync("campaign");
+                await provider.CreateAttributeAsync("strength", campaign);
+            }
+
+            using (var context = new RpgContext(genOptions))
+            {
+                var provider = new EfStatisticProvider(context, mapper);
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+
+                await charProvider.CreateCharacterAsync(1, "bob");
+            }
+
+            // Act
+            Character bob;
+            Statistic strength;
+            using (var context = new RpgContext(genOptions))
+            {
+                var statProvider = new EfStatisticProvider(context, mapper);
+                var userProvider = new EfUserProvider(context, mapper);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var campProvider = new EfCampaignProvider(context, mapper, null);
+
+                bob = await charProvider.GetActiveCharacterAsync(1);
+                Campaign camp = await campProvider.GetCampaignAsync("campaign");
+                strength = await statProvider.GetStatisticFromCampaignAsync("Strength", camp.Id);
+                bob.SetStatistic(strength, new StatisticValue(5));
+            }
+
+            // Assert
+            Assert.Equal(5, bob.GetStatistic(strength).Value);
         }
         #endregion
     }

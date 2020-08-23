@@ -25,15 +25,19 @@ namespace Frags.Presentation.Controllers
         private readonly ICharacterProvider _charProvider;
 
         private readonly ICampaignProvider _campProvider;
+
+        private readonly IStatisticProvider _statProvider;
         
 
         public CampaignController(IUserProvider userProvider,
         ICharacterProvider charProvider,
-        ICampaignProvider campProvider)
+        ICampaignProvider campProvider,
+        IStatisticProvider statProvider)
         {
             _userProvider = userProvider;
             _charProvider = charProvider;
             _campProvider = campProvider;
+            _statProvider = statProvider;
         }
 
         public async Task<IResult> RenameCampaignAsync(ulong callerId, string newName, ulong channelId)
@@ -62,6 +66,20 @@ namespace Frags.Presentation.Controllers
             }
 
             return CampaignResult.ChannelAdded();
+        }
+
+        public async Task<IResult> RemoveCampaignChannelAsync(ulong channelId)
+        {
+            try
+            {
+                await _campProvider.RemoveChannelAsync(channelId);   
+            }
+            catch (CampaignException e)
+            {
+                return GenericResult.Failure(e.Message);
+            }
+
+            return CampaignResult.ChannelRemoved();
         }
 
         public async Task<IResult> ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value)
@@ -115,8 +133,9 @@ namespace Frags.Presentation.Controllers
             List<Channel> channels = await _campProvider.GetChannelsAsync(campaign);
             List<Character> characters = await _campProvider.GetCharactersAsync(campaign);
             StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
+            IEnumerable<Statistic> statistics = await _statProvider.GetAllStatisticsFromCampaignAsync(campaign);
 
-            return CampaignResult.Show(campaign, channels, characters, statOptions);
+            return CampaignResult.Show(campaign, channels, characters, statOptions, statistics);
         }
     }
 }

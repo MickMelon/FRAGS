@@ -17,6 +17,7 @@ namespace Frags.Core.Campaigns
         public ulong Id { get; set; }
 
         public Campaign Campaign { get; set; }
+        public int CampaignId { get; set; }
 
         public bool IsExperienceEnabled { get; set; }
     }
