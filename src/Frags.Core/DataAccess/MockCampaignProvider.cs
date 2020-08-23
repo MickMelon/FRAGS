@@ -182,5 +182,16 @@ namespace Frags.Core.DataAccess
             channels.Add(new Channel(channelId, campaign));
             return Task.CompletedTask;
         }
+
+        public Task<RollOptions> GetRollOptionsAsync(Campaign campaign)
+        {
+            return Task.FromResult(campaign.RollOptions);
+        }
+
+        public Task UpdateRollOptionsAsync(Campaign campaign, RollOptions rollOptions)
+        {
+            _campaigns[_campaigns.IndexOf(campaign)].RollOptions = rollOptions;
+            return Task.CompletedTask;
+        }
     }
 }

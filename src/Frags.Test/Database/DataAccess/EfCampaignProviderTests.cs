@@ -148,7 +148,7 @@ namespace Frags.Test.Database.DataAccess
                 if (!result.IsSuccess) throw new CampaignException(result.Message);
             }
 
-            // $camp configure
+            // $camp statoptions
             using (var context = new RpgContext(options))
             {
                 var userProvider = new EfUserProvider(context, mapper);
@@ -161,7 +161,7 @@ namespace Frags.Test.Database.DataAccess
                 var propertyName = nameof(StatisticOptions.ProgressionStrategy);
                 string newValue = nameof(MockProgressionStrategy);
 
-                var result = await campController.ConfigureCampaignAsync(userId, channelId, propertyName, newValue);
+                var result = await campController.ConfigureStatisticOptionsAsync(userId, channelId, propertyName, newValue);
                 if (!result.IsSuccess) throw new CampaignException(result.Message);
             }
 

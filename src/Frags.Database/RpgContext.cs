@@ -74,9 +74,8 @@ namespace Frags.Database
 
             builder.Entity<CharacterDto>()
                 .HasOne(ch => ch.Campaign)
-                .WithMany(camp => camp.Characters);
-
-            
+                .WithMany(camp => camp.Characters)
+                .IsRequired(false);
         }
     }
 }

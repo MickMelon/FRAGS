@@ -37,11 +37,18 @@ namespace Frags.Discord
             await ReplyAsync(result.Message);
         }
 
-        [Command("configure")]
-        [Alias("config", "set")]
-        public async Task ConfigureCampaignAsync(string property, string value)
+        [Command("statisticoptions")]
+        [Alias("statopts", "statopt", "statop", "statops", "statoptions", "statoption")]
+        public async Task ConfigureStatisticOptionsAsync(string property, string value)
         {
-            await ReplyAsync((await _controller.ConfigureCampaignAsync(Context.User.Id, Context.Channel.Id, property, (object)value)).Message);
+            await ReplyAsync((await _controller.ConfigureStatisticOptionsAsync(Context.User.Id, Context.Channel.Id, property, (object)value)).Message);
+        }
+
+        [Command("rolloptions")]
+        [Alias("rollopts", "rollopt", "rollop", "rollops", "rolloption")]
+        public async Task ConfigureRollOptionsAsync(string property, string value)
+        {
+            await ReplyAsync((await _controller.ConfigureRollOptionsAsync(Context.User.Id, Context.Channel.Id, property, (object)value)).Message);
         }
 
         [Command("create")]
@@ -72,7 +79,8 @@ namespace Frags.Discord
             await ReplyAsync((await _controller.RemoveCampaignChannelAsync(Context.Channel.Id)).Message);
         }
 
-        [Command("info")]
+        [Command("show")]
+        [Alias("info")]
         public async Task GetCampaignInfoAsync([Remainder]string name = null)
         {
             Presentation.Results.IResult result;
@@ -114,6 +122,7 @@ namespace Frags.Discord
             var characterNames = string.Join(", ", view.CharacterNames);
             var chanNames = string.Join(", ", chanNameList);
 
+            embed.WithColor(Color.Gold);
             embed.WithTitle(view.Name + " Campaign");
             embed.WithDescription($"**Owner:** {ownerName}\n" +
                 $"**Characters:** {(string.IsNullOrWhiteSpace(characterNames) ? "None" : characterNames)}\n" +
@@ -122,7 +131,7 @@ namespace Frags.Discord
             await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
         }
 
-        [Command("options")]
+        [Command("show options")]
         public async Task GetCampaignOptionsAsync([Remainder]string name = null)
         {
             Presentation.Results.IResult result;
@@ -140,22 +149,41 @@ namespace Frags.Discord
 
             if (view.StatisticOptions != null)
             {
-                StringBuilder statOpts = new StringBuilder("**Statistic Options:**\n");
+                StringBuilder output = new StringBuilder("**Statistic Options:**\n");
                 foreach (var property in view.StatisticOptions.GetType().GetProperties())
                 {
-                    if (property.Name == "Id" || property.Name == "ExpEnabledChannels")
+                    if (property.Name == nameof(view.StatisticOptions.Id) || property.Name == nameof(view.StatisticOptions.ExpEnabledChannels))
                         continue;
 
-                    statOpts.Append($"*{property.Name}:* {property.GetValue(view.StatisticOptions)}\n");
+                    output.Append($"*{property.Name}:* {property.GetValue(view.StatisticOptions)}\n");
                 }
-                desc += statOpts;
+
+                output.Append("\n");
+                desc += output;
+            }
+
+            if (view.RollOptions != null)
+            {
+                StringBuilder output = new StringBuilder("**Roll Options:**\n");
+                foreach (var property in view.RollOptions.GetType().GetProperties())
+                {
+                    if (property.Name == nameof(view.RollOptions.Id))
+                        continue;
+
+                    output.Append($"*{property.Name}:* {property.GetValue(view.RollOptions)}\n");
+                }
+
+                output.Append("\n");
+                desc += output;
             }
             
             embed.WithDescription(desc);
+            embed.WithColor(Color.Gold);
             await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
         }
 
-        [Command("showstats")]
+        [Command("show statistics")]
+        [Alias("show statistic", "show stats", "show stat")]
         public async Task ShowCampaignStatisticsAsync([Remainder]string name = null)
         {
             Presentation.Results.IResult result;
@@ -197,6 +225,7 @@ namespace Frags.Discord
             }
 
             embed.WithDescription(desc);
+            embed.WithColor(Color.Gold);
             await ReplyAsync(message: Context.User.Mention, embed: embed.Build());
         }
     }

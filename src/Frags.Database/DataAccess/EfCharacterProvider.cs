@@ -90,20 +90,11 @@ namespace Frags.Database.DataAccess
                 .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
                 .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
+                .AsNoTracking()
                 .FirstOrDefaultAsync())?.Characters;
 
-            if (charDtos == null) return null;
-
-
-            // This sets CharacterDto.Active properly
-            foreach (var x in charDtos) x.Active = false;
-            var activeChar = (await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier))?.ActiveCharacter;
-            if (activeChar != null)
-            {
-                var match = charDtos.FirstOrDefault(x => x.Id.Equals(activeChar.Id));
-                if (match != null)
-                    match.Active = true;
-            }
+            if (charDtos == null) 
+                return null;
 
             var mappedList = new List<Character>();
             foreach (var dto in charDtos)
@@ -113,8 +104,8 @@ namespace Frags.Database.DataAccess
 
                 // Convert from StatisticMapping list to Dictionary
                 mapped.Statistics.Clear();
-                foreach (var stat in dto.Statistics)
-                    mapped.Statistics.Add(_mapper.Map<Statistic>(stat.Statistic), stat.StatisticValue);
+                foreach (var statMap in dto.Statistics)
+                    mapped.Statistics.Add(_mapper.Map<Statistic>(statMap.Statistic), statMap.StatisticValue);
 
                 mappedList.Add(mapped);
             }
@@ -130,6 +121,7 @@ namespace Frags.Database.DataAccess
                 return;
             
             var dbChar = await _context.Characters.Where(x => x.Id.Equals(character.Id))
+                .Include(x => x.User)
                 .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
                 .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
@@ -155,6 +147,7 @@ namespace Frags.Database.DataAccess
                 dbChar.Statistics.Add(new StatisticMapping(_mapper.Map<StatisticDto>(stat.Key), stat.Value));
 
             _context.Update(dbChar);
+            //_context.Entry(dbChar).Reference(x => x.User).IsModified = false;
 
             if (character.Active)
             {
@@ -163,7 +156,8 @@ namespace Frags.Database.DataAccess
                 if (userDto != null)
                 {
                     userDto.ActiveCharacter = dbChar;
-                    _context.Update(userDto);
+                    //var userEntity = _context.Attach(userDto);
+                    //userEntity.Reference(x => x.ActiveCharacter).IsModified = true;
                 }
                 else
                 {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Frags.Core.Common;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Progression;
+using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
@@ -84,14 +85,20 @@ namespace Frags.Test.Presentation.Controllers
             await charProv.CreateCharacterAsync(userId, name);
 
             var provider = new MockCampaignProvider(userProv);
-            var strategy = new MockProgressionStrategy();
-            var statProvider = new MockStatisticProvider();
-            var stratName = strategy.GetType().Name;
-            var controller = new CampaignController(userProv, charProv, provider, statProvider, new List<IProgressionStrategy> { strategy });
+
+            var progStrategy = new MockProgressionStrategy();
+            var progStratName = progStrategy.GetType().Name;
+
+            var rollStrategy = new MockRollStrategy();
+            var rollStratName = rollStrategy.GetType().Name;
+
+            var statProvider = new MockStatisticProvider();          
+            var controller = new CampaignController(userProv, charProv, provider, statProvider, new List<IProgressionStrategy> { progStrategy });
 
             await controller.CreateCampaignAsync(userId, name);
             await controller.AddCampaignChannelAsync(name, channelId);
-            await controller.ConfigureCampaignAsync(userId, channelId, nameof(StatisticOptions.ProgressionStrategy), stratName);
+            await controller.ConfigureStatisticOptionsAsync(userId, channelId, nameof(StatisticOptions.ProgressionStrategy), progStratName);
+            await controller.ConfigureRollOptionsAsync(userId, channelId, nameof(RollOptions.RollStrategy), rollStratName);
             var convResult = await controller.ConvertCharacterAsync(userId, channelId);
             var result = await controller.GetCampaignInfoAsync(name);
             var viewModel = (ShowCampaignViewModel)result.ViewModel;
@@ -100,9 +107,10 @@ namespace Frags.Test.Presentation.Controllers
             bool chanExist = viewModel.Channels.Exists(x => x.Id == channelId);
             bool charNameFound = viewModel.CharacterNames.Any(x => x.Equals(name));
             bool userIdEq = viewModel.Owner.UserIdentifier == userId;
-            bool progEq = viewModel.StatisticOptions.ProgressionStrategy.Equals(stratName);
+            bool progEq = viewModel.StatisticOptions.ProgressionStrategy.Equals(progStratName);
+            bool rollEq = viewModel.RollOptions.RollStrategy.Equals(rollStratName);
 
-            Assert.True(nameEq && chanExist && convResult.IsSuccess && userIdEq && progEq);
+            Assert.True(nameEq && chanExist && convResult.IsSuccess && userIdEq && progEq && rollEq);
         }
     }
 }

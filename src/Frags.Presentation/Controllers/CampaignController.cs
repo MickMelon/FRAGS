@@ -86,43 +86,70 @@ namespace Frags.Presentation.Controllers
             return CampaignResult.ChannelRemoved();
         }
 
-        public async Task<IResult> ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value)
+        public async Task<IResult> ConfigureStatisticOptionsAsync(ulong callerId, ulong channelId, string propName, object value)
         {
-            // Since we want the DTO, we can't just use GetCampaignAsync
             Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
             if (campaign == null) return CampaignResult.NotFoundByChannel();
 
-            // Caller is a moderator or owner of this campaign
-            if (await _campProvider.HasPermissionAsync(campaign, callerId))
+            // Caller is not a moderator or owner of this campaign
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
+                return CampaignResult.AccessDenied();
+
+            StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
+            if (statOptions == null) statOptions = new StatisticOptions();
+
+            if (propName == null || propName == nameof(statOptions.Id) || propName == nameof(statOptions.ExpEnabledChannels)) 
+                    return CampaignResult.InvalidProperty();
+
+            try
             {
-                StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
-                if (statOptions == null) statOptions = new StatisticOptions();
-
-                // Try to match propName to a property in StatisticOptions
-                var propertyInfo = statOptions.GetType().GetProperty(propName);
-                if (propertyInfo == null || propertyInfo.Name == nameof(statOptions.Id) || propertyInfo.Name == nameof(statOptions.ExpEnabledChannels)) 
-                    throw new CampaignException(Messages.CAMP_PROPERTY_INVALID);
-
-                try
-                {
-                    // Try to convert our given object (probably a string or int) to the same type as the property
-                    var propertyType = propertyInfo.PropertyType;
-                    value = Convert.ChangeType(value, propertyType);
-
-                    propertyInfo.SetValue(statOptions, value);
-                }
-                catch (System.Exception)
-                {
-                    throw new CampaignException(Messages.CAMP_PROPERTY_INVALID_VALUE);
-                }
-                
+                SetOptionsProperty(propName, value, statOptions);
                 await _campProvider.UpdateStatisticOptionsAsync(campaign, statOptions);
                 return CampaignResult.PropertyChanged();
             }
-            else
+            catch (System.Exception e)
             {
-                return CampaignResult.AccessDenied();
+                return CampaignResult.InvalidPropertyValue(e.Message);
             }
+        }
+
+        public async Task<IResult> ConfigureRollOptionsAsync(ulong callerId, ulong channelId, string propName, object value)
+        {
+            Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
+            if (campaign == null) return CampaignResult.NotFoundByChannel();
+
+            // Caller is not a moderator or owner of this campaign
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
+                return CampaignResult.AccessDenied();
+
+            RollOptions rollOptions = await _campProvider.GetRollOptionsAsync(campaign);
+            if (rollOptions == null) rollOptions = new RollOptions();
+
+            if (propName == null || propName == nameof(rollOptions.Id))
+                    return CampaignResult.InvalidProperty();
+
+            try
+            {
+                SetOptionsProperty(propName, value, rollOptions);
+                await _campProvider.UpdateRollOptionsAsync(campaign, rollOptions);
+                return CampaignResult.PropertyChanged();
+            }
+            catch (System.Exception e)
+            {
+                return CampaignResult.InvalidPropertyValue(e.Message);
+            }
+        }
+
+        private void SetOptionsProperty(string propName, object value, object toConfigure)
+        {
+            // Try to match propName to a property in our given object to configure
+            var propertyInfo = toConfigure.GetType().GetProperty(propName);
+
+            // Try to convert our given value (probably a string or int) to the same type as the property
+            var propertyType = propertyInfo.PropertyType;
+            value = Convert.ChangeType(value, propertyType);
+
+            propertyInfo.SetValue(toConfigure, value);
         }
 
         private IProgressionStrategy GetProgressionStrategy(StatisticOptions options)
@@ -178,9 +205,10 @@ namespace Frags.Presentation.Controllers
             List<Channel> channels = await _campProvider.GetChannelsAsync(campaign);
             List<Character> characters = await _campProvider.GetCharactersAsync(campaign);
             StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
+            RollOptions rollOptions = await _campProvider.GetRollOptionsAsync(campaign);
             IEnumerable<Statistic> statistics = await _statProvider.GetAllStatisticsFromCampaignAsync(campaign);
 
-            return CampaignResult.Show(campaign, channels, characters, statOptions, statistics);
+            return CampaignResult.Show(campaign, channels, characters, statOptions, rollOptions, statistics);
         }
     }
 }

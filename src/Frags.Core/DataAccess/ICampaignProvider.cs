@@ -19,6 +19,8 @@ namespace Frags.Core.DataAccess
 
         Task<StatisticOptions> GetStatisticOptionsAsync(Campaign campaign);
         Task UpdateStatisticOptionsAsync(Campaign campaign, StatisticOptions statisticOptions);
+        Task<RollOptions> GetRollOptionsAsync(Campaign campaign);
+        Task UpdateRollOptionsAsync(Campaign campaign, RollOptions rollOptions);
 
         Task RenameCampaignAsync(Campaign campaign, string newName);
 
@@ -30,5 +32,6 @@ namespace Frags.Core.DataAccess
         Task CreateCampaignAsync(ulong userIdentifier, string name);
         Task DeleteCampaignAsync(Campaign campaign);
         Task SetCampaignChannelAsync(Campaign campaign, ulong channelId);
+        
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Frags.Core.Campaigns;
 using Frags.Core.Common;
+using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Presentation.Attributes;
 using Frags.Presentation.ViewModels.Statistics;
@@ -21,5 +22,6 @@ namespace Frags.Presentation.ViewModels.Campaigns
         public StatisticOptions StatisticOptions { get; set; }
 
         public List<ShowStatisticViewModel> Statistics { get; set; }
+        public RollOptions RollOptions { get; set; }
     }
 }

@@ -2,11 +2,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Frags.Core.Characters;
+using Frags.Core.Common;
 using Frags.Core.Statistics;
 using Frags.Database;
 using Frags.Database.AutoMapper;
 using Frags.Database.Characters;
 using Frags.Database.DataAccess;
+using Frags.Presentation.Controllers;
+using Frags.Presentation.Results;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
@@ -41,6 +44,51 @@ namespace Frags.Test.Database.DataAccess
             var result = await provider.GetActiveCharacterAsync(305847674974896128);
 
             Assert.True(result.User.UserIdentifier == 305847674974896128);
+        }
+
+        [Fact]
+        public async Task EntityFramework_CreateTwoCharacters_EntityMatchesInput()
+        {
+            int dbId = GameRandom.Between(5, int.MaxValue - 1);
+
+            var genOpts = new GeneralOptions
+            {
+                UseInMemoryDatabase = true,
+                DatabaseName = "CreateTwoCharacters_EntityMatchesInput" + dbId,
+                CharacterLimit = 10
+            };
+            
+            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
+            var mapper = new Mapper(mapperConfig);
+
+            ulong userId = 305847674974896128;
+
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                var controller = new CharacterController(provider, null, genOpts);
+                await controller.CreateCharacterAsync(userId, "Thing 1");
+            }
+
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                var controller = new CharacterController(provider, null, genOpts);
+                await controller.CreateCharacterAsync(userId, "Thing 2");
+            }
+
+            IResult result;
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                var controller = new CharacterController(provider, null, genOpts);
+                result = await controller.ActivateCharacterAsync(userId, "Thing 1");
+            }
+
+            Assert.True(result.IsSuccess);
         }
 
         [Fact]

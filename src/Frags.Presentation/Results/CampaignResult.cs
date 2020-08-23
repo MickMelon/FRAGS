@@ -1,6 +1,7 @@
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
+using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Presentation.ViewModels.Campaigns;
 using Frags.Presentation.ViewModels.Characters;
@@ -83,14 +84,15 @@ namespace Frags.Presentation.Results
         public static CampaignResult InvalidPropertyValue(string exceptionMessage) =>
             new CampaignResult(string.Format(Messages.CAMP_PROPERTY_INVALID_VALUE, exceptionMessage), success: false);
 
-        public static IResult Show(Campaign campaign, List<Channel> channels, List<Character> characters, StatisticOptions statOptions, IEnumerable<Statistic> statistics)
+        public static IResult Show(Campaign campaign, List<Channel> channels, List<Character> characters, StatisticOptions statOptions, RollOptions rollOptions, IEnumerable<Statistic> statistics)
         {
             ShowCampaignViewModel vm = new ShowCampaignViewModel
             {
                 Name = campaign.Name,
                 Owner = campaign.Owner,
                 Channels = channels,
-                StatisticOptions = statOptions
+                StatisticOptions = statOptions,
+                RollOptions = rollOptions
             };
 
             if (characters != null) 

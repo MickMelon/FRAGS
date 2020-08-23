@@ -11,6 +11,7 @@ using Frags.Core.Common.Exceptions;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Progression;
+using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Database.Campaigns;
 using Frags.Database.Characters;
@@ -129,14 +130,6 @@ namespace Frags.Database.DataAccess
             await _context.SaveChangesAsync();
         }
 
-        private IProgressionStrategy GetProgressionStrategy(StatisticOptionsDto options)
-        {
-            if (string.IsNullOrWhiteSpace(options.ProgressionStrategy))
-                return null;
-
-            return _progStrategies.Find(x => x.GetType().Name.ContainsIgnoreCase(options.ProgressionStrategy));
-        }
-
         public async Task UpdateModeratorsAsync(Campaign campaign, List<Moderator> moderators)
         {
             CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
@@ -174,6 +167,22 @@ namespace Frags.Database.DataAccess
                 channel.CampaignId = campaign?.Id ?? 0;
             }
             
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<RollOptions> GetRollOptionsAsync(Campaign campaign)
+        {
+            CampaignDto campDto = await _context.Campaigns.Include(x => x.RollOptions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            RollOptionsDto rollDto = campDto?.RollOptions;
+
+            return _mapper.Map<RollOptions>(rollDto);
+        }
+
+        public async Task UpdateRollOptionsAsync(Campaign campaign, RollOptions rollOptions)
+        {
+            CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+
+            dto.RollOptions = _mapper.Map<RollOptionsDto>(rollOptions);
             await _context.SaveChangesAsync();
         }
     }
