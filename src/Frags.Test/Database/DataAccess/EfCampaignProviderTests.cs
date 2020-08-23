@@ -71,7 +71,7 @@ namespace Frags.Test.Database.DataAccess
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
                 var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
                 var campProvider = new EfCampaignProvider(context, mapper, progStrats);
-                var campController = new CampaignController(userProvider, charProvider, campProvider, null);
+                var campController = new CampaignController(userProvider, charProvider, campProvider, null, progStrats);
 
                 var result = await campController.AddCampaignChannelAsync(campName, channelId);
                 if (!result.IsSuccess) throw new CampaignException(result.Message);
@@ -85,9 +85,9 @@ namespace Frags.Test.Database.DataAccess
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
                 var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
                 var campProvider = new EfCampaignProvider(context, mapper, progStrats);
-                var campController = new CampaignController(userProvider, charProvider, campProvider, null);
+                var campController = new CampaignController(userProvider, charProvider, campProvider, null, progStrats);
                 
-                var result = await campController.RenameCampaignAsync(userId, newName, channelId);
+                var result = await campController.RenameCampaignAsync(userId, channelId, newName);
                 if (!result.IsSuccess) throw new CampaignException(result.Message);
             }
 
@@ -97,7 +97,7 @@ namespace Frags.Test.Database.DataAccess
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
                 var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
                 var campProvider = new EfCampaignProvider(context, mapper, progStrats);
-                var campController = new CampaignController(userProvider, charProvider, campProvider, null);
+                var campController = new CampaignController(userProvider, charProvider, campProvider, null, progStrats);
 
                 Campaign campaign = await campProvider.GetCampaignAsync(channelId);
 
@@ -125,6 +125,8 @@ namespace Frags.Test.Database.DataAccess
             ulong channelId = (ulong)GameRandom.Between(11, int.MaxValue - 1);
             string campName = baseName + "_Campaign";
 
+            _output.WriteLine($"User ID: {userId}, Channel ID: {channelId}");
+
             // $camp create
             using (var context = new RpgContext(options))
             {
@@ -140,7 +142,7 @@ namespace Frags.Test.Database.DataAccess
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
                 var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
                 var campProvider = new EfCampaignProvider(context, mapper, progStrats);
-                var campController = new CampaignController(userProvider, charProvider, campProvider, null);
+                var campController = new CampaignController(userProvider, charProvider, campProvider, null, progStrats);
 
                 var result = await campController.AddCampaignChannelAsync(campName, channelId);
                 if (!result.IsSuccess) throw new CampaignException(result.Message);
@@ -154,7 +156,7 @@ namespace Frags.Test.Database.DataAccess
                 var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
                 var campProvider = new EfCampaignProvider(context, mapper, progStrats);
                 
-                var campController = new CampaignController(userProvider, charProvider, campProvider, null);
+                var campController = new CampaignController(userProvider, charProvider, campProvider, null, progStrats);
 
                 var propertyName = nameof(StatisticOptions.ProgressionStrategy);
                 string newValue = nameof(MockProgressionStrategy);
@@ -182,7 +184,7 @@ namespace Frags.Test.Database.DataAccess
                 var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
                 var campProvider = new EfCampaignProvider(context, mapper, progStrats);
 
-                var campController = new CampaignController(userProvider, charProvider, campProvider, null);
+                var campController = new CampaignController(userProvider, charProvider, campProvider, null, progStrats);
 
                 var result = await campController.ConvertCharacterAsync(userId, channelId);
                 if (!result.IsSuccess) throw new CampaignException(result.Message);
@@ -197,7 +199,7 @@ namespace Frags.Test.Database.DataAccess
                 var campProvider = new EfCampaignProvider(context, mapper, progStrats);
                 var statProvider = new EfStatisticProvider(context, mapper);
 
-                var campController = new CampaignController(userProvider, charProvider, campProvider, statProvider);
+                var campController = new CampaignController(userProvider, charProvider, campProvider, statProvider, progStrats);
                 var result = await campController.GetCampaignInfoAsync(campName);
                 ShowCampaignViewModel vm = (ShowCampaignViewModel)result.ViewModel;
                 

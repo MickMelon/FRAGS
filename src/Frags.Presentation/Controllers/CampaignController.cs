@@ -27,86 +27,131 @@ namespace Frags.Presentation.Controllers
         private readonly ICampaignProvider _campProvider;
 
         private readonly IStatisticProvider _statProvider;
+
+        private readonly List<IProgressionStrategy> _progStrategies;
         
 
         public CampaignController(IUserProvider userProvider,
         ICharacterProvider charProvider,
         ICampaignProvider campProvider,
-        IStatisticProvider statProvider)
+        IStatisticProvider statProvider,
+        List<IProgressionStrategy> progStrategies)
         {
             _userProvider = userProvider;
             _charProvider = charProvider;
             _campProvider = campProvider;
             _statProvider = statProvider;
+            _progStrategies = progStrategies;
         }
 
-        public async Task<IResult> RenameCampaignAsync(ulong callerId, string newName, ulong channelId)
+        public async Task<IResult> RenameCampaignAsync(ulong callerId, ulong channelId, string newName)
         {
-            try
-            {
-                await _campProvider.RenameCampaignAsync(callerId, newName, channelId);
-            }
-            catch (CampaignException e)
-            {
-                return GenericResult.Failure(e.Message);
-            }
+            Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
+            if (campaign == null) return CampaignResult.NotFoundByChannel();
 
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
+                return CampaignResult.AccessDenied();
+
+            if (await _campProvider.GetCampaignAsync(newName) != null)
+                return CampaignResult.NameAlreadyExists();
+
+            await _campProvider.RenameCampaignAsync(campaign, newName);
             return CampaignResult.NameChanged();
         }
 
         public async Task<IResult> AddCampaignChannelAsync(string campaignName, ulong channelId)
         {
-            try
-            {
-                await _campProvider.AddChannelAsync(campaignName, channelId);   
-            }
-            catch (CampaignException e)
-            {
-                return GenericResult.Failure(e.Message);
-            }
+            Campaign campaignToSet = await _campProvider.GetCampaignAsync(campaignName);
+            if (campaignToSet == null) return CampaignResult.NotFoundByName();
 
-            return CampaignResult.ChannelAdded();
+            // We should warn the user if there is already a Campaign associated with this channel.
+            Campaign previouslySet = await _campProvider.GetCampaignAsync(channelId);
+            if (previouslySet == null)
+            {
+                await _campProvider.SetCampaignChannelAsync(campaignToSet, channelId);
+                return CampaignResult.ChannelAdded();
+            }
+            else
+            {
+                return CampaignResult.ChannelAlreadyPresent();
+            }
         }
 
         public async Task<IResult> RemoveCampaignChannelAsync(ulong channelId)
         {
-            try
-            {
-                await _campProvider.RemoveChannelAsync(channelId);   
-            }
-            catch (CampaignException e)
-            {
-                return GenericResult.Failure(e.Message);
-            }
+            if (await _campProvider.GetCampaignAsync(channelId) == null)
+                return CampaignResult.NotFoundByChannel();
 
+            await _campProvider.SetCampaignChannelAsync(null, channelId);
             return CampaignResult.ChannelRemoved();
         }
 
         public async Task<IResult> ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value)
         {
-            try
+            // Since we want the DTO, we can't just use GetCampaignAsync
+            Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
+            if (campaign == null) return CampaignResult.NotFoundByChannel();
+
+            // Caller is a moderator or owner of this campaign
+            if (await _campProvider.HasPermissionAsync(campaign, callerId))
             {
-                await _campProvider.ConfigureCampaignAsync(callerId, channelId, propName, value);
+                StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
+                if (statOptions == null) statOptions = new StatisticOptions();
+
+                // Try to match propName to a property in StatisticOptions
+                var propertyInfo = statOptions.GetType().GetProperty(propName);
+                if (propertyInfo == null || propertyInfo.Name == nameof(statOptions.Id) || propertyInfo.Name == nameof(statOptions.ExpEnabledChannels)) 
+                    throw new CampaignException(Messages.CAMP_PROPERTY_INVALID);
+
+                try
+                {
+                    // Try to convert our given object (probably a string or int) to the same type as the property
+                    var propertyType = propertyInfo.PropertyType;
+                    value = Convert.ChangeType(value, propertyType);
+
+                    propertyInfo.SetValue(statOptions, value);
+                }
+                catch (System.Exception)
+                {
+                    throw new CampaignException(Messages.CAMP_PROPERTY_INVALID_VALUE);
+                }
+                
+                await _campProvider.UpdateStatisticOptionsAsync(campaign, statOptions);
+                return CampaignResult.PropertyChanged();
             }
-            catch (CampaignException e)
+            else
             {
-                return GenericResult.Failure(e.Message);
+                return CampaignResult.AccessDenied();
             }
-            
-            return CampaignResult.PropertyChanged();
+        }
+
+        private IProgressionStrategy GetProgressionStrategy(StatisticOptions options)
+        {
+            if (string.IsNullOrWhiteSpace(options.ProgressionStrategy))
+                return null;
+
+            return _progStrategies.Find(x => x.GetType().Name.ContainsIgnoreCase(options.ProgressionStrategy));
         }
 
         public async Task<IResult> ConvertCharacterAsync(ulong callerId, ulong channelId)
         {
-            try
-            {
-                await _campProvider.ConvertCharacterAsync(callerId, channelId);    
-            }
-            catch (CampaignException e)
-            {
-                return GenericResult.Failure(e.Message);
-            }
+            Character character = await _charProvider.GetActiveCharacterAsync(callerId);
+            if (character == null) return CharacterResult.CharacterNotFound();
+
+            Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
+            if (campaign == null) return CampaignResult.NotFoundByChannel();
+
+            StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
+            if (statOptions == null) return CampaignResult.StatisticOptionsNotFound();
+
+            var strategy = GetProgressionStrategy(statOptions);
+            if (strategy == null) throw new CampaignException(Messages.CAMP_PROGSTRATEGY_INVALID);
+
+            await strategy.ResetCharacter(character);
             
+            character.CampaignId = campaign.Id;
+
+            await _charProvider.UpdateCharacterAsync(character);
             return CampaignResult.CharacterConverted();
         }
 

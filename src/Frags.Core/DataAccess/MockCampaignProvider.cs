@@ -34,9 +34,9 @@ namespace Frags.Core.DataAccess
             _campaigns.Add(new Campaign(user, name));
         }
 
-        public Task DeleteCampaignAsync(string campaignName)
+        public Task DeleteCampaignAsync(Campaign campaign)
         {
-            _campaigns.RemoveAll(x => x.Name.EqualsIgnoreCase(campaignName));
+            _campaigns.Remove(campaign);
             return Task.CompletedTask;
         }
 
@@ -53,7 +53,7 @@ namespace Frags.Core.DataAccess
                     return Task.FromResult(campaign);
             }
 
-            return null;
+            return Task.FromResult<Campaign>(null);
         }
 
         public Task<List<Channel>> GetChannelsAsync(Campaign campaign)
@@ -129,18 +129,6 @@ namespace Frags.Core.DataAccess
             return Task.CompletedTask;
         }
 
-        public Task<bool> HasPermissionAsync(ulong userIdentifier, ulong channelId)
-        {
-            Campaign camp = GetCampaignAsync(channelId).Result;
-            return Task.FromResult(camp.Owner.UserIdentifier == userIdentifier || (camp.ModeratedCampaigns?.Select(x => x.User.UserIdentifier)?.Contains(userIdentifier) ?? false));
-        }
-
-        public Task<bool> HasPermissionAsync(ulong userIdentifier, string name)
-        {
-            Campaign camp = GetCampaignAsync(name).Result;
-            return Task.FromResult(camp.Owner.UserIdentifier == userIdentifier || (camp.ModeratedCampaigns?.Select(x => x.User.UserIdentifier)?.Contains(userIdentifier) ?? false));
-        }
-
         public Task RemoveChannelAsync(ulong channelId)
         {
             foreach (var campaign in _campaigns)
@@ -154,6 +142,44 @@ namespace Frags.Core.DataAccess
                 }
             }
             
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateModeratorsAsync(Campaign campaign, List<Moderator> moderators)
+        {
+            _campaigns[_campaigns.IndexOf(campaign)].ModeratedCampaigns = moderators;
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateStatisticOptionsAsync(Campaign campaign, StatisticOptions statisticOptions)
+        {
+            _campaigns[_campaigns.IndexOf(campaign)].StatisticOptions = statisticOptions;
+            return Task.CompletedTask;
+        }
+
+        public Task RenameCampaignAsync(Campaign campaign, string newName)
+        {
+            _campaigns[_campaigns.IndexOf(campaign)].Name = newName;
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateChannelsAsync(Campaign campaign, List<Channel> channels)
+        {
+            _campaigns[_campaigns.IndexOf(campaign)].Channels = channels;
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> HasPermissionAsync(Campaign camp, ulong userIdentifier)
+        {
+            return Task.FromResult(camp.Owner.UserIdentifier == userIdentifier || (camp.ModeratedCampaigns?.Select(x => x.User.UserIdentifier)?.Contains(userIdentifier) ?? false));
+        }
+
+        public Task SetCampaignChannelAsync(Campaign campaign, ulong channelId)
+        {
+            List<Channel> channels = _campaigns[_campaigns.IndexOf(campaign)].Channels;
+            if (channels == null) channels = new List<Channel>();
+            
+            channels.Add(new Channel(channelId, campaign));
             return Task.CompletedTask;
         }
     }

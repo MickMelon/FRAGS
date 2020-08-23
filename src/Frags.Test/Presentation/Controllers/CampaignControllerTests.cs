@@ -20,7 +20,7 @@ namespace Frags.Test.Presentation.Controllers
             var userProv = new MockUserProvider();
             var charProv = new MockCharacterProvider();
             var provider = new MockCampaignProvider(userProv);
-            var controller = new CampaignController(userProv, charProv, provider, null);
+            var controller = new CampaignController(userProv, charProv, provider, null, null);
 
             string name = nameof(CampaignControllerTests.AddCampaignChannel_ValidInput_ReturnSuccess);
             ulong userId = (ulong)GameRandom.Between(11, int.MaxValue - 1);
@@ -44,7 +44,7 @@ namespace Frags.Test.Presentation.Controllers
 
             var provider = new MockCampaignProvider(userProv);
             var strategy = new MockProgressionStrategy();
-            var controller = new CampaignController(userProv, charProv, provider, null);
+            var controller = new CampaignController(userProv, charProv, provider, null, null);
 
             var result = await controller.CreateCampaignAsync(userId, name);
 
@@ -63,7 +63,7 @@ namespace Frags.Test.Presentation.Controllers
 
             var provider = new MockCampaignProvider(userProv);
             var strategy = new MockProgressionStrategy();
-            var controller = new CampaignController(userProv, charProv, provider, null);
+            var controller = new CampaignController(userProv, charProv, provider, null, null);
 
             await controller.CreateCampaignAsync(userId, name);
             var result = await controller.CreateCampaignAsync(userId, name);
@@ -87,7 +87,7 @@ namespace Frags.Test.Presentation.Controllers
             var strategy = new MockProgressionStrategy();
             var statProvider = new MockStatisticProvider();
             var stratName = strategy.GetType().Name;
-            var controller = new CampaignController(userProv, charProv, provider, statProvider);
+            var controller = new CampaignController(userProv, charProv, provider, statProvider, new List<IProgressionStrategy> { strategy });
 
             await controller.CreateCampaignAsync(userId, name);
             await controller.AddCampaignChannelAsync(name, channelId);
@@ -102,7 +102,7 @@ namespace Frags.Test.Presentation.Controllers
             bool userIdEq = viewModel.Owner.UserIdentifier == userId;
             bool progEq = viewModel.StatisticOptions.ProgressionStrategy.Equals(stratName);
 
-            Assert.True(nameEq && chanExist && charNameFound && userIdEq && progEq);
+            Assert.True(nameEq && chanExist && convResult.IsSuccess && userIdEq && progEq);
         }
     }
 }

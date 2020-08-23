@@ -53,7 +53,7 @@ namespace Frags.Discord
         [Command("rename")]
         public async Task RenameCampaignAsync([Remainder]string newName)
         {
-            await ReplyAsync((await _controller.RenameCampaignAsync(Context.User.Id, newName, Context.Channel.Id)).Message);
+            await ReplyAsync((await _controller.RenameCampaignAsync(Context.User.Id, Context.Channel.Id, newName)).Message);
         }
 
         [Command("channeladd")]

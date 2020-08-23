@@ -32,7 +32,7 @@ namespace Frags.Presentation.Controllers
             Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
             if (campaign == null) return CampaignResult.NotFoundByChannel();
 
-            if (!await _campProvider.HasPermissionAsync(callerId, channelId)) return CampaignResult.AccessDenied();
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId)) return CampaignResult.AccessDenied();
 
             var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign.Id);
             if (stat == null) return StatisticResult.StatisticNotFound();
@@ -51,7 +51,7 @@ namespace Frags.Presentation.Controllers
             Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
             if (campaign == null) return CampaignResult.NotFoundByChannel();
 
-            if (!await _campProvider.HasPermissionAsync(callerId, channelId))
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
             var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign.Id);
@@ -68,7 +68,7 @@ namespace Frags.Presentation.Controllers
             Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
             if (campaign == null) return CampaignResult.NotFoundByChannel();
 
-            if (!await _campProvider.HasPermissionAsync(callerId, channelId))
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
             var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign.Id);
@@ -83,7 +83,7 @@ namespace Frags.Presentation.Controllers
             Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
             if (campaign == null) return CampaignResult.NotFoundByChannel();
 
-            if (!await _campProvider.HasPermissionAsync(callerId, channelId))
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
             var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign.Id);
@@ -107,18 +107,18 @@ namespace Frags.Presentation.Controllers
         /// </returns>
         public async Task<IResult> CreateCampaignAttributeAsync(string statName, ulong callerId, ulong channelId)
         {
-            Campaign camp = await _campProvider.GetCampaignAsync(channelId);
+            Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
 
-            if (camp == null)
+            if (campaign == null)
                 return CampaignResult.NotFoundByChannel();
 
-            if (!await _campProvider.HasPermissionAsync(callerId, channelId))
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
-            if (await _statProvider.GetStatisticFromCampaignAsync(statName, camp.Id) != null)
+            if (await _statProvider.GetStatisticFromCampaignAsync(statName, campaign.Id) != null)
                 return StatisticResult.NameAlreadyExists();
 
-            var result = await _statProvider.CreateAttributeAsync(statName, camp);
+            var result = await _statProvider.CreateAttributeAsync(statName, campaign);
 
             if (result == null)
                 return StatisticResult.StatisticCreationFailed();
@@ -138,18 +138,18 @@ namespace Frags.Presentation.Controllers
         /// </returns>
         public async Task<IResult> CreateCampaignSkillAsync(string statName, string attribName, ulong callerId, ulong channelId)
         {
-            Campaign camp = await _campProvider.GetCampaignAsync(channelId);
+            Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
 
-            if (camp == null)
+            if (campaign == null)
                 return CampaignResult.NotFoundByChannel();
 
-            if (!await _campProvider.HasPermissionAsync(callerId, channelId))
+            if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
-            if (await _statProvider.GetStatisticFromCampaignAsync(statName, camp.Id) != null)
+            if (await _statProvider.GetStatisticFromCampaignAsync(statName, campaign.Id) != null)
                 return StatisticResult.NameAlreadyExists();
 
-            var result = await _statProvider.CreateSkillAsync(statName, attribName, camp);
+            var result = await _statProvider.CreateSkillAsync(statName, attribName, campaign);
 
             if (result == null)
                 return StatisticResult.StatisticCreationFailed();

@@ -15,18 +15,20 @@ namespace Frags.Core.DataAccess
         Task<Campaign> GetCampaignAsync(ulong channelId);
         
         Task<List<Moderator>> GetModeratorsAsync(Campaign campaign);
+        Task UpdateModeratorsAsync(Campaign campaign, List<Moderator> moderators);
+
         Task<StatisticOptions> GetStatisticOptionsAsync(Campaign campaign);
-        Task UpdateCampaignAsync(Campaign campaign);
+        Task UpdateStatisticOptionsAsync(Campaign campaign, StatisticOptions statisticOptions);
+
+        Task RenameCampaignAsync(Campaign campaign, string newName);
+
         Task<List<Channel>> GetChannelsAsync(Campaign campaign);
+        Task UpdateChannelsAsync(Campaign campaign, List<Channel> channels);
+
         Task<List<Character>> GetCharactersAsync(Campaign campaign);
-        Task<bool> HasPermissionAsync(ulong userIdentifier, ulong channelId);
-        Task<bool> HasPermissionAsync(ulong userIdentifier, string name);
+        Task<bool> HasPermissionAsync(Campaign campaign, ulong userIdentifier);
         Task CreateCampaignAsync(ulong userIdentifier, string name);
-        Task DeleteCampaignAsync(string campaignName);
-        Task ConfigureCampaignAsync(ulong callerId, ulong channelId, string propName, object value);
-        Task ConvertCharacterAsync(ulong callerId, ulong channelId);
-        Task AddChannelAsync(string campaignName, ulong channelId);
-        Task RemoveChannelAsync(ulong channelId);
-        Task RenameCampaignAsync(ulong callerId, string newName, ulong channelId);
+        Task DeleteCampaignAsync(Campaign campaign);
+        Task SetCampaignChannelAsync(Campaign campaign, ulong channelId);
     }
 }

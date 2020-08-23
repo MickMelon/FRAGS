@@ -158,12 +158,12 @@ namespace Frags.Database.DataAccess
 
             if (character.Active)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.User.UserIdentifier);
+                var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.User.UserIdentifier);
                 
-                if (user != null)
+                if (userDto != null)
                 {
-                    user.ActiveCharacter = dbChar;
-                    _context.Update(user);
+                    userDto.ActiveCharacter = dbChar;
+                    _context.Update(userDto);
                 }
                 else
                 {
