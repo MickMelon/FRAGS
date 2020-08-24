@@ -67,7 +67,7 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context, mapper);
                 var provider = new EfCharacterProvider(context, mapper, userProvider);
-                var controller = new CharacterController(provider, null, genOpts);
+                var controller = new CharacterController(provider, null, genOpts, userProvider, null);
                 await controller.CreateCharacterAsync(userId, "Thing 1");
             }
 
@@ -75,7 +75,7 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context, mapper);
                 var provider = new EfCharacterProvider(context, mapper, userProvider);
-                var controller = new CharacterController(provider, null, genOpts);
+                var controller = new CharacterController(provider, null, genOpts, userProvider, null);
                 await controller.CreateCharacterAsync(userId, "Thing 2");
             }
 
@@ -84,7 +84,7 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context, mapper);
                 var provider = new EfCharacterProvider(context, mapper, userProvider);
-                var controller = new CharacterController(provider, null, genOpts);
+                var controller = new CharacterController(provider, null, genOpts, userProvider, null);
                 result = await controller.ActivateCharacterAsync(userId, "Thing 1");
             }
 

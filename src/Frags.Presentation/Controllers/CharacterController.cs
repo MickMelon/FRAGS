@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Characters;
+using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Game.Progression;
@@ -33,16 +35,19 @@ namespace Frags.Presentation.Controllers
 
         private readonly ICampaignProvider _campProvider;
 
+        private readonly IUserProvider _userProvider;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options, ICampaignProvider campProvider = null)
+        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options, IUserProvider userProvider, ICampaignProvider campProvider = null)
         {
             _provider = provider;
             _progStrategy = progStrategy;
             _options = options;
             _campProvider = campProvider;
+            _userProvider = userProvider;
         }
 
         /// <summary>
@@ -71,15 +76,16 @@ namespace Frags.Presentation.Controllers
         /// <returns>A new CharacterResult object.</returns>
         public async Task<IResult> ActivateCharacterAsync(ulong callerId, string charName)
         {
-            var characters = await _provider.GetAllCharactersAsync(callerId);
-
-            var match = characters.OrderBy(x => x.Id).FirstOrDefault(x => x.Name.ContainsIgnoreCase(charName));
-
+            List<Character> characters = await _provider.GetAllCharactersAsync(callerId);
+            Character match = characters.FirstOrDefault(x => x.Name.ContainsIgnoreCase(charName));
             if (match == null) return CharacterResult.CharacterNotFound();
-            if (match.Active) return CharacterResult.CharacterAlreadyActive();
-            match.Active = true;
 
-            await _provider.UpdateCharacterAsync(match);
+            if (match.User.ActiveCharacter?.Id == match.Id)
+                return CharacterResult.CharacterAlreadyActive();
+
+            match.User.ActiveCharacter = match;
+            await _userProvider.UpdateUserAsync(match.User);
+
             return CharacterResult.CharacterActive();
         }
 

@@ -36,9 +36,11 @@ namespace Frags.Database.DataAccess
 
         public async Task UpdateUserAsync(User user)
         {
-            var dto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == user.UserIdentifier);
-            _mapper.Map(user, dto);
-            _context.Update(dto);
+            UserDto userDto = _context.Users.Find(user.Id);
+            CharacterDto charDto = await _context.Characters.FirstOrDefaultAsync(x => x.Id == user.ActiveCharacter.Id);
+            userDto.ActiveCharacter = charDto;
+
+            _context.Update(userDto);
             await _context.SaveChangesAsync();
         }
     }

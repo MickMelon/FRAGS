@@ -72,6 +72,8 @@ namespace Frags.Presentation.Controllers
             else
             {
                 stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign.Id);
+                // RollOptions rollOpts = await _campProvider.GetRollOptions(character.Campaign);
+                throw new NotImplementedException("this has to be fixed first.");
                 strategy = GetCampaignStrategy(character.Campaign);
             }
 
