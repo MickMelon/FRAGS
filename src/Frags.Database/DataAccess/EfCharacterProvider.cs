@@ -63,21 +63,10 @@ namespace Frags.Database.DataAccess
                 .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
                 .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
                 .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
-            
-            if (dto == null) return null;
-            dto.Active = true;
 
-            var mapped = _mapper.Map<Character>(dto);
-
-            // TODO: move this to automapper configuration
-            // Convert from StatisticMapping list to Dictionary
-            mapped.Statistics.Clear();
-            foreach (var stat in dto.Statistics)
-                mapped.Statistics.Add(_mapper.Map<Statistic>(stat.Statistic), stat.StatisticValue);
-
-            mapped.Effects = _mapper.Map<List<Effect>>(dto.EffectMappings.Select(x => x.Effect).ToList());
-            return mapped;
+            return _mapper.Map<Character>(dto);
         }
 
         /// <inheritdoc/>
@@ -93,78 +82,15 @@ namespace Frags.Database.DataAccess
                 .AsNoTracking()
                 .FirstOrDefaultAsync())?.Characters;
 
-            if (charDtos == null) 
-                return null;
-
-            var mappedList = new List<Character>();
-            foreach (var dto in charDtos)
-            {
-                var mapped = _mapper.Map<Character>(dto);
-                mapped.Effects = _mapper.Map<List<Effect>>(dto.EffectMappings.Select(x => x.Effect).ToList());
-
-                // Convert from StatisticMapping list to Dictionary
-                mapped.Statistics.Clear();
-                foreach (var statMap in dto.Statistics)
-                    mapped.Statistics.Add(_mapper.Map<Statistic>(statMap.Statistic), statMap.StatisticValue);
-
-                mappedList.Add(mapped);
-            }
-
-            return mappedList;
+            return _mapper.Map<List<Character>>(charDtos);
         }
 
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
-            // If the character does not exist in the database, abort
-            if (await _context.Characters.CountAsync(c => c.Id.Equals(character.Id)) <= 0)
-                return;
+            CharacterDto dto = _mapper.Map<CharacterDto>(character);
             
-            var dbChar = await _context.Characters.Where(x => x.Id.Equals(character.Id))
-                .Include(x => x.User)
-                .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
-                .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
-                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
-                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
-                .FirstOrDefaultAsync();
-
-            _mapper.Map<Character, CharacterDto>(character, dbChar);
-
-            if (dbChar.EffectMappings == null)
-                dbChar.EffectMappings = new List<EffectMapping>();
-            else
-                dbChar.EffectMappings.Clear();
-
-            foreach (var effect in character.Effects)
-            {
-                var effectDto = _mapper.Map<EffectDto>(effect);
-                dbChar.EffectMappings.Add(new EffectMapping { Effect = effectDto, Character = dbChar });
-            }
-
-            // Convert from Statistic Dictionary to StatisticMapping List
-            dbChar.Statistics.Clear();
-            foreach (var stat in character.Statistics)
-                dbChar.Statistics.Add(new StatisticMapping(_mapper.Map<StatisticDto>(stat.Key), stat.Value));
-
-            _context.Update(dbChar);
-            //_context.Entry(dbChar).Reference(x => x.User).IsModified = false;
-
-            if (character.Active)
-            {
-                var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == character.User.UserIdentifier);
-                
-                if (userDto != null)
-                {
-                    userDto.ActiveCharacter = dbChar;
-                    //var userEntity = _context.Attach(userDto);
-                    //userEntity.Reference(x => x.ActiveCharacter).IsModified = true;
-                }
-                else
-                {
-                    await _context.AddAsync(new UserDto(character.User.UserIdentifier, dbChar));
-                }
-            }
-
+            _context.Update(dto);
             await _context.SaveChangesAsync();
         }
     }

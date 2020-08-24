@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Frags.Core.Campaigns;
@@ -17,24 +18,28 @@ namespace Frags.Database.AutoMapper
     {
         public GeneralProfile()
         {
-            // Can't go from a collection of POCO Users to Moderator many-to-many DTOs...
             CreateMap<Campaign, CampaignDto>();
-
-            // ...but we can separate the UserDTO's from the Moderator object
             CreateMap<CampaignDto, Campaign>();
 
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
 
+            CreateMap<KeyValuePair<Statistic, StatisticValue>, StatisticMapping>()
+               .ConvertUsing<StatisticKeyValueConverter>();
+
+            CreateMap<StatisticMapping, KeyValuePair<Statistic, StatisticValue>>()
+               .ConvertUsing<StatisticMappingConverter>();
+
             CreateMap<Character, CharacterDto>()
-               .ForMember(x => x.Statistics, opt => opt.Ignore());
+               .ForMember(x => x.EffectMappings, opt => opt.MapFrom<EffectMappingResolver>());
+
             CreateMap<CharacterDto, Character>()
                .ForMember(poco => poco.Attributes, opt => opt.Ignore())
                .ForMember(poco => poco.Skills, opt => opt.Ignore())
-               .ForMember(poco => poco.Effects, opt => opt.Ignore())
-               .ForMember(x => x.Statistics, opt => opt.Ignore());
+               .ForMember(poco => poco.Effects, opt => opt.MapFrom<EffectPocoResolver>());
 
-            CreateMap<Effect, EffectDto>();
+            CreateMap<Effect, EffectDto>()
+               .ForMember(dto => dto.EffectMappings, opt => opt.Ignore());
             CreateMap<EffectDto, Effect>();
 
             CreateMap<Statistic, StatisticDto>()

@@ -49,6 +49,14 @@ namespace Frags.Database
             builder.Entity<EffectMapping>()
                 .HasKey(ec => new { ec.EffectId, ec.CharacterId });
 
+            // builder.Entity<EffectMapping>()
+            //     .Property(ec => ec.CharacterId)
+            //     .ValueGeneratedNever();
+
+            // builder.Entity<EffectMapping>()
+            //     .Property(ec => ec.EffectId)
+            //     .ValueGeneratedNever();
+
             builder.Entity<EffectMapping>()
                 .HasOne(ec => ec.Effect)
                 .WithMany(e => e.EffectMappings)

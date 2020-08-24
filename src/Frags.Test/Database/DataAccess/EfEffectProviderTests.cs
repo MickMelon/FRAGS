@@ -19,32 +19,65 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task MakeSureCharacterHasTheEffects()
         {
-            var context = new RpgContext(new GeneralOptions
+            var genOpts = new GeneralOptions
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "MakeSureCharacterHasTheEffects"
-            });
+            };
 
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<Frags.Database.AutoMapper.GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
 
-            var userProvider = new EfUserProvider(context, mapper);
-            var effectProvider = new EfEffectProvider(context, mapper, userProvider);
-            var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-
-            await charProvider.CreateCharacterAsync(1, "Char1");
-            var char1 = await charProvider.GetActiveCharacterAsync(1);
-            var effect1 = await effectProvider.CreateEffectAsync(1, "Effect1");
-            var effect2 = await effectProvider.CreateEffectAsync(1, "Effect2");
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var effectProvider = new EfEffectProvider(context, mapper, userProvider);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);    
+                await charProvider.CreateCharacterAsync(1, "Char1");
+            }
             
-            char1.Active = true;
-            char1.Effects.Add(effect1);
-            char1.Effects.Add(effect2);
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var effectProvider = new EfEffectProvider(context, mapper, userProvider);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);    
+                var effect1 = await effectProvider.CreateEffectAsync(1, "Effect1");
+            }
 
-            await charProvider.UpdateCharacterAsync(char1);
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var effectProvider = new EfEffectProvider(context, mapper, userProvider);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);    
+                var effect2 = await effectProvider.CreateEffectAsync(1, "Effect2");
+            }
+            
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var effectProvider = new EfEffectProvider(context, mapper, userProvider);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);    
 
-            char1 = await charProvider.GetActiveCharacterAsync(1);
-            Assert.True(char1.Effects.Count == 2);
+                var effect1 = await effectProvider.GetEffectAsync("Effect1");
+                var effect2 = await effectProvider.GetEffectAsync("Effect2");
+
+                var char1 = await charProvider.GetActiveCharacterAsync(1);
+
+                char1.Effects.Add(effect1);
+                char1.Effects.Add(effect2);
+
+                await charProvider.UpdateCharacterAsync(char1);
+            }
+
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var effectProvider = new EfEffectProvider(context, mapper, userProvider);
+                var charProvider = new EfCharacterProvider(context, mapper, userProvider);    
+
+                var char1 = await charProvider.GetActiveCharacterAsync(1);
+                Assert.True(char1.Effects.Count == 2);
+            }
         }
     }
 }

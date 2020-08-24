@@ -94,60 +94,105 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task EntityFramework_CharacterStatistics_EntityMatchesInput()
         {
-            var context = new RpgContext(new GeneralOptions
+            var genOpts = new GeneralOptions
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "CharacterStatistics_EntityMatchesInput"
-            });
+            };
 
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
             var mapper = new Mapper(mapperConfig);
-            var userProvider = new EfUserProvider(context, mapper);
-            var provider = new EfCharacterProvider(context, mapper, userProvider);
-            var statProvider = new EfStatisticProvider(context, mapper);
 
             ulong userIdentifier = 305847674974896128;
             string name = "Melon Head";
+
             //int id = 1;
+
+            Attribute strength;
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                var statProvider = new EfStatisticProvider(context, mapper);
+                strength = await statProvider.CreateAttributeAsync("Strength");
+            }
             
-            var strength = await statProvider.CreateAttributeAsync("Strength");
             var value = new StatisticValue(5);
-            await provider.CreateCharacterAsync(userIdentifier, name);
-            var result = await provider.GetActiveCharacterAsync(userIdentifier);
+            
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                var statProvider = new EfStatisticProvider(context, mapper);
+                await provider.CreateCharacterAsync(userIdentifier, name);
+            }
 
-            result.SetStatistic(strength, value);
-            await provider.UpdateCharacterAsync(result);
+            Character character;
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                var statProvider = new EfStatisticProvider(context, mapper);
+                character = await provider.GetActiveCharacterAsync(userIdentifier);
+                character.SetStatistic(strength, value);
+                await provider.UpdateCharacterAsync(character);
+            }
 
-            result = await provider.GetActiveCharacterAsync(userIdentifier);
-            Assert.True(result.Statistics.Count > 0);
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                var statProvider = new EfStatisticProvider(context, mapper);
+                character = await provider.GetActiveCharacterAsync(userIdentifier);
+                Assert.True(character.Statistics.Count > 0);
+            }
         }
 
         [Fact]
         public async Task EntityFramework_UpdateCharacter_EntityMatchesInput()
         {
-            var context = new RpgContext(new GeneralOptions
+            var genOpts = new GeneralOptions
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "UpdateCharacter_EntityMatchesInput"
-            });
+            };
 
             var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            var mapper = new Mapper(mapperConfig);
-            var userProvider = new EfUserProvider(context, mapper);
-            var provider = new EfCharacterProvider(context, mapper, userProvider);
+            
             
             ulong userIdentifier = 305847674974896128;
             string oldName = "Melon Head", newName = "Mr. Melon";
             //int id = 1;
 
-            await provider.CreateCharacterAsync(userIdentifier, oldName);
-            var result = await provider.GetActiveCharacterAsync(userIdentifier);
+            using (var context = new RpgContext(genOpts))
+            {
+                var mapper = new Mapper(mapperConfig);
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+                await provider.CreateCharacterAsync(userIdentifier, oldName);
+            }
 
-            result.Name = newName;
-            await provider.UpdateCharacterAsync(result);
+            using (var context = new RpgContext(genOpts))
+            {
+                var mapper = new Mapper(mapperConfig);
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
 
-            result = await provider.GetActiveCharacterAsync(userIdentifier);
-            Assert.Equal(newName, result.Name);
+                var result = await provider.GetActiveCharacterAsync(userIdentifier);
+                result.Name = newName;
+                
+                await provider.UpdateCharacterAsync(result);
+            }
+
+            using (var context = new RpgContext(genOpts))
+            {
+                var mapper = new Mapper(mapperConfig);
+                var userProvider = new EfUserProvider(context, mapper);
+                var provider = new EfCharacterProvider(context, mapper, userProvider);
+
+                var result = await provider.GetActiveCharacterAsync(userIdentifier);
+                Assert.Equal(newName, result.Name);
+            }
         }
         #endregion
     }
