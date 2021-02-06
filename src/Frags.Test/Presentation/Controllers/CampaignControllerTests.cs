@@ -21,7 +21,7 @@ namespace Frags.Test.Presentation.Controllers
             var userProv = new MockUserProvider();
             var charProv = new MockCharacterProvider();
             var provider = new MockCampaignProvider(userProv);
-            var controller = new CampaignController(userProv, charProv, provider, null, null);
+            var controller = new CampaignController(userProv, charProv, provider, null);
 
             string name = nameof(CampaignControllerTests.AddCampaignChannel_ValidInput_ReturnSuccess);
             ulong userId = (ulong)GameRandom.Between(11, int.MaxValue - 1);
@@ -45,7 +45,7 @@ namespace Frags.Test.Presentation.Controllers
 
             var provider = new MockCampaignProvider(userProv);
             var strategy = new MockProgressionStrategy();
-            var controller = new CampaignController(userProv, charProv, provider, null, null);
+            var controller = new CampaignController(userProv, charProv, provider, null);
 
             var result = await controller.CreateCampaignAsync(userId, name);
 
@@ -64,7 +64,7 @@ namespace Frags.Test.Presentation.Controllers
 
             var provider = new MockCampaignProvider(userProv);
             var strategy = new MockProgressionStrategy();
-            var controller = new CampaignController(userProv, charProv, provider, null, null);
+            var controller = new CampaignController(userProv, charProv, provider, null);
 
             await controller.CreateCampaignAsync(userId, name);
             var result = await controller.CreateCampaignAsync(userId, name);
@@ -93,7 +93,7 @@ namespace Frags.Test.Presentation.Controllers
             var rollStratName = rollStrategy.GetType().Name;
 
             var statProvider = new MockStatisticProvider();          
-            var controller = new CampaignController(userProv, charProv, provider, statProvider, new List<IProgressionStrategy> { progStrategy });
+            var controller = new CampaignController(userProv, charProv, provider, statProvider);
 
             await controller.CreateCampaignAsync(userId, name);
             await controller.AddCampaignChannelAsync(name, channelId);

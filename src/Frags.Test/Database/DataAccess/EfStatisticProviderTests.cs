@@ -133,7 +133,7 @@ namespace Frags.Test.Database.DataAccess
             // Simulate injected DbContext and dependencies with Scoped lifetime (One instance per "request", i.e. a command)
             using (var context = new RpgContext(genOptions))
             {
-                var campProvider = new EfCampaignProvider(context, mapper, null);
+                var campProvider = new EfCampaignProvider(context, mapper, null, null);
                 await campProvider.CreateCampaignAsync(1, "campaign");
             }
 
@@ -141,7 +141,7 @@ namespace Frags.Test.Database.DataAccess
             {
                 var provider = new EfStatisticProvider(context, mapper);
                 var userProvider = new EfUserProvider(context, mapper);
-                var campProvider = new EfCampaignProvider(context, mapper, null);
+                var campProvider = new EfCampaignProvider(context, mapper, null, null);
 
                 Campaign campaign = await campProvider.GetCampaignAsync("campaign");
                 await provider.CreateAttributeAsync("strength", campaign);
@@ -164,11 +164,11 @@ namespace Frags.Test.Database.DataAccess
                 var statProvider = new EfStatisticProvider(context, mapper);
                 var userProvider = new EfUserProvider(context, mapper);
                 var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-                var campProvider = new EfCampaignProvider(context, mapper, null);
+                var campProvider = new EfCampaignProvider(context, mapper, null, null);
 
                 bob = await charProvider.GetActiveCharacterAsync(1);
                 Campaign camp = await campProvider.GetCampaignAsync("campaign");
-                strength = await statProvider.GetStatisticFromCampaignAsync("Strength", camp.Id);
+                strength = await statProvider.GetStatisticFromCampaignAsync("Strength", camp);
                 bob.SetStatistic(strength, new StatisticValue(5));
             }
 

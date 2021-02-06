@@ -4,6 +4,7 @@ using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
 using Frags.Core.Effects;
+using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 
@@ -20,6 +21,8 @@ namespace Frags.Core.DataAccess
         Task<StatisticOptions> GetStatisticOptionsAsync(Campaign campaign);
         Task UpdateStatisticOptionsAsync(Campaign campaign, StatisticOptions statisticOptions);
         Task<RollOptions> GetRollOptionsAsync(Campaign campaign);
+        Task<IProgressionStrategy> GetProgressionStrategy(Campaign campaign);
+        Task<IRollStrategy> GetRollStrategy(Campaign campaign);
         Task UpdateRollOptionsAsync(Campaign campaign, RollOptions rollOptions);
 
         Task RenameCampaignAsync(Campaign campaign, string newName);

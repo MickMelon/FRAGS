@@ -31,23 +31,21 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly IRollStrategy _defaultStrategy;
 
-        /// <summary>
-        /// Used when a character is in a Campaign.
-        /// </summary>
-        private readonly List<IRollStrategy> _strategies;
+        private readonly ICampaignProvider _campProvider;
         
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RollController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public RollController(ICharacterProvider provider, IStatisticProvider statProvider, IRollStrategy defaultStrategy, List<IRollStrategy> strategies)
+        public RollController(ICharacterProvider provider, IStatisticProvider statProvider, IRollStrategy defaultStrategy, ICampaignProvider campProvider)
         {
             _provider = provider;
             _statProvider = statProvider;
 
             _defaultStrategy = defaultStrategy;
-            _strategies = strategies;
+
+            _campProvider = campProvider;
         }
 
         /// <summary>
@@ -71,10 +69,8 @@ namespace Frags.Presentation.Controllers
             }
             else
             {
-                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign.Id);
-                // RollOptions rollOpts = await _campProvider.GetRollOptions(character.Campaign);
-                throw new NotImplementedException("this has to be fixed first.");
-                strategy = GetCampaignStrategy(character.Campaign);
+                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign);
+                strategy = await _campProvider.GetRollStrategy(character.Campaign);
             }
 
             if (strategy == null)
@@ -112,8 +108,8 @@ namespace Frags.Presentation.Controllers
             }
             else
             {
-                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign.Id);
-                strategy = GetCampaignStrategy(character.Campaign);
+                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign);
+                strategy = await _campProvider.GetRollStrategy(character.Campaign);
             }
 
             if (strategy == null)
@@ -162,8 +158,8 @@ namespace Frags.Presentation.Controllers
             }
             else
             {
-                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, caller.Campaign.Id);
-                strategy = GetCampaignStrategy(caller.Campaign);
+                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, caller.Campaign);
+                strategy = await _campProvider.GetRollStrategy(caller.Campaign);
             }
 
             if (strategy == null)
@@ -179,8 +175,5 @@ namespace Frags.Presentation.Controllers
 
             return RollResult.RollFailed();
         }
-
-        private IRollStrategy GetCampaignStrategy(Campaign campaign) =>
-            _strategies.Find(x => x.GetType().Name.ContainsIgnoreCase(campaign.RollOptions?.RollStrategy));
     }
 }

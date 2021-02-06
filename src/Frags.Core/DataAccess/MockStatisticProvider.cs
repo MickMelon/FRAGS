@@ -44,6 +44,7 @@ namespace Frags.Core.DataAccess
             if (await GetStatisticAsync(name) != null) throw new ArgumentException("Statistic name was not unique.");
 
             var stat = new Attribute(name);
+            stat.Campaign = campaign;
             _statistics.Add(stat);
             return await Task.FromResult(stat);
         }
@@ -56,6 +57,7 @@ namespace Frags.Core.DataAccess
             if (attrib == null) return null;
 
             var stat = new Skill(attrib, name);
+            stat.Campaign = campaign;
             _statistics.Add(stat);
 
             return await Task.FromResult(stat);
@@ -82,9 +84,9 @@ namespace Frags.Core.DataAccess
             return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
         }
 
-        public async Task<Statistic> GetStatisticFromCampaignAsync(string name, int campaignId)
+        public async Task<Statistic> GetStatisticFromCampaignAsync(string name, Campaign campaign)
         {
-            return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaignId));
+            return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign?.Id == campaign.Id));
         }
 
         public async Task UpdateStatisticAsync(Statistic statistic)

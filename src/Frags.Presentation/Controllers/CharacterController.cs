@@ -33,15 +33,21 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly GeneralOptions _options;
 
-        private readonly ICampaignProvider _campProvider;
-
+        /// <summary>
+        /// Used to set active characters.
+        /// </summary>
         private readonly IUserProvider _userProvider;
+
+        /// <summary>
+        /// Used to show correct progression information for characters in Campaigns.
+        /// </summary>
+        private readonly ICampaignProvider _campProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CharacterController" /> class.
         /// </summary>
         /// <param name="provider">The CharacterProvider.</param>
-        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options, IUserProvider userProvider, ICampaignProvider campProvider = null)
+        public CharacterController(ICharacterProvider provider, IProgressionStrategy progStrategy, GeneralOptions options, IUserProvider userProvider, ICampaignProvider campProvider)
         {
             _provider = provider;
             _progStrategy = progStrategy;
@@ -58,8 +64,17 @@ namespace Frags.Presentation.Controllers
         public async Task<IResult> ShowCharacterAsync(ulong callerId)
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
-            if (character == null) return CharacterResult.CharacterNotFound();
-            return CharacterResult.Show(character, _progStrategy.GetCharacterLevel(character), await _progStrategy.GetCharacterInfo(character));
+            if (character == null) 
+                return CharacterResult.CharacterNotFound();
+
+            IProgressionStrategy strategy = _progStrategy;
+            if (character.Campaign != null)
+            {
+                strategy = await _campProvider.GetProgressionStrategy(character.Campaign);
+                if (strategy == null) return CampaignResult.InvalidProgressionStrategy();
+            }
+
+            return CharacterResult.Show(character, strategy.GetCharacterLevel(character), await strategy.GetCharacterInfo(character));
         }
 
         public async Task<IResult> ListCharactersAsync(ulong callerId)

@@ -87,9 +87,9 @@ namespace Frags.Database.DataAccess
             return _mapper.Map<Statistic>(await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
         }
 
-        public async Task<Statistic> GetStatisticFromCampaignAsync(string name, int campaignId)
+        public async Task<Statistic> GetStatisticFromCampaignAsync(string name, Campaign campaign)
         {
-            return _mapper.Map<Statistic>(await _context.Statistics.AsNoTracking().FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaignId));
+            return _mapper.Map<Statistic>(await _context.Statistics.AsNoTracking().FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaign.Id));
         }
 
         public async Task UpdateStatisticAsync(Statistic statistic)

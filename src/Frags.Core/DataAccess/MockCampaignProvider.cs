@@ -8,6 +8,7 @@ using Frags.Core.Common;
 using Frags.Core.Common.Exceptions;
 using Frags.Core.Common.Extensions;
 using Frags.Core.Effects;
+using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 
@@ -18,6 +19,9 @@ namespace Frags.Core.DataAccess
         private List<Campaign> _campaigns = new List<Campaign>();
 
         private readonly IUserProvider _userProvider;
+
+        private List<IProgressionStrategy> _progStrategies = new List<IProgressionStrategy> { new MockProgressionStrategy() };
+        private List<IRollStrategy> _rollStrategies = new List<IRollStrategy> { new MockRollStrategy(), new FragsRollStrategy() };
 
         public MockCampaignProvider(IUserProvider userProvider)
         {
@@ -192,6 +196,18 @@ namespace Frags.Core.DataAccess
         {
             _campaigns[_campaigns.IndexOf(campaign)].RollOptions = rollOptions;
             return Task.CompletedTask;
+        }
+
+        public Task<IProgressionStrategy> GetProgressionStrategy(Campaign campaign)
+        {
+            StatisticOptions statOpts = campaign.StatisticOptions;
+            return Task.FromResult(_progStrategies.Find(x => x.GetType().Name.ContainsIgnoreCase(statOpts.ProgressionStrategy)));
+        }
+
+        public Task<IRollStrategy> GetRollStrategy(Campaign campaign)
+        {
+            RollOptions rollOpts = campaign.RollOptions;
+            return Task.FromResult(_rollStrategies.Find(x => x.GetType().Name.ContainsIgnoreCase(rollOpts.RollStrategy)));
         }
     }
 }

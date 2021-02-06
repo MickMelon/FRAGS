@@ -27,21 +27,17 @@ namespace Frags.Presentation.Controllers
         private readonly ICampaignProvider _campProvider;
 
         private readonly IStatisticProvider _statProvider;
-
-        private readonly List<IProgressionStrategy> _progStrategies;
         
 
         public CampaignController(IUserProvider userProvider,
         ICharacterProvider charProvider,
         ICampaignProvider campProvider,
-        IStatisticProvider statProvider,
-        List<IProgressionStrategy> progStrategies)
+        IStatisticProvider statProvider)
         {
             _userProvider = userProvider;
             _charProvider = charProvider;
             _campProvider = campProvider;
             _statProvider = statProvider;
-            _progStrategies = progStrategies;
         }
 
         public async Task<IResult> RenameCampaignAsync(ulong callerId, ulong channelId, string newName)
@@ -152,14 +148,6 @@ namespace Frags.Presentation.Controllers
             propertyInfo.SetValue(toConfigure, value);
         }
 
-        private IProgressionStrategy GetProgressionStrategy(StatisticOptions options)
-        {
-            if (string.IsNullOrWhiteSpace(options.ProgressionStrategy))
-                return null;
-
-            return _progStrategies.Find(x => x.GetType().Name.ContainsIgnoreCase(options.ProgressionStrategy));
-        }
-
         public async Task<IResult> ConvertCharacterAsync(ulong callerId, ulong channelId)
         {
             Character character = await _charProvider.GetActiveCharacterAsync(callerId);
@@ -168,11 +156,8 @@ namespace Frags.Presentation.Controllers
             Campaign campaign = await _campProvider.GetCampaignAsync(channelId);
             if (campaign == null) return CampaignResult.NotFoundByChannel();
 
-            StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
-            if (statOptions == null) return CampaignResult.StatisticOptionsNotFound();
-
-            var strategy = GetProgressionStrategy(statOptions);
-            if (strategy == null) throw new CampaignException(Messages.CAMP_PROGSTRATEGY_INVALID);
+            IProgressionStrategy strategy = await _campProvider.GetProgressionStrategy(campaign);
+            if (strategy == null) return CampaignResult.InvalidProgressionStrategy();
 
             await strategy.ResetCharacter(character);
             

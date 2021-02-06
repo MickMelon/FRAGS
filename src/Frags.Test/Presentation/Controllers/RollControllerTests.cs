@@ -178,14 +178,20 @@ namespace Frags.Test.Presentation.Controllers
         {
             // Arrange
             var statProvider = new MockStatisticProvider();
-            var strength = await statProvider.GetStatisticAsync("Strength");
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
 
-            var campaign = new Campaign(new User(1), "myCampaign")
-            {
-                Statistics = new List<Statistic>() { strength },
-                RollOptions = new RollOptions { RollStrategy = "frags" }
-            };
-            strength.Campaign = campaign;
+            await userProvider.CreateUserAsync(1);
+
+            await campProvider.CreateCampaignAsync(1, "myCampaign");
+            var campaign = await campProvider.GetCampaignAsync("myCampaign");
+
+            var rollOptions = new RollOptions { RollStrategy = "Frags" };
+            await campProvider.UpdateRollOptionsAsync(campaign, rollOptions);
+
+            var attribName = "Constitution";
+            await statProvider.CreateAttributeAsync(attribName, campaign);
+            var attribute = await statProvider.GetStatisticAsync(attribName);
 
             var provider = new MockCharacterProvider();
             var chars = await provider.GetAllCharactersAsync(1);
@@ -193,15 +199,15 @@ namespace Frags.Test.Presentation.Controllers
             // Give the new character a Statistic to test
             chars[0].Campaign = campaign;
             // 0 stat will guarantee a crit fail with FRAGS rules
-            chars[0].SetStatistic(strength, new StatisticValue(0));
+            chars[0].SetStatistic(attribute, new StatisticValue(0));
 
             await provider.UpdateCharacterAsync(chars[0]);
 
             var strategies = new List<IRollStrategy>() { new MockRollStrategy(), new FragsRollStrategy() };
-            var controller = new RollController(provider, statProvider, new MockRollStrategy(), strategies);
+            var controller = new RollController(provider, statProvider, new MockRollStrategy(), campProvider);
 
             // Act
-            var result = await controller.RollStatisticAsync(1, "strength");
+            var result = await controller.RollStatisticAsync(1, attribName);
 
             // Assert
             Assert.True(result.GetType() == typeof(RollResult) && result.IsSuccess && result.Message.Contains("CRITICAL"));

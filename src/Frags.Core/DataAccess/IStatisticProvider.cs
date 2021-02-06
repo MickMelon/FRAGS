@@ -48,9 +48,9 @@ namespace Frags.Core.DataAccess
         /// Gets the statistic with the matching name or one of its aliases if it exists in the specified campaign.
         /// </summary>
         /// <param name="name">Statistics's name or alias.</param>
-        /// <param name="campaignId">The ID of the campaign to search from.</param>
+        /// <param name="campaign">The campaign to search from.</param>
         /// <returns>The matching statistic or null if none.</returns>
-        Task<Statistic> GetStatisticFromCampaignAsync(string name, int campaignId);
+        Task<Statistic> GetStatisticFromCampaignAsync(string name, Campaign campaign);
 
         /// <summary>
         /// Gets every statistic currently in use.

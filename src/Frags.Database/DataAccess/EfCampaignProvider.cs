@@ -25,14 +25,17 @@ namespace Frags.Database.DataAccess
         private readonly RpgContext _context;
         private readonly IMapper _mapper;
         private readonly List<IProgressionStrategy> _progStrategies;
+        private readonly List<IRollStrategy> _rollStrategies;
 
         public EfCampaignProvider(RpgContext context,
         IMapper mapper,
-        List<IProgressionStrategy> progStrategies)
+        List<IProgressionStrategy> progStrategies,
+        List<IRollStrategy> rollStrategies)
         {
             _context = context;
             _mapper = mapper;
             _progStrategies = progStrategies;
+            _rollStrategies = rollStrategies;
         }
 
         public async Task CreateCampaignAsync(ulong userIdentifier, string name)
@@ -184,6 +187,18 @@ namespace Frags.Database.DataAccess
 
             dto.RollOptions = _mapper.Map<RollOptionsDto>(rollOptions);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IProgressionStrategy> GetProgressionStrategy(Campaign campaign)
+        {
+            StatisticOptions statOpts = await GetStatisticOptionsAsync(campaign);
+            return _progStrategies?.Find(x => x.GetType().Name.ContainsIgnoreCase(statOpts.ProgressionStrategy));
+        }
+
+        public async Task<IRollStrategy> GetRollStrategy(Campaign campaign)
+        {
+            RollOptions rollOpts = await GetRollOptionsAsync(campaign);
+            return _rollStrategies?.Find(x => x.GetType().Name.ContainsIgnoreCase(rollOpts.RollStrategy));
         }
     }
 }
