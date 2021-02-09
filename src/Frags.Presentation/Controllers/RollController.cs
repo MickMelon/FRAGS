@@ -69,7 +69,7 @@ namespace Frags.Presentation.Controllers
             }
             else
             {
-                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign);
+                stat = await _statProvider.GetStatisticAsync(statName, character.Campaign);
                 strategy = await _campProvider.GetRollStrategy(character.Campaign);
             }
 
@@ -108,7 +108,7 @@ namespace Frags.Presentation.Controllers
             }
             else
             {
-                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, character.Campaign);
+                stat = await _statProvider.GetStatisticAsync(statName, character.Campaign);
                 strategy = await _campProvider.GetRollStrategy(character.Campaign);
             }
 
@@ -158,7 +158,7 @@ namespace Frags.Presentation.Controllers
             }
             else
             {
-                stat = await _statProvider.GetStatisticFromCampaignAsync(statName, caller.Campaign);
+                stat = await _statProvider.GetStatisticAsync(statName, caller.Campaign);
                 strategy = await _campProvider.GetRollStrategy(caller.Campaign);
             }
 

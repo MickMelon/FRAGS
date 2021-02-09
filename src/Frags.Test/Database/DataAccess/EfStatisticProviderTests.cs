@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 using Frags.Database;
-using Frags.Database.AutoMapper;
-using Frags.Database.Characters;
 using Frags.Database.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -27,9 +25,7 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = "CreateStatistic_EntityMatchesInput"
             });
 
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            var mapper = new Mapper(mapperConfig);
-            var provider = new EfStatisticProvider(context, mapper);
+            var provider = new EfStatisticProvider(context);
 
             await provider.CreateAttributeAsync("Strength");
             var result = await provider.GetStatisticAsync("Strength");
@@ -44,11 +40,9 @@ namespace Frags.Test.Database.DataAccess
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "GetAllStatistics_EntityMatchesInput"
-            });
-
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            var mapper = new Mapper(mapperConfig);
-            var statProvider = new EfStatisticProvider(context, mapper);
+            });            
+            
+            var statProvider = new EfStatisticProvider(context);
 
             await statProvider.CreateAttributeAsync("Strength");
             await statProvider.CreateSkillAsync("Powerlifting", "Strength");
@@ -65,11 +59,9 @@ namespace Frags.Test.Database.DataAccess
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "UpdateStatistic_EntityMatchesInput"
-            });
-
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            var mapper = new Mapper(mapperConfig);
-            var provider = new EfStatisticProvider(context, mapper);
+            });            
+            
+            var provider = new EfStatisticProvider(context);
             
             await provider.CreateAttributeAsync("Strength");
             var result = await provider.GetStatisticAsync("Strength");
@@ -91,13 +83,11 @@ namespace Frags.Test.Database.DataAccess
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "DeleteStatistic_ValidInput_CharacterNoLongerHasValue"
-            });
-
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            var mapper = new Mapper(mapperConfig);
-            var provider = new EfStatisticProvider(context, mapper);
-            var userProvider = new EfUserProvider(context, mapper);
-            var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+            });            
+            
+            var provider = new EfStatisticProvider(context);
+            var userProvider = new EfUserProvider(context);
+            var charProvider = new EfCharacterProvider(context, userProvider, provider);
 
             var strength = await provider.CreateAttributeAsync("strength");
             await charProvider.CreateCharacterAsync(1, "bob");
@@ -125,23 +115,21 @@ namespace Frags.Test.Database.DataAccess
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "GetStatisticFromCampaignAsync_ValidInput_ReturnSuccess"
-            };
-
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            var mapper = new Mapper(mapperConfig);
+            };            
+            
 
             // Simulate injected DbContext and dependencies with Scoped lifetime (One instance per "request", i.e. a command)
             using (var context = new RpgContext(genOptions))
             {
-                var campProvider = new EfCampaignProvider(context, mapper, null, null);
+                var campProvider = new EfCampaignProvider(context, null, null);
                 await campProvider.CreateCampaignAsync(1, "campaign");
             }
 
             using (var context = new RpgContext(genOptions))
             {
-                var provider = new EfStatisticProvider(context, mapper);
-                var userProvider = new EfUserProvider(context, mapper);
-                var campProvider = new EfCampaignProvider(context, mapper, null, null);
+                var provider = new EfStatisticProvider(context);
+                var userProvider = new EfUserProvider(context);
+                var campProvider = new EfCampaignProvider(context, null, null);
 
                 Campaign campaign = await campProvider.GetCampaignAsync("campaign");
                 await provider.CreateAttributeAsync("strength", campaign);
@@ -149,9 +137,9 @@ namespace Frags.Test.Database.DataAccess
 
             using (var context = new RpgContext(genOptions))
             {
-                var provider = new EfStatisticProvider(context, mapper);
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var provider = new EfStatisticProvider(context);
+                var userProvider = new EfUserProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, provider);
 
                 await charProvider.CreateCharacterAsync(1, "bob");
             }
@@ -161,14 +149,14 @@ namespace Frags.Test.Database.DataAccess
             Statistic strength;
             using (var context = new RpgContext(genOptions))
             {
-                var statProvider = new EfStatisticProvider(context, mapper);
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-                var campProvider = new EfCampaignProvider(context, mapper, null, null);
+                var statProvider = new EfStatisticProvider(context);
+                var userProvider = new EfUserProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var campProvider = new EfCampaignProvider(context, null, null);
 
                 bob = await charProvider.GetActiveCharacterAsync(1);
                 Campaign camp = await campProvider.GetCampaignAsync("campaign");
-                strength = await statProvider.GetStatisticFromCampaignAsync("Strength", camp);
+                strength = await statProvider.GetStatisticAsync("Strength", camp);
                 bob.SetStatistic(strength, new StatisticValue(5));
             }
 

@@ -26,6 +26,11 @@ namespace Frags.Core.Statistics
         /// </summary>
         public double Proficiency { get; set; }
 
+        public override string ToString()
+        {
+            return Value + "," + IsProficient + "," + Proficiency;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StatisticValue" /> class.
         /// </summary>

@@ -278,7 +278,7 @@ namespace Frags.Core.Game.Progression
 
         public Task<bool> AddExperienceFromMessage(Character character, ulong channelId, string message)
         {
-            if (!_statOptions.ExpEnabledChannels.Contains(channelId)) return Task.FromResult(false);
+            if (!_statOptions.ExpEnabledChannels.Select(x => x.Id).Contains(channelId)) return Task.FromResult(false);
             if (string.IsNullOrWhiteSpace(message)) return Task.FromResult(false);
 
             return AddExperience(character, message.Length / _statOptions.ExpMessageLengthDivisor);

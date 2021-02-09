@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+
 using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
 using Frags.Core.Statistics;
 using Frags.Core.Common;
-using Frags.Database.Characters;
-using Frags.Database.Effects;
-using Frags.Database.Statistics;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Text.Json;
+using Frags.Database.Models;
 
 namespace Frags.Database.DataAccess
 {
@@ -18,34 +18,30 @@ namespace Frags.Database.DataAccess
     {
         private readonly RpgContext _context;
 
-        private readonly IMapper _mapper;
-
         private readonly IUserProvider _userProvider;
+        private readonly IStatisticProvider _statProvider;
 
-        public EfCharacterProvider(RpgContext context, IMapper mapper, IUserProvider userProvider)
+        public EfCharacterProvider(RpgContext context, IUserProvider userProvider, IStatisticProvider statProvider)
         {
             _context = context;
-
-            _mapper = mapper;
-
             _userProvider = userProvider;
+            _statProvider = statProvider;
         }
 
         public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
         {
-            var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId);
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId);
 
-            if (userDto == null)
+            if (user == null)
             {
                 await _userProvider.CreateUserAsync(discordId);
-                userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId);
+                user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == discordId);
             }
 
-            var charDto = _mapper.Map<CharacterDto>(new Character(_mapper.Map<User>(userDto), name));
-            await _context.AddAsync(charDto);
+            Character character = new Character(user, name);
+            await _context.AddAsync(character);
 
-            //userDto.Characters.Add(charDto);
-            userDto.ActiveCharacter = charDto;
+            user.ActiveCharacter = character;
             
             await _context.SaveChangesAsync();
             return true;
@@ -54,43 +50,48 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong userIdentifier)
         {
-            // Guess we still need the holy water, damn.
-            var dto = await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
-                .Select(usr => usr.ActiveCharacter)
-                .Include(x => x.User)
-                .Include(x => x.Campaign)
-                .Include(x => x.Statistics).ThenInclude(x => x.Statistic)
-                .Include(x => x.Statistics).ThenInclude(x => x.StatisticValue)
-                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
-                .Include(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
+            User user = await _context.Users.Include(x => x.ActiveCharacter).FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier);
 
-            return _mapper.Map<Character>(dto);
+            if (user?.ActiveCharacter != null)
+            {
+                await LoadRelatedCharacterData(user.ActiveCharacter);
+                return user.ActiveCharacter;
+            }
+
+            return null;
         }
 
         /// <inheritdoc/>
         public async Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier)
         {
-            ICollection<CharacterDto> charDtos = (await _context.Users.Where(c => c.UserIdentifier == userIdentifier)
-                .Include(x => x.Characters).ThenInclude(x => x.User)
-                .Include(x => x.Characters).ThenInclude(x => x.Campaign)
-                .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.Statistic)
-                .Include(x => x.Characters).ThenInclude(x => x.Statistics).ThenInclude(x => x.StatisticValue)
-                .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.Statistic)
-                .Include(x => x.Characters).ThenInclude(x => x.EffectMappings).ThenInclude(x => x.Effect).ThenInclude(x => x.StatisticEffects).ThenInclude(x => x.StatisticValue)
-                .AsNoTracking()
-                .FirstOrDefaultAsync())?.Characters;
+            User user = await _context.Users.Include(x => x.Characters).FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier);
+            if (user == null) return null;
 
-            return _mapper.Map<List<Character>>(charDtos);
+            List<Character> characters = user.Characters;
+
+            characters.ForEach(async character => await LoadRelatedCharacterData(character));
+
+            return characters;
+        }
+
+        private async Task LoadRelatedCharacterData(Character character)
+        {
+            await _context.Entry(character).Reference(x => x.User).LoadAsync();
+            await _context.Entry(character).Reference(x => x.Campaign).LoadAsync();
+
+            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+            character.Statistics = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
         }
 
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
-            CharacterDto dto = _mapper.Map<CharacterDto>(character);
-            
-            _context.Update(dto);
+            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+            if (statlist != null)
+                statlist.Data = DbHelper.SerializeStatisticList(character.Statistics);
+
+            _context.Update(character);
+            _context.Update(statlist);
             await _context.SaveChangesAsync();
         }
     }

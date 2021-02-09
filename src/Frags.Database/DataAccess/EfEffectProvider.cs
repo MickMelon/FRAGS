@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
-using Frags.Database.Effects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -15,33 +14,25 @@ namespace Frags.Database.DataAccess
     {
         private readonly RpgContext _context;
 
-        private readonly IMapper _mapper;
-
         private readonly IUserProvider _userProvider;
 
-        public EfEffectProvider(RpgContext context, IMapper mapper, IUserProvider userProvider)
+        public EfEffectProvider(RpgContext context, IUserProvider userProvider)
         {
             _context = context;
-            
-            _mapper = mapper;
 
             _userProvider = userProvider;
         }
 
         public async Task<Effect> CreateEffectAsync(ulong ownerId, string name)
         {
-            var userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == ownerId);
-            User userMapped;
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == ownerId);
 
-            if (userDto == null)
-                userMapped = await _userProvider.CreateUserAsync(ownerId);
-            else
-                userMapped = _mapper.Map<User>(userDto);
+            if (user == null)
+                user = await _userProvider.CreateUserAsync(ownerId);
 
-            var effect = new Effect(userMapped, name);
+            Effect effect = new Effect(user, name);
 
-            var dto = _mapper.Map<EffectDto>(effect);
-            await _context.Effects.AddAsync(dto);
+            await _context.Effects.AddAsync(effect);
             await _context.SaveChangesAsync();
             
             return effect;
@@ -61,28 +52,29 @@ namespace Frags.Database.DataAccess
 
         public async Task<IEnumerable<Effect>> GetAllEffectsAsync()
         {
-            return _mapper.Map<List<Effect>>(await _context.Effects
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .ToListAsync());
+            var effectList = await _context.Effects.ToListAsync();
+            //foreach (var effect in effectList)
+                //effect.StatisticEffects = ...
+
+            return effectList;
         }
 
         public async Task<Effect> GetEffectAsync(string name)
         {
-            return _mapper.Map<Effect>(await _context.Effects
+            return await _context.Effects
                 .Where(x => x.Name.EqualsIgnoreCase(name))
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .FirstOrDefaultAsync());
+                // .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
+                // .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Effect>> GetOwnedEffectsAsync(ulong userId)
         {
-            return _mapper.Map<List<Effect>>(await _context.Effects
+            return await _context.Effects
                 .Where(x => x.Owner.UserIdentifier == userId)
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .ToListAsync());
+                // .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
+                // .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
+                .ToListAsync();
         }
 
         public async Task UpdateEffectAsync(Effect effect)
@@ -91,11 +83,7 @@ namespace Frags.Database.DataAccess
             if (await _context.Effects.CountAsync(c => c.Id.Equals(effect.Id)) <= 0)
                 return;
 
-            var dto = await _context.Effects.FirstOrDefaultAsync(x => x.Id.Equals(effect.Id));
-            _mapper.Map<Effect, EffectDto>(effect, dto);
-            dto.EffectMappings = await _context.Set<EffectMapping>().Where(x => x.EffectId.Equals(effect.Id)).ToListAsync();
-            _context.Update(dto);
-
+            _context.Update(effect);
             await _context.SaveChangesAsync();
         }
     }

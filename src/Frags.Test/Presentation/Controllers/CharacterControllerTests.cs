@@ -206,7 +206,7 @@ namespace Frags.Test.Presentation.Controllers
             var statProvider = new MockStatisticProvider();
             var statOptions = new StatisticOptions
             {
-                ExpEnabledChannels = new ulong[] { 1 },
+                ExpEnabledChannels = new List<Channel> { new Channel(1) },
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
@@ -226,7 +226,7 @@ namespace Frags.Test.Presentation.Controllers
             var statProvider = new MockStatisticProvider();
             var statOptions = new StatisticOptions
             {
-                ExpEnabledChannels = new ulong[] { 1 },
+                ExpEnabledChannels = new List<Channel> { new Channel(1) },
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);
@@ -246,7 +246,7 @@ namespace Frags.Test.Presentation.Controllers
             var statProvider = new MockStatisticProvider();
             var statOptions = new StatisticOptions
             {
-                ExpEnabledChannels = new ulong[] { 1 },
+                ExpEnabledChannels = new List<Channel> { new Channel(1) },
                 ExpMessageLengthDivisor = 1
             };
             var strategy = new GenericProgressionStrategy(statProvider, statOptions);

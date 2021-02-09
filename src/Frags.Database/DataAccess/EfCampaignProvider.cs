@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using AutoMapper;
+
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
@@ -13,9 +13,6 @@ using Frags.Core.DataAccess;
 using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
-using Frags.Database.Campaigns;
-using Frags.Database.Characters;
-using Frags.Database.Statistics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -23,95 +20,92 @@ namespace Frags.Database.DataAccess
     public class EfCampaignProvider : ICampaignProvider
     {
         private readonly RpgContext _context;
-        private readonly IMapper _mapper;
         private readonly List<IProgressionStrategy> _progStrategies;
         private readonly List<IRollStrategy> _rollStrategies;
 
         public EfCampaignProvider(RpgContext context,
-        IMapper mapper,
         List<IProgressionStrategy> progStrategies,
         List<IRollStrategy> rollStrategies)
         {
             _context = context;
-            _mapper = mapper;
             _progStrategies = progStrategies;
             _rollStrategies = rollStrategies;
         }
 
         public async Task CreateCampaignAsync(ulong userIdentifier, string name)
         {
-            UserDto userDto = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier);
-            if (userDto == null)
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier);
+            if (user == null)
             {
-                userDto = new UserDto(userIdentifier);
-                await _context.AddAsync(userDto);
+                user = new User(userIdentifier);
+                await _context.AddAsync(user);
             }
 
-            CampaignDto newCamp = new CampaignDto { Owner = userDto, Name = name };
+            Campaign newCamp = new Campaign(user,name);
             await _context.AddAsync(newCamp);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteCampaignAsync(Campaign campaign)
         {
-            CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
 
-            _context.Remove(dto);
+            _context.Remove(camp);
             await _context.SaveChangesAsync();
         }
 
         public async Task<Campaign> GetCampaignAsync(string campaignName)
         {
-            return _mapper.Map<Campaign>(await _context.Campaigns.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(campaignName)));
+            return await _context.Campaigns.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(campaignName));
         }
 
         public async Task<Campaign> GetCampaignAsync(ulong channelId)
         {
-            ChannelDto channelDto = await _context.Set<ChannelDto>().FirstOrDefaultAsync(x => x.Id == channelId);
-            if (channelDto == null) return null;
-            await _context.Entry(channelDto).Reference(x => x.Campaign).LoadAsync();
-            _context.Entry(channelDto).State = EntityState.Detached;
+            Channel channel = await _context.Set<Channel>().FirstOrDefaultAsync(x => x.Id == channelId);
+            if (channel == null) return null;
+            await _context.Entry(channel).Reference(x => x.Campaign).LoadAsync();
+            _context.Entry(channel).State = EntityState.Detached;
 
-            CampaignDto campDto = channelDto.Campaign;
-            if (campDto == null) return null;
+            Campaign camp = channel.Campaign;
+            if (camp == null) return null;
 
-            await _context.Entry(campDto).Reference(x => x.Owner).LoadAsync();
-            _context.Entry(campDto.Owner).State = EntityState.Detached;
-            _context.Entry(campDto).State = EntityState.Detached;
+            await _context.Entry(camp).Reference(x => x.Owner).LoadAsync();
+            _context.Entry(camp.Owner).State = EntityState.Detached;
+            _context.Entry(camp).State = EntityState.Detached;
             
-            return _mapper.Map<Campaign>(campDto);
+            return camp;
         }
 
         public async Task<List<Channel>> GetChannelsAsync(Campaign campaign)
         {
-            CampaignDto campDto = await _context.Campaigns.Include(x => x.Channels).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
-            List<ChannelDto> channelDtos = campDto?.Channels;
+            Campaign camp = await _context.Campaigns.Include(x => x.Channels).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            List<Channel> channels = camp?.Channels;
 
-            return _mapper.Map<List<Channel>>(channelDtos);
+            return channels;
         }
 
         public async Task<List<Character>> GetCharactersAsync(Campaign campaign)
         {
-            CampaignDto campDto = await _context.Campaigns.Include(x => x.Characters).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
-            List<CharacterDto> charDtos = campDto?.Characters;
+            Campaign camp = await _context.Campaigns.Include(x => x.Characters).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            List<Character> characters = camp?.Characters;
 
-            return _mapper.Map<List<Character>>(charDtos);
+            return characters;
         }
 
         public async Task<List<Moderator>> GetModeratorsAsync(Campaign campaign)
         {
-            CampaignDto campDto = await _context.Campaigns.Include(x => x.ModeratedCampaigns).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
-            List<ModeratorDto> modDtos = campDto?.ModeratedCampaigns;
+            Campaign camp = await _context.Campaigns.Include(x => x.ModeratedCampaigns).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            List<Moderator> mods = camp?.ModeratedCampaigns;
 
-            return _mapper.Map<List<Moderator>>(modDtos);
+            return mods;
         }
 
         public async Task<StatisticOptions> GetStatisticOptionsAsync(Campaign campaign)
         {
-            CampaignDto campDto = await _context.Campaigns.Include(x => x.StatisticOptions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
-            StatisticOptionsDto optDto = campDto?.StatisticOptions;
+            Campaign camp = await _context.Campaigns.Include(x => x.StatisticOptions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            StatisticOptions statOpts = camp?.StatisticOptions;
 
-            return _mapper.Map<StatisticOptions>(optDto);
+            return statOpts;
         }
 
         public async Task<bool> HasPermissionAsync(Campaign campaign, ulong userIdentifier)
@@ -127,43 +121,43 @@ namespace Frags.Database.DataAccess
 
         public async Task RenameCampaignAsync(Campaign campaign, string newName)
         {
-            CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
 
-            dto.Name = newName;
+            camp.Name = newName;
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateModeratorsAsync(Campaign campaign, List<Moderator> moderators)
         {
-            CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
 
-            dto.ModeratedCampaigns = _mapper.Map<List<ModeratorDto>>(moderators);
+            camp.ModeratedCampaigns = moderators;
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateStatisticOptionsAsync(Campaign campaign, StatisticOptions statisticOptions)
         {
-            CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
 
-            dto.StatisticOptions = _mapper.Map<StatisticOptionsDto>(statisticOptions);
+            camp.StatisticOptions = statisticOptions;
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateChannelsAsync(Campaign campaign, List<Channel> channels)
         {
-            CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
 
-            dto.Channels = _mapper.Map<List<ChannelDto>>(channels);
+            camp.Channels = channels;
             await _context.SaveChangesAsync();
         }
 
         public async Task SetCampaignChannelAsync(Campaign campaign, ulong channelId)
         {
-            ChannelDto channel = await _context.Set<ChannelDto>().FirstOrDefaultAsync(x => x.Id == channelId);
+            Channel channel = await _context.Set<Channel>().FirstOrDefaultAsync(x => x.Id == channelId);
 
             if (channel == null)
             {
-                await _context.AddAsync(new ChannelDto { Id = channelId, CampaignId = campaign.Id } );
+                await _context.AddAsync(new Channel(channelId, campaign));
             }
             else
             {
@@ -175,17 +169,17 @@ namespace Frags.Database.DataAccess
 
         public async Task<RollOptions> GetRollOptionsAsync(Campaign campaign)
         {
-            CampaignDto campDto = await _context.Campaigns.Include(x => x.RollOptions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
-            RollOptionsDto rollDto = campDto?.RollOptions;
+            Campaign camp = await _context.Campaigns.Include(x => x.RollOptions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            RollOptions rollOpts = camp?.RollOptions;
 
-            return _mapper.Map<RollOptions>(rollDto);
+            return rollOpts;
         }
 
         public async Task UpdateRollOptionsAsync(Campaign campaign, RollOptions rollOptions)
         {
-            CampaignDto dto = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == campaign.Id);
 
-            dto.RollOptions = _mapper.Map<RollOptionsDto>(rollOptions);
+            camp.RollOptions = rollOptions;
             await _context.SaveChangesAsync();
         }
 

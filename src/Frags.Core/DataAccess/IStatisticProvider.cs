@@ -38,19 +38,20 @@ namespace Frags.Core.DataAccess
         Task DeleteStatisticAsync(Statistic statistic);
 
         /// <summary>
+        /// Gets the statistic with the matching ID.
+        /// This method should work even if the effect has a Campaign associated with it (or doesn't.)
+        /// </summary>
+        /// <param name="name">Statistics's name or alias.</param>
+        /// <returns>The matching statistic or null if none.</returns>
+        Task<Statistic> GetStatisticAsync(int id);
+
+        /// <summary>
         /// Gets the statistic with the matching name or one of its aliases.
         /// </summary>
         /// <param name="name">Statistics's name or alias.</param>
+        /// <param name="campaign">The optional Campaign to search from. Must be specified if the Statistic is associated with a Campaign, otherwise returns null.</param>
         /// <returns>The matching statistic or null if none.</returns>
-        Task<Statistic> GetStatisticAsync(string name);
-
-        /// <summary>
-        /// Gets the statistic with the matching name or one of its aliases if it exists in the specified campaign.
-        /// </summary>
-        /// <param name="name">Statistics's name or alias.</param>
-        /// <param name="campaign">The campaign to search from.</param>
-        /// <returns>The matching statistic or null if none.</returns>
-        Task<Statistic> GetStatisticFromCampaignAsync(string name, Campaign campaign);
+        Task<Statistic> GetStatisticAsync(string name, Campaign campaign = null);
 
         /// <summary>
         /// Gets every statistic currently in use.

@@ -11,6 +11,7 @@ namespace Frags.Core.Statistics
     {
         /// <summary>
         /// The statistics's unique identifier.
+        /// It is always unique, even between Campaigns.
         /// </summary>
         public int Id { get; set; }
 
@@ -55,12 +56,13 @@ namespace Frags.Core.Statistics
 
             return Name.Equals(stat.Name) && 
             Description.Equals(stat.Description) && 
-            Aliases.Equals(stat.Aliases);
+            Aliases.Equals(stat.Aliases) &&
+            Id.Equals(stat.Id);
         }
         
         public override int GetHashCode()
         {
-            return ("" + Name + Description + Aliases).GetHashCode();
+            return ("" + Name + Description + Aliases + Id).GetHashCode();
         }
 
         protected Statistic(string name, string description = "")

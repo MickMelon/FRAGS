@@ -24,8 +24,8 @@ namespace Frags.Core.Common
 
         public ulong UserIdentifier { get; set; }
 
-        public ICollection<Character> Characters { get; set; }
-        public ICollection<Moderator> ModeratedCampaigns { get; set; }
+        public List<Character> Characters { get; set; }
+        public List<Moderator> ModeratedCampaigns { get; set; }
 
         public Character ActiveCharacter { get; set; }
 
@@ -53,5 +53,7 @@ namespace Frags.Core.Common
         {
             return (int)UserIdentifier;
         }
+
+        protected User() { }
     }
 }

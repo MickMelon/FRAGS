@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using AutoMapper;
+
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
@@ -15,7 +15,6 @@ using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Database;
-using Frags.Database.AutoMapper;
 using Frags.Database.DataAccess;
 using Frags.Discord.Services;
 using Frags.Presentation.Controllers;
@@ -115,8 +114,7 @@ namespace Frags.Discord
                 .AddTransient<RollController>()
                 .AddTransient<StatisticController>()
                 .AddTransient<CampaignStatisticController>()
-                .AddTransient<StatisticCharacterController>()
-                .AddAutoMapper(typeof(GeneralProfile));
+                .AddTransient<StatisticCharacterController>();
 
         private static IServiceCollection AddConfiguredServices(IServiceCollection services)
         {

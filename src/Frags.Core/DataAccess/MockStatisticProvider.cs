@@ -79,13 +79,16 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(campaign.Statistics.AsEnumerable());
         }
 
-        public async Task<Statistic> GetStatisticAsync(string name)
+        public async Task<Statistic> GetStatisticAsync(int id)
         {
-            return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
+            return await Task.FromResult(_statistics.FirstOrDefault(x => x.Id == id));
         }
 
-        public async Task<Statistic> GetStatisticFromCampaignAsync(string name, Campaign campaign)
+        public async Task<Statistic> GetStatisticAsync(string name, Campaign campaign = null)
         {
+            if (campaign == null)
+                return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
+
             return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign?.Id == campaign.Id));
         }
 

@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Frags.Core.Campaigns;
+
 namespace Frags.Core.Statistics
 {
     public class StatisticOptions
@@ -34,6 +37,6 @@ namespace Frags.Core.Statistics
         public int ExpMessageLengthDivisor { get; set; }
 
         // Only used by the configuration JSON, i.e. not Campaigns (they use the Channel object instead.)
-        public ulong[] ExpEnabledChannels { get; set; }
+        public List<Channel> ExpEnabledChannels { get; set; }
     }
 }

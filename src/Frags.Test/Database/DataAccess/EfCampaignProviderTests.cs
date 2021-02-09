@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿
 using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
@@ -8,8 +8,6 @@ using Frags.Core.Game.Progression;
 using Frags.Core.Game.Rolling;
 using Frags.Core.Statistics;
 using Frags.Database;
-using Frags.Database.AutoMapper;
-using Frags.Database.Campaigns;
 using Frags.Database.DataAccess;
 using Frags.Presentation.Controllers;
 using Frags.Presentation.Results;
@@ -47,9 +45,6 @@ namespace Frags.Test.Database.DataAccess
             string baseName = nameof(EfCampaignProviderTests.RenameCampaignAsync_ValidInput_ReturnSuccess);
             string campName = baseName += "_Campaign";
 
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            IMapper mapper = new Mapper(mapperConfig);
-
             var options = new GeneralOptions
             {
                 UseInMemoryDatabase = true,
@@ -62,17 +57,18 @@ namespace Frags.Test.Database.DataAccess
             // $camp create
             using (var context = new RpgContext(options))
             {
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 await campProvider.CreateCampaignAsync(userId, campName);
             }
 
             // $camp addchannel
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
                 
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
                 var result = await campController.AddCampaignChannelAsync(campName, channelId);
@@ -83,9 +79,10 @@ namespace Frags.Test.Database.DataAccess
             string newName = "the new name";
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
                 
                 var result = await campController.RenameCampaignAsync(userId, channelId, newName);
@@ -94,9 +91,10 @@ namespace Frags.Test.Database.DataAccess
 
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
                 Campaign campaign = await campProvider.GetCampaignAsync(channelId);
@@ -118,9 +116,6 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = baseName + "_DB"
             };
 
-            var mapperConfig = new MapperConfiguration(x => x.AddProfile<GeneralProfile>());
-            var mapper = new Mapper(mapperConfig);
-
             ulong userId = (ulong)GameRandom.Between(11, int.MaxValue - 1);
             ulong channelId = (ulong)GameRandom.Between(11, int.MaxValue - 1);
             string campName = baseName + "_Campaign";
@@ -133,17 +128,18 @@ namespace Frags.Test.Database.DataAccess
             // $camp create
             using (var context = new RpgContext(options))
             {
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 await campProvider.CreateCampaignAsync(userId, campName);
             }
 
             // $camp addchannel
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
                 
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
                 var result = await campController.AddCampaignChannelAsync(campName, channelId);
@@ -153,9 +149,10 @@ namespace Frags.Test.Database.DataAccess
             // $camp statoptions
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -171,8 +168,9 @@ namespace Frags.Test.Database.DataAccess
             // $create (character)
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
 
                 await charProvider.CreateCharacterAsync(userId, charName);
             }
@@ -180,9 +178,10 @@ namespace Frags.Test.Database.DataAccess
             // $camp convert
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -193,10 +192,10 @@ namespace Frags.Test.Database.DataAccess
             // $camp info
             using (var context = new RpgContext(options))
             {
-                var userProvider = new EfUserProvider(context, mapper);
-                var charProvider = new EfCharacterProvider(context, mapper, userProvider);
-                var campProvider = new EfCampaignProvider(context, mapper, progStrats, rollStrats);
-                var statProvider = new EfStatisticProvider(context, mapper);
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, statProvider);
                 var result = await campController.GetCampaignInfoAsync(campName);

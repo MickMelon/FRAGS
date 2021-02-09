@@ -34,10 +34,10 @@ namespace Frags.Presentation.Controllers
 
             if (!await _campProvider.HasPermissionAsync(campaign, callerId)) return CampaignResult.AccessDenied();
 
-            var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign);
+            var stat = await _statProvider.GetStatisticAsync(statName, campaign);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            if (await _statProvider.GetStatisticFromCampaignAsync(alias, campaign) != null)
+            if (await _statProvider.GetStatisticAsync(alias, campaign) != null)
                 return StatisticResult.NameAlreadyExists();
 
             stat.Aliases += alias + "/";
@@ -54,7 +54,7 @@ namespace Frags.Presentation.Controllers
             if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
-            var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign);
+            var stat = await _statProvider.GetStatisticAsync(statName, campaign);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
             stat.Aliases = stat.Name + "/";
@@ -71,7 +71,7 @@ namespace Frags.Presentation.Controllers
             if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
-            var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign);
+            var stat = await _statProvider.GetStatisticAsync(statName, campaign);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
             await _statProvider.DeleteStatisticAsync(stat);
@@ -86,7 +86,7 @@ namespace Frags.Presentation.Controllers
             if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
-            var stat = await _statProvider.GetStatisticFromCampaignAsync(statName, campaign);
+            var stat = await _statProvider.GetStatisticAsync(statName, campaign);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
             stat.Name = newName;
@@ -115,7 +115,7 @@ namespace Frags.Presentation.Controllers
             if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
-            if (await _statProvider.GetStatisticFromCampaignAsync(statName, campaign) != null)
+            if (await _statProvider.GetStatisticAsync(statName, campaign) != null)
                 return StatisticResult.NameAlreadyExists();
 
             var result = await _statProvider.CreateAttributeAsync(statName, campaign);
@@ -146,7 +146,7 @@ namespace Frags.Presentation.Controllers
             if (!await _campProvider.HasPermissionAsync(campaign, callerId))
                 return CampaignResult.AccessDenied();
 
-            if (await _statProvider.GetStatisticFromCampaignAsync(statName, campaign) != null)
+            if (await _statProvider.GetStatisticAsync(statName, campaign) != null)
                 return StatisticResult.NameAlreadyExists();
 
             var result = await _statProvider.CreateSkillAsync(statName, attribName, campaign);
