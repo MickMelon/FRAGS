@@ -6,6 +6,7 @@ using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
+using Frags.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -15,12 +16,14 @@ namespace Frags.Database.DataAccess
         private readonly RpgContext _context;
 
         private readonly IUserProvider _userProvider;
+        private readonly IStatisticProvider _statProvider;
 
-        public EfEffectProvider(RpgContext context, IUserProvider userProvider)
+        public EfEffectProvider(RpgContext context, IUserProvider userProvider, IStatisticProvider statProvider)
         {
             _context = context;
 
             _userProvider = userProvider;
+            _statProvider = statProvider;
         }
 
         public async Task<Effect> CreateEffectAsync(ulong ownerId, string name)
@@ -59,29 +62,61 @@ namespace Frags.Database.DataAccess
             return effectList;
         }
 
+        public async Task<Effect> GetEffectAsync(int id)
+        {
+            Effect effect = await _context.Effects.FirstOrDefaultAsync(x => x.Id == id);
+            if (effect == null) return null;
+
+            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == id);
+            effect.StatisticEffects = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
+
+            return effect;
+        }
+
         public async Task<Effect> GetEffectAsync(string name)
         {
-            return await _context.Effects
-                .Where(x => x.Name.EqualsIgnoreCase(name))
-                // .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
-                // .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .FirstOrDefaultAsync();
+            Effect effect = await _context.Effects.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
+            if (effect == null) return null;
+
+            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
+            effect.StatisticEffects = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
+
+            return effect;
         }
 
         public async Task<IEnumerable<Effect>> GetOwnedEffectsAsync(ulong userId)
         {
-            return await _context.Effects
-                .Where(x => x.Owner.UserIdentifier == userId)
-                // .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
-                // .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .ToListAsync();
+            List<Effect> effects = await _context.Effects.Include(x => x.Owner).Where(x => x.Owner.UserIdentifier == userId).ToListAsync();
+            if (effects == null || effects.Count <= 0) return effects;
+
+            foreach (var effect in effects)
+            {
+                StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
+                effect.StatisticEffects = await DbHelper.GetStatisticDictionary(statlist, _statProvider);    
+            }
+
+            return effects;
         }
 
         public async Task UpdateEffectAsync(Effect effect)
         {
-            // If it doesn't exist in the DB, abort
-            if (await _context.Effects.CountAsync(c => c.Id.Equals(effect.Id)) <= 0)
-                return;
+            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
+            if (effect.StatisticEffects != null)
+            {
+                string data = DbHelper.SerializeStatisticList(effect.StatisticEffects);
+                
+                if (statlist != null)
+                {
+                    statlist.Data = data;
+                    _context.Update(statlist);
+                }
+                else
+                {
+                    statlist = new StatisticList(effect);
+                    statlist.Data = data;
+                    _context.Add(statlist);
+                }
+            }
 
             _context.Update(effect);
             await _context.SaveChangesAsync();

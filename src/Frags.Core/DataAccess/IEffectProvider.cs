@@ -22,6 +22,13 @@ namespace Frags.Core.DataAccess
         Task DeleteEffectAsync(Effect effect);
 
         /// <summary>
+        /// Gets the Effect with the matching id.
+        /// </summary>
+        /// <param name="id">Effects's id.</param>
+        /// <returns>The matching effect or null if none.</returns>
+        Task<Effect> GetEffectAsync(int id);
+
+        /// <summary>
         /// Gets the Effect with the matching name.
         /// </summary>
         /// <param name="name">Effects's name.</param>

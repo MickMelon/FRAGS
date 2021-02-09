@@ -34,12 +34,12 @@ namespace Frags.Core.Statistics
         /// <summary>
         /// Initializes a new instance of the <see cref="StatisticValue" /> class.
         /// </summary>
-        /// <param name="val">The value of the associated statistic.</param>
+        /// <param name="value">The value of the associated statistic.</param>
         /// <param name="isProficient">Whether or not to mark this statistic as proficient.</param>
         /// <param name="proficiency">The bonus that is applied if this statistic is marked proficient.</param>
-        public StatisticValue(int val, bool isProficient = false, double proficiency = 0)
+        public StatisticValue(int value, bool isProficient = false, double proficiency = 0)
         {
-            Value = val;
+            Value = value;
             IsProficient = isProficient;
             Proficiency = proficiency;
         }

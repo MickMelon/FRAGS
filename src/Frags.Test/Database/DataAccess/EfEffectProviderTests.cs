@@ -28,17 +28,26 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var effectProvider = new EfEffectProvider(context, userProvider);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 await charProvider.CreateCharacterAsync(1, "Char1");
+            }
+
+            using (var context = new RpgContext(genOpts))
+            {
+                var userProvider = new EfUserProvider(context);
+                var statProvider = new EfStatisticProvider(context);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
+                await charProvider.CreateCharacterAsync(2, "Char2");
             }
             
             using (var context = new RpgContext(genOpts))
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var effectProvider = new EfEffectProvider(context, userProvider);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);    
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);    
                 var effect1 = await effectProvider.CreateEffectAsync(1, "Effect1");
             }
 
@@ -46,8 +55,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var effectProvider = new EfEffectProvider(context, userProvider);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);    
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);    
                 var effect2 = await effectProvider.CreateEffectAsync(1, "Effect2");
             }
             
@@ -55,29 +64,35 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var effectProvider = new EfEffectProvider(context, userProvider);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);    
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);    
 
                 var effect1 = await effectProvider.GetEffectAsync("Effect1");
                 var effect2 = await effectProvider.GetEffectAsync("Effect2");
 
                 var char1 = await charProvider.GetActiveCharacterAsync(1);
+                var char2 = await charProvider.GetActiveCharacterAsync(2);
 
                 char1.Effects.Add(effect1);
                 char1.Effects.Add(effect2);
+                
+                char2.Effects.Add(effect1);
+                char2.Effects.Add(effect2);
 
                 await charProvider.UpdateCharacterAsync(char1);
+                await charProvider.UpdateCharacterAsync(char2);
             }
 
             using (var context = new RpgContext(genOpts))
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var effectProvider = new EfEffectProvider(context, userProvider);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);    
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);    
 
                 var char1 = await charProvider.GetActiveCharacterAsync(1);
-                Assert.True(char1.Effects.Count == 2);
+                var char2 = await charProvider.GetActiveCharacterAsync(2);
+                Assert.True(char1.Effects.Count == 2 && char2.Effects.Count == 2);
             }
         }
     }

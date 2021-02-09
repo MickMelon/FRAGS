@@ -31,6 +31,11 @@ namespace Frags.Core.DataAccess
             return Task.FromResult<IEnumerable<Effect>>(_effects);
         }
 
+        public Task<Effect> GetEffectAsync(int id)
+        {
+            return Task.FromResult(_effects.FirstOrDefault(x => x.Id == id));
+        }
+
         public Task<Effect> GetEffectAsync(string name)
         {
             return Task.FromResult(_effects.FirstOrDefault(x => x.Name.EqualsIgnoreCase(name)));

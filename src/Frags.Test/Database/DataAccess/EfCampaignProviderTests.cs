@@ -66,7 +66,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
@@ -81,7 +82,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
                 
@@ -93,7 +95,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -137,7 +140,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
@@ -151,7 +155,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
@@ -170,7 +175,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
 
                 await charProvider.CreateCharacterAsync(userId, charName);
             }
@@ -180,7 +186,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
@@ -194,7 +201,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var userProvider = new EfUserProvider(context);
                 var statProvider = new EfStatisticProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, statProvider);

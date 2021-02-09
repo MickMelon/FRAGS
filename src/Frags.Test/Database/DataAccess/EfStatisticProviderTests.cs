@@ -55,22 +55,29 @@ namespace Frags.Test.Database.DataAccess
         [Fact]
         public async Task UpdateStatistic_ValidInput_EntityMatchesInput()
         {
-            var context = new RpgContext(new GeneralOptions
+            var generalOpts = new GeneralOptions
             {
                 UseInMemoryDatabase = true,
                 DatabaseName = "UpdateStatistic_EntityMatchesInput"
-            });            
-            
-            var provider = new EfStatisticProvider(context);
-            
-            await provider.CreateAttributeAsync("Strength");
-            var result = await provider.GetStatisticAsync("Strength");
+            };
 
-            result.Name = "STR";
-            result.Aliases = "STR" + "/";
-            await provider.UpdateStatisticAsync(result);
+            using (var context = new RpgContext(generalOpts))
+            {
+                var provider = new EfStatisticProvider(context);
+                await provider.CreateAttributeAsync("Strength");
+            }
 
-            Assert.NotNull(await provider.GetStatisticAsync("STR"));
+            using (var context = new RpgContext(generalOpts))
+            {
+                var provider = new EfStatisticProvider(context);
+
+                var result = await provider.GetStatisticAsync("Strength");
+                result.Name = "STR";
+                result.Aliases = "STR" + "/";
+                await provider.UpdateStatisticAsync(result);
+
+                Assert.NotNull(await provider.GetStatisticAsync("STR"));
+            }
         }
         #endregion
 
@@ -87,7 +94,8 @@ namespace Frags.Test.Database.DataAccess
             
             var provider = new EfStatisticProvider(context);
             var userProvider = new EfUserProvider(context);
-            var charProvider = new EfCharacterProvider(context, userProvider, provider);
+            var effectProvider = new EfEffectProvider(context, userProvider, provider);
+            var charProvider = new EfCharacterProvider(context, userProvider, provider, effectProvider);
 
             var strength = await provider.CreateAttributeAsync("strength");
             await charProvider.CreateCharacterAsync(1, "bob");
@@ -139,7 +147,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var provider = new EfStatisticProvider(context);
                 var userProvider = new EfUserProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, provider);
+                var effectProvider = new EfEffectProvider(context, userProvider, provider);
+            var charProvider = new EfCharacterProvider(context, userProvider, provider, effectProvider);
 
                 await charProvider.CreateCharacterAsync(1, "bob");
             }
@@ -151,7 +160,8 @@ namespace Frags.Test.Database.DataAccess
             {
                 var statProvider = new EfStatisticProvider(context);
                 var userProvider = new EfUserProvider(context);
-                var charProvider = new EfCharacterProvider(context, userProvider, statProvider);
+                var effectProvider = new EfEffectProvider(context, userProvider, statProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, statProvider, effectProvider);
                 var campProvider = new EfCampaignProvider(context, null, null);
 
                 bob = await charProvider.GetActiveCharacterAsync(1);

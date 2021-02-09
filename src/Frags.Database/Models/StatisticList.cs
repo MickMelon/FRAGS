@@ -5,6 +5,20 @@ namespace Frags.Database.Models
 {
     public class StatisticList
     {
+        public StatisticList(Character character)
+        {
+            Character = character;
+            CharacterId = character.Id;
+        }
+
+        public StatisticList(Effect effect)
+        {
+            Effect = effect;
+            EffectId = effect.Id;
+        }
+
+        protected StatisticList() { }
+
         public int Id { get; set; }
         
         public string Data { get; set; }

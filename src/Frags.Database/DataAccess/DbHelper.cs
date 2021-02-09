@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Frags.Core.DataAccess;
+using Frags.Core.Effects;
 using Frags.Core.Statistics;
 using Frags.Database.Models;
 
@@ -39,6 +42,31 @@ namespace Frags.Database.DataAccess
                 newDict.Add(statmap.Key.Id, statmap.Value);
 
             return JsonSerializer.Serialize(newDict);
+        }
+
+        internal static async Task<IList<Effect>> GetEffectList(EffectList effectlist, IEffectProvider effectProvider)
+        {
+            IList<Effect> result = new List<Effect>();
+
+            if (effectlist == null || string.IsNullOrWhiteSpace(effectlist.Data))
+                return result;
+
+            int[] ids = effectlist.Data.Split(',').Select(int.Parse).ToArray();
+
+            foreach (int id in ids)
+            {
+                Effect effect = await effectProvider.GetEffectAsync(id);
+                if (effect == null) continue;
+
+                result.Add(effect);
+            }
+
+            return result;
+        }
+
+        internal static string SerializeEffectList(IList<Effect> effects)
+        {
+            return string.Join(",", effects.Select(x => x.Id));
         }
     }
 }

@@ -20,12 +20,14 @@ namespace Frags.Database.DataAccess
 
         private readonly IUserProvider _userProvider;
         private readonly IStatisticProvider _statProvider;
+        private readonly IEffectProvider _effectProvider;
 
-        public EfCharacterProvider(RpgContext context, IUserProvider userProvider, IStatisticProvider statProvider)
+        public EfCharacterProvider(RpgContext context, IUserProvider userProvider, IStatisticProvider statProvider, IEffectProvider effectProvider)
         {
             _context = context;
             _userProvider = userProvider;
             _statProvider = statProvider;
+            _effectProvider = effectProvider;
         }
 
         public async Task<bool> CreateCharacterAsync(ulong discordId, string name)
@@ -81,17 +83,51 @@ namespace Frags.Database.DataAccess
 
             StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
             character.Statistics = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
+
+            EffectList effectList = await _context.EffectLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+            character.Effects = await DbHelper.GetEffectList(effectList, _effectProvider);
         }
 
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
             StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
-            if (statlist != null)
-                statlist.Data = DbHelper.SerializeStatisticList(character.Statistics);
+            if (character.Statistics != null)
+            {
+                string data = DbHelper.SerializeStatisticList(character.Statistics);
+                
+                if (statlist != null)
+                {
+                    statlist.Data = data;
+                    _context.Update(statlist);
+                }
+                else
+                {
+                    statlist = new StatisticList(character);
+                    statlist.Data = data;
+                    _context.Add(statlist);
+                }
+            }
+
+            EffectList effectList = await _context.EffectLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+            if (character.Effects != null)
+            {
+                string data = DbHelper.SerializeEffectList(character.Effects);
+
+                if (effectList != null)
+                {
+                    effectList.Data = data;
+                    _context.Update(effectList);
+                }
+                else
+                {
+                    effectList = new EffectList(character);
+                    effectList.Data = data;
+                    _context.Add(effectList);
+                }
+            }
 
             _context.Update(character);
-            _context.Update(statlist);
             await _context.SaveChangesAsync();
         }
     }
