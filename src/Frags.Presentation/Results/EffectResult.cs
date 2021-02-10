@@ -44,7 +44,7 @@ namespace Frags.Presentation.Results
 
         public static EffectResult Show(Effect effect)
         {
-            var viewModel = new ShowEffectViewModel(effect.Name, effect.Description, effect.StatisticEffects);
+            var viewModel = new ShowEffectViewModel(effect.Name, effect.Description, effect.Statistics);
             return new EffectResult(viewModel.Name, true, viewModel);
         }
 

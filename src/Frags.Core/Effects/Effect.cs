@@ -7,13 +7,13 @@ using Frags.Core.Statistics;
 
 namespace Frags.Core.Effects
 {
-    public class Effect
+    public class Effect : IStatsheetContainer
     {
         protected Effect() { }
 
         public Effect(User owner, string name)
         {
-            StatisticEffects = new Dictionary<Statistic, StatisticValue>();
+            Statistics = new Dictionary<Statistic, StatisticValue>();
             Name = name;
             Owner = owner;
         }
@@ -25,6 +25,10 @@ namespace Frags.Core.Effects
 
         public User Owner { get; set; }
 
-        public virtual Dictionary<Statistic, StatisticValue> StatisticEffects { get; set; }
+        /// <summary>
+        /// The effect on a Statsheet after it is applied.
+        /// StatisticValues will be added on top of existing values.
+        /// </summary>
+        public Dictionary<Statistic, StatisticValue> Statistics { get; set; }
     }
 }

@@ -91,41 +91,8 @@ namespace Frags.Database.DataAccess
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {
-            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
-            if (character.Statistics != null)
-            {
-                string data = DbHelper.SerializeStatisticList(character.Statistics);
-                
-                if (statlist != null)
-                {
-                    statlist.Data = data;
-                    _context.Update(statlist);
-                }
-                else
-                {
-                    statlist = new StatisticList(character);
-                    statlist.Data = data;
-                    _context.Add(statlist);
-                }
-            }
-
-            EffectList effectList = await _context.EffectLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
-            if (character.Effects != null)
-            {
-                string data = DbHelper.SerializeEffectList(character.Effects);
-
-                if (effectList != null)
-                {
-                    effectList.Data = data;
-                    _context.Update(effectList);
-                }
-                else
-                {
-                    effectList = new EffectList(character);
-                    effectList.Data = data;
-                    _context.Add(effectList);
-                }
-            }
+            await DbHelper.EfUpdateOrCreateStatisticList(character, _context);
+            await DbHelper.EfUpdateOrCreateEffectList(character, _context);
 
             _context.Update(character);
             await _context.SaveChangesAsync();

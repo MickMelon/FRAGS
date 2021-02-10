@@ -15,7 +15,7 @@ namespace Frags.Core.Characters
     /// <summary>
     /// The Character model.
     /// </summary>
-    public class Character
+    public class Character : IStatsheetContainer
     {
         /// <summary>
         /// The character's unique identifier.
@@ -74,6 +74,11 @@ namespace Frags.Core.Characters
         /// <summary>
         /// Where the character's statistics are actually stored.
         /// </summary>
+        //public IStatsheet Statsheet { get; set; }
+
+        /// <summary>
+        /// A shortcut to the character's statsheet in dictionary form.
+        /// </summary>
         public Dictionary<Statistic, StatisticValue> Statistics { get; set; }
 
         public Dictionary<Attribute, StatisticValue> Attributes => 
@@ -91,7 +96,7 @@ namespace Frags.Core.Characters
             var clonedStats = CloneStatistics();
 
             foreach (var effect in Effects)
-                foreach (var statEffect in effect.StatisticEffects)
+                foreach (var statEffect in effect.Statistics)
                     if (clonedStats.ContainsKey(statEffect.Key))
                         clonedStats[statEffect.Key].Value += statEffect.Value.Value;
 
@@ -102,6 +107,7 @@ namespace Frags.Core.Characters
         /// A list of which Effects are currently applied to this character.
         /// </summary>
         public virtual IList<Effect> Effects { get; set; }
+        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.

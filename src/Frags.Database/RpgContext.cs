@@ -80,7 +80,7 @@ namespace Frags.Database
                 .Ignore(x => x.Effects);
 
             builder.Entity<Effect>()
-                .Ignore(x => x.StatisticEffects);
+                .Ignore(x => x.Statistics);
 
             builder.Entity<Moderator>()
                 .HasKey(ec => new { ec.CampaignId, ec.UserId });

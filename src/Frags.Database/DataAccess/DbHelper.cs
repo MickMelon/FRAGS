@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Frags.Core.Characters;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
 using Frags.Core.Statistics;
 using Frags.Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
 {
@@ -19,7 +21,7 @@ namespace Frags.Database.DataAccess
             if (statlist == null || string.IsNullOrWhiteSpace(statlist.Data))
                 return result;
 
-            var deserialized = JsonSerializer.Deserialize<Dictionary<int,StatisticValue>>(statlist.Data);
+            var deserialized = JsonSerializer.Deserialize<Dictionary<int, StatisticValue>>(statlist.Data);
 
             foreach (var statmap in deserialized)
             {
@@ -67,6 +69,65 @@ namespace Frags.Database.DataAccess
         internal static string SerializeEffectList(IList<Effect> effects)
         {
             return string.Join(",", effects.Select(x => x.Id));
+        }
+
+        internal static async Task EfUpdateOrCreateEffectList(Character character, RpgContext context)
+        {
+            EffectList effectList = await context.EffectLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+            if (character.Effects != null)
+            {
+                string data = DbHelper.SerializeEffectList(character.Effects);
+
+                if (effectList != null)
+                {
+                    effectList.Data = data;
+                    context.Update(effectList);
+                }
+                else
+                {
+                    effectList = new EffectList(character);
+                    effectList.Data = data;
+                    context.Add(effectList);
+                }
+            }
+        }
+
+        internal static async Task EfUpdateOrCreateStatisticList(Character character, RpgContext context)
+        {
+            StatisticList statlist = await context.StatisticLists.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+            EfUpdateOrCreateStatisticList(statlist, character, context);
+        }
+
+        internal static async Task EfUpdateOrCreateStatisticList(Effect effect, RpgContext context)
+        {
+            StatisticList statlist = await context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
+            EfUpdateOrCreateStatisticList(statlist, effect, context);
+        }
+
+        private static void EfUpdateOrCreateStatisticList(StatisticList statlist, IStatsheetContainer statContainer, RpgContext context)
+        {
+            if (statContainer.Statistics != null)
+            {
+                string data = DbHelper.SerializeStatisticList(statContainer.Statistics);
+
+                if (statlist != null)
+                {
+                    statlist.Data = data;
+                    context.Update(statlist);
+                }
+                else
+                {
+                    if (statContainer is Character ch)
+                        statlist = new StatisticList(ch);
+                    else if (statContainer is Effect ef)
+                        statlist = new StatisticList(ef);
+                    else
+                        throw new NotImplementedException();
+
+                    statlist.Data = data;
+                    context.Add(statlist);
+                }
+            }
         }
     }
 }

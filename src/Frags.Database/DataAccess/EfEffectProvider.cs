@@ -67,8 +67,7 @@ namespace Frags.Database.DataAccess
             Effect effect = await _context.Effects.FirstOrDefaultAsync(x => x.Id == id);
             if (effect == null) return null;
 
-            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == id);
-            effect.StatisticEffects = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
+            await LoadRelatedEffectData(effect);
 
             return effect;
         }
@@ -78,8 +77,7 @@ namespace Frags.Database.DataAccess
             Effect effect = await _context.Effects.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
             if (effect == null) return null;
 
-            StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
-            effect.StatisticEffects = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
+            await LoadRelatedEffectData(effect);
 
             return effect;
         }
@@ -90,33 +88,20 @@ namespace Frags.Database.DataAccess
             if (effects == null || effects.Count <= 0) return effects;
 
             foreach (var effect in effects)
-            {
-                StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
-                effect.StatisticEffects = await DbHelper.GetStatisticDictionary(statlist, _statProvider);    
-            }
+                await LoadRelatedEffectData(effect);
 
             return effects;
         }
 
-        public async Task UpdateEffectAsync(Effect effect)
+        private async Task LoadRelatedEffectData(Effect effect)
         {
             StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
-            if (effect.StatisticEffects != null)
-            {
-                string data = DbHelper.SerializeStatisticList(effect.StatisticEffects);
-                
-                if (statlist != null)
-                {
-                    statlist.Data = data;
-                    _context.Update(statlist);
-                }
-                else
-                {
-                    statlist = new StatisticList(effect);
-                    statlist.Data = data;
-                    _context.Add(statlist);
-                }
-            }
+            effect.Statistics = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
+        }
+
+        public async Task UpdateEffectAsync(Effect effect)
+        {
+            await DbHelper.EfUpdateOrCreateStatisticList(effect, _context);
 
             _context.Update(effect);
             await _context.SaveChangesAsync();

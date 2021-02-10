@@ -93,13 +93,13 @@ namespace Frags.Presentation.Controllers
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            if (effect.StatisticEffects.ContainsKey(stat))
+            if (effect.Statistics.ContainsKey(stat))
             {
-                effect.StatisticEffects[stat].Value = value;
+                effect.Statistics[stat].Value = value;
             }
             else
             {
-                effect.StatisticEffects.Add(stat, new StatisticValue(value));
+                effect.Statistics.Add(stat, new StatisticValue(value));
             }
 
             await _effectProvider.UpdateEffectAsync(effect);
