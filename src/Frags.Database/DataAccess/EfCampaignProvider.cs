@@ -56,29 +56,22 @@ namespace Frags.Database.DataAccess
 
         public async Task<Campaign> GetCampaignAsync(string campaignName)
         {
-            return await _context.Campaigns.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(campaignName));
+            return await _context.Campaigns.Include(x => x.Owner).FirstOrDefaultAsync(x => x.Name == campaignName);
         }
 
         public async Task<Campaign> GetCampaignAsync(ulong channelId)
         {
-            Channel channel = await _context.Set<Channel>().FirstOrDefaultAsync(x => x.Id == channelId);
-            if (channel == null) return null;
-            await _context.Entry(channel).Reference(x => x.Campaign).LoadAsync();
-            _context.Entry(channel).State = EntityState.Detached;
+            Channel channel = await _context.Channels.Include(x => x.Campaign).FirstOrDefaultAsync(x => x.Id == channelId);
+            if (channel?.Campaign == null) return null;
 
-            Campaign camp = channel.Campaign;
-            if (camp == null) return null;
+            await _context.Entry<Campaign>(channel.Campaign).Reference(x => x.Owner).LoadAsync();
 
-            await _context.Entry(camp).Reference(x => x.Owner).LoadAsync();
-            _context.Entry(camp.Owner).State = EntityState.Detached;
-            _context.Entry(camp).State = EntityState.Detached;
-            
-            return camp;
+            return channel.Campaign;
         }
 
         public async Task<List<Channel>> GetChannelsAsync(Campaign campaign)
         {
-            Campaign camp = await _context.Campaigns.Include(x => x.Channels).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.Include(x => x.Channels)/*.AsNoTracking()*/.FirstOrDefaultAsync(x => x.Id == campaign.Id);
             List<Channel> channels = camp?.Channels;
 
             return channels;
@@ -86,7 +79,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<List<Character>> GetCharactersAsync(Campaign campaign)
         {
-            Campaign camp = await _context.Campaigns.Include(x => x.Characters).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.Include(x => x.Characters)/*.AsNoTracking()*/.FirstOrDefaultAsync(x => x.Id == campaign.Id);
             List<Character> characters = camp?.Characters;
 
             return characters;
@@ -94,7 +87,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<List<Moderator>> GetModeratorsAsync(Campaign campaign)
         {
-            Campaign camp = await _context.Campaigns.Include(x => x.ModeratedCampaigns).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.Include(x => x.ModeratedCampaigns)/*.AsNoTracking()*/.FirstOrDefaultAsync(x => x.Id == campaign.Id);
             List<Moderator> mods = camp?.ModeratedCampaigns;
 
             return mods;
@@ -102,7 +95,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<StatisticOptions> GetStatisticOptionsAsync(Campaign campaign)
         {
-            Campaign camp = await _context.Campaigns.Include(x => x.StatisticOptions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.Include(x => x.StatisticOptions)/*.AsNoTracking()*/.FirstOrDefaultAsync(x => x.Id == campaign.Id);
             StatisticOptions statOpts = camp?.StatisticOptions;
 
             return statOpts;
@@ -169,7 +162,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<RollOptions> GetRollOptionsAsync(Campaign campaign)
         {
-            Campaign camp = await _context.Campaigns.Include(x => x.RollOptions).AsNoTracking().FirstOrDefaultAsync(x => x.Id == campaign.Id);
+            Campaign camp = await _context.Campaigns.Include(x => x.RollOptions)/*.AsNoTracking()*/.FirstOrDefaultAsync(x => x.Id == campaign.Id);
             RollOptions rollOpts = camp?.RollOptions;
 
             return rollOpts;

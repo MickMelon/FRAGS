@@ -75,9 +75,9 @@ namespace Frags.Database.DataAccess
         public async Task<Statistic> GetStatisticAsync(string name, Campaign campaign = null)
         {
             if (campaign == null)
-                return await _context.Statistics.AsNoTracking().FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase));
+                return await _context.Statistics/*.AsNoTracking()*/.FirstOrDefaultAsync(x => x.Aliases.Split(Statistic.ALIAS_SEPARATOR, StringSplitOptions.None).Contains(name, StringComparer.OrdinalIgnoreCase));
 
-            return await _context.Statistics.AsNoTracking().FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaign.Id);
+            return await _context.Statistics/*.AsNoTracking()*/.FirstOrDefaultAsync(x => x.Aliases.Split(Statistic.ALIAS_SEPARATOR, StringSplitOptions.None).Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign.Id == campaign.Id);
         }
 
         public async Task<Statistic> GetStatisticAsync(int id)

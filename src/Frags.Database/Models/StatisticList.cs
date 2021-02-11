@@ -23,8 +23,8 @@ namespace Frags.Database.Models
         
         public string Data { get; set; }
         public Character Character { get; set; }
-        public int CharacterId { get; set; }
+        public int? CharacterId { get; set; }
         public Effect Effect { get; set; }
-        public int EffectId { get; set; }
+        public int? EffectId { get; set; }
     }
 }

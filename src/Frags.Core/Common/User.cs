@@ -29,31 +29,6 @@ namespace Frags.Core.Common
 
         public Character ActiveCharacter { get; set; }
 
-        public static bool operator == (User user1, User user2)
-        {
-            return Equals(user1, user2);
-        }
-
-        public static bool operator != (User user1, User user2)
-        {
-            return !Equals(user1, user2);
-        }
-
-        public override bool Equals(object obj)
-        {   
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            
-            return this.UserIdentifier == ((User)obj).UserIdentifier;
-        }
-        
-        public override int GetHashCode()
-        {
-            return (int)UserIdentifier;
-        }
-
         protected User() { }
     }
 }

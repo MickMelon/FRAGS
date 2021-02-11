@@ -111,11 +111,11 @@ namespace Frags.Test.Database.DataAccess
         {
             // Each using statement simulates a scoped DI request per command
 
-            string baseName = nameof(TheBigOne);
+            string baseName = nameof(EfCampaignProviderTests.TheBigOne);
 
             var options = new GeneralOptions
             {
-                UseInMemoryDatabase = true,
+                UseInMemoryDatabase = false,
                 DatabaseName = baseName + "_DB"
             };
 
@@ -131,6 +131,9 @@ namespace Frags.Test.Database.DataAccess
             // $camp create
             using (var context = new RpgContext(options))
             {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
                 var campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
                 await campProvider.CreateCampaignAsync(userId, campName);
             }

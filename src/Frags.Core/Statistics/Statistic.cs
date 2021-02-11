@@ -29,12 +29,14 @@ namespace Frags.Core.Statistics
         /// </summary>
         public int Order { get; set; }
 
+        public static readonly char ALIAS_SEPARATOR = '/';
+
         public string[] AliasesArray
         {
             get
             {
                 if (!String.IsNullOrEmpty(Aliases))
-                    return Aliases.Split('/');
+                    return Aliases.Split(ALIAS_SEPARATOR);
                 else
                     return new string[] { Name };
             }

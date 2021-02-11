@@ -20,6 +20,7 @@ namespace Frags.Database
         public DbSet<User> Users { get; set; }
         public DbSet<StatisticList> StatisticLists { get; set; }
         public DbSet<EffectList> EffectLists { get; set; }
+        public DbSet<Channel> Channels { get; set; }
 
         private readonly GeneralOptions _options;
 
@@ -44,34 +45,9 @@ namespace Frags.Database
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            // builder.Entity<StatisticMapping>()
-            //     .HasOne(x => x.Statistic)
-            //         .WithMany()
-            //         .OnDelete(DeleteBehavior.Cascade);
-
-            // builder.Entity<EffectMapping>()
-            //     .HasKey(ec => new { ec.EffectId, ec.CharacterId });
-
-            // builder.Entity<EffectMapping>()
-            //     .Property(ec => ec.CharacterId)
-            //     .ValueGeneratedNever();
-
-            // builder.Entity<EffectMapping>()
-            //     .Property(ec => ec.EffectId)
-            //     .ValueGeneratedNever();
-
-            // builder.Entity<EffectMapping>()
-            //     .HasOne(ec => ec.Effect)
-            //     .WithMany(e => e.EffectMappings)
-            //     .HasForeignKey(ec => ec.EffectId);
-
-            // builder.Entity<EffectMapping>()
-            //     .HasOne(ec => ec.Character)
-            //     .WithMany(c => c.EffectMappings)
-            //     .HasForeignKey(ec => ec.CharacterId);
-
-            // builder.Entity<EffectList>()
-            //     .HasKey(x => x.Id);
+            // SQLite ignore case
+            if (!_options.UseInMemoryDatabase)
+                builder.UseCollation("NOCASE");
 
             builder.Entity<Character>()
                 .Ignore(x => x.Statistics)
