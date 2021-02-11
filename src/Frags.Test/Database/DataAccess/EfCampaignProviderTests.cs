@@ -115,7 +115,7 @@ namespace Frags.Test.Database.DataAccess
 
             var options = new GeneralOptions
             {
-                UseInMemoryDatabase = false,
+                UseInMemoryDatabase = true,
                 DatabaseName = baseName + "_DB"
             };
 
