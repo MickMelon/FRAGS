@@ -69,9 +69,12 @@ namespace Frags.Core.DataAccess
             return Task.CompletedTask;
         }
 
-        public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync()
+        public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync(bool includeCampaignStatistics = false)
         {
-            return await Task.FromResult(_statistics);
+            if (includeCampaignStatistics)
+                return await Task.FromResult(_statistics);
+
+            return await Task.FromResult(_statistics.Where(x => x.Campaign == null));
         }
 
         public Task<IEnumerable<Statistic>> GetAllStatisticsFromCampaignAsync(Campaign campaign)

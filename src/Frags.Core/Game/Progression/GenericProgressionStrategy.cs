@@ -42,7 +42,14 @@ namespace Frags.Core.Game.Progression
 
         protected async Task InitializeStatistics(Character character)
         {
-            foreach (var stat in await _statProvider.GetAllStatisticsAsync())
+            IEnumerable<Statistic> stats;
+
+            if (character.Campaign != null)
+                stats = await _statProvider.GetAllStatisticsFromCampaignAsync(character.Campaign);
+            else
+                stats = await _statProvider.GetAllStatisticsAsync();
+
+            foreach (var stat in stats)
             {
                 if (character.GetStatistic(stat) == null)
                 {
@@ -201,28 +208,20 @@ namespace Frags.Core.Game.Progression
             return Task.FromResult(true);
         }
 
-        public Task<bool> ResetCharacter(Character character)
+        public async Task<bool> ResetCharacter(Character character)
         {
             var level = GetCharacterLevel(character);
-            if (level <= 1) return Task.FromResult(false);
+            //if (level <= 1) return false;
 
-            foreach (var stat in character.Statistics)
-            {
-                if (stat.Key is Attribute)
-                    stat.Value.Value = _statOptions.InitialAttributeMin;
-                if (stat.Key is Skill)
-                    stat.Value.Value = _statOptions.InitialSkillMin;
-
-                stat.Value.IsProficient = false;
-                stat.Value.Proficiency = 0;
-            }
+            character.Statistics.Clear();
+            await InitializeStatistics(character);
 
             character.AttributePoints = 0;
             character.SkillPoints = 0;
 
             OnLevelUp(character, level - 1);
 
-            return Task.FromResult(true);
+            return true;
         }
 
         protected async Task<bool> InitialAttributesSet(Character character)

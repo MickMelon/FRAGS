@@ -159,6 +159,7 @@ namespace Frags.Presentation.Controllers
             IProgressionStrategy strategy = await _campProvider.GetProgressionStrategy(campaign);
             if (strategy == null) return CampaignResult.InvalidProgressionStrategy();
 
+            character.Campaign = campaign;
             await strategy.ResetCharacter(character);
             
             character.CampaignId = campaign.Id;

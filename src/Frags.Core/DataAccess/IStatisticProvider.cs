@@ -57,7 +57,7 @@ namespace Frags.Core.DataAccess
         /// Gets every statistic currently in use.
         /// </summary>
         /// <returns>An Enumerable of statistics currently in use.</returns>
-        Task<IEnumerable<Statistic>> GetAllStatisticsAsync();
+        Task<IEnumerable<Statistic>> GetAllStatisticsAsync(bool includeCampaignStatistics = false);
 
         /// <summary>
         /// Gets every statistic currently in use in the specified Campaign.

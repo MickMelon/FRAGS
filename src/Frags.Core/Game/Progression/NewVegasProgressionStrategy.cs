@@ -82,7 +82,14 @@ namespace Frags.Core.Game.Progression
 
         new private async Task InitializeStatistics(Character character)
         {
-            foreach (var stat in await _statProvider.GetAllStatisticsAsync())
+            IEnumerable<Statistic> stats;
+
+            if (character.Campaign != null)
+                stats = await _statProvider.GetAllStatisticsFromCampaignAsync(character.Campaign);
+            else
+                stats = await _statProvider.GetAllStatisticsAsync();
+
+            foreach (var stat in stats)
             {
                 if (character.GetStatistic(stat) == null)
                 {

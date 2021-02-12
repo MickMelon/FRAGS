@@ -53,13 +53,13 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            var stat = await _statProvider.GetStatisticAsync(statName);
-            if (stat == null) return StatisticResult.StatisticNotFound();
+            Statistic statistic = await GetStatistic(statName, character);
+            if (statistic == null) return StatisticResult.StatisticNotFound();
 
-            var statValue = character.GetStatistic(stat);
+            var statValue = character.GetStatistic(statistic);
             if (statValue == null) return StatisticResult.StatisticNotFound();
 
-            return StatisticResult.StatisticCheck(character.Name, stat.Name, statValue.Value);
+            return StatisticResult.StatisticCheck(character.Name, statistic.Name, statValue.Value);
         }
 
         public async Task<IResult> AddExperienceAsync(ulong callerId, int xp)
@@ -133,7 +133,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            var statistic = await _statProvider.GetStatisticAsync(statName);
+            Statistic statistic = await GetStatistic(statName, character);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
             try
@@ -173,7 +173,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            var statistic = await _statProvider.GetStatisticAsync(statName);
+            Statistic statistic = await GetStatistic(statName, character);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
             try
@@ -205,7 +205,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            var statistic = await _statProvider.GetStatisticAsync(statName);
+            Statistic statistic = await GetStatistic(statName, character);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
             try
@@ -228,6 +228,14 @@ namespace Frags.Presentation.Controllers
                 return GenericResult.Failure(e.Message);
                 throw e;
             }
+        }
+
+        private async Task<Statistic> GetStatistic(string statName, Character character)
+        {
+            if (character.Campaign != null)
+                return await _statProvider.GetStatisticAsync(statName, character.Campaign);
+            else
+                return await _statProvider.GetStatisticAsync(statName);
         }
     }
 }

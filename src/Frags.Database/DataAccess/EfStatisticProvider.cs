@@ -62,9 +62,12 @@ namespace Frags.Database.DataAccess
             }
         }
 
-        public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync()
+        public async Task<IEnumerable<Statistic>> GetAllStatisticsAsync(bool includeCampaignStatistics = false)
         {
-            return await _context.Statistics.ToListAsync();
+            if (includeCampaignStatistics)
+                return await _context.Statistics.ToListAsync();
+            
+            return await _context.Statistics.Where(x => x.Campaign == null).ToListAsync();
         }
 
         public async Task<IEnumerable<Statistic>> GetAllStatisticsFromCampaignAsync(Campaign campaign)
