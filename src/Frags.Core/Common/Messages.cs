@@ -32,6 +32,7 @@ namespace Frags.Core.Common
         public static readonly string STAT_DELETE_SUCCESS = "Statistic deleted successfully.";
         public static readonly string STAT_NAME_EXISTS = "Statistic with that name already exists.";
         public static readonly string STAT_NOT_FOUND = "Statistic not found.";
+        public static readonly string STAT_CHAR_NOT_SET = "Statistics not yet set on character. Try running the set command first.";
         public static readonly string STAT_SET_SUCCESS = "Statistic set sucessfully.";
         public static readonly string STAT_TOO_MANY_AT_MAX = "Too many statistics were set to their max value. (Limit {0})";
         public static readonly string STAT_RESET = "Statistics reset.";

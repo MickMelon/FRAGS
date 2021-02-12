@@ -109,5 +109,8 @@ namespace Frags.Presentation.Results
             return new StatisticResult($"{character.Statistics.Count()} Statistics found",
                 viewModel: result);
         }
+
+        public static StatisticResult CharacterStatisticsNotSet() =>
+            new StatisticResult(Messages.STAT_CHAR_NOT_SET, false);
     }
 }

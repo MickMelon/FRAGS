@@ -118,7 +118,7 @@ namespace Frags.Presentation.Controllers
             if (character == null) return CharacterResult.CharacterNotFound();
 
             if (character.Statistics == null || character.Statistics.Count <= 0)
-                return StatisticResult.StatisticNotFound();
+                return StatisticResult.CharacterStatisticsNotSet();
 
             return StatisticResult.ShowCharacter(character, await _strategy.GetCharacterStatisticsInfo(character));
         }
