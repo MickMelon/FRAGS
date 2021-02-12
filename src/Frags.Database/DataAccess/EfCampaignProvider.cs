@@ -179,6 +179,9 @@ namespace Frags.Database.DataAccess
         public async Task<IProgressionStrategy> GetProgressionStrategy(Campaign campaign)
         {
             StatisticOptions statOpts = await GetStatisticOptionsAsync(campaign);
+            if (statOpts == null || string.IsNullOrWhiteSpace(statOpts.ProgressionStrategy))
+                return null;
+                
             return _progStrategies?.Find(x => x.GetType().Name.ContainsIgnoreCase(statOpts.ProgressionStrategy));
         }
 

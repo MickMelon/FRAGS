@@ -59,5 +59,8 @@ namespace Frags.Presentation.Results
 
             return new EffectResult(character.Name + "'s Effects", true, viewModel);
         }
+
+        public static EffectResult CharacterHasNoEffectsApplied() =>
+            new EffectResult(Messages.EFFECT_CHAR_NO_EFFECTS_APPLIED, false);
     }
 }

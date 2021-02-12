@@ -52,6 +52,7 @@ namespace Frags.Core.Common
         public static readonly string EFFECT_REMOVED = "Effect removed sucessfully.";
         public static readonly string EFFECT_ALREADY_ADDED = "Effect is already added.";
         public static readonly string EFFECT_TOO_MANY = "You have reached the limit of effects.";
+        public static readonly string EFFECT_CHAR_NO_EFFECTS_APPLIED = "Character has no effects applied.";
         #endregion
 
         #region Campaigns
