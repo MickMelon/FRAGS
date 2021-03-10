@@ -11,32 +11,32 @@ namespace Frags.Discord.Modules
     [RequireAdminRole]
     public class CampaignStatisticModule : ModuleBase
     {
-        private readonly CampaignStatisticController _statController;
+        private readonly CampaignStatisticController _campStatController;
 
         public CampaignStatisticModule(CampaignStatisticController statController)
         {
-            _statController = statController;
+            _campStatController = statController;
         }
 
         [Command("create attribute")]
         [Alias("create attrib")]
         public async Task CreateAttributeAsync([Remainder]string statName)
         {
-            var result = await _statController.CreateCampaignAttributeAsync(statName, Context.User.Id, Context.Channel.Id);
+            var result = await _campStatController.CreateCampaignAttributeAsync(statName, Context.User.Id, Context.Channel.Id);
             await ReplyAsync(result.Message);
         }
 
         [Command("create skill")]
         public async Task CreateSkillAsync(string statName, [Remainder]string attribName)
         {
-            var result = await _statController.CreateCampaignSkillAsync(statName, attribName, Context.User.Id, Context.Channel.Id);
+            var result = await _campStatController.CreateCampaignSkillAsync(statName, attribName, Context.User.Id, Context.Channel.Id);
             await ReplyAsync(result.Message);
         }
 
         [Command("alias")]
         public async Task AddAliasAsync(string statName, [Remainder]string alias)
         {
-            var result = await _statController.AddCampaignAliasAsync(statName, alias, Context.User.Id, Context.Channel.Id);
+            var result = await _campStatController.AddCampaignAliasAsync(statName, alias, Context.User.Id, Context.Channel.Id);
             await ReplyAsync(result.Message);
         }
 
@@ -44,21 +44,21 @@ namespace Frags.Discord.Modules
         [Alias("clearalias", "clearaliases")]
         public async Task ClearAliasesAsync([Remainder]string statName)
         {
-            var result = await _statController.ClearCampaignAliasesAsync(statName, Context.User.Id, Context.Channel.Id);
+            var result = await _campStatController.ClearCampaignAliasesAsync(statName, Context.User.Id, Context.Channel.Id);
             await ReplyAsync(result.Message);
         }
 
         [Command("rename")]
         public async Task RenameStatisticAsync(string statName, [Remainder]string newName)
         {
-            var result = await _statController.RenameCampaignStatisticAsync(statName, newName, Context.User.Id, Context.Channel.Id);
+            var result = await _campStatController.RenameCampaignStatisticAsync(statName, newName, Context.User.Id, Context.Channel.Id);
             await ReplyAsync(result.Message);
         }
 
         [Command("delete")]
         public async Task DeleteStatisticAsync([Remainder]string statName)
         {
-            var result = await _statController.DeleteCampaignStatisticAsync(statName, Context.User.Id, Context.Channel.Id);
+            var result = await _campStatController.DeleteCampaignStatisticAsync(statName, Context.User.Id, Context.Channel.Id);
             await ReplyAsync(result.Message);
         }
     }
