@@ -17,17 +17,19 @@ namespace Frags.Core.Game.Progression
     {
         private readonly StatisticOptions _statOptions;
         private readonly IStatisticProvider _statProvider;
+        private readonly ICampaignProvider _campProvider;
 
         private static readonly int SKILL_BASE = 2;
         private static readonly int TAG_BONUS = 15;
         
-        public NewVegasProgressionStrategy(IStatisticProvider statProvider, StatisticOptions statOptions) : base(statProvider, statOptions)
+        public NewVegasProgressionStrategy(IStatisticProvider statProvider, StatisticOptions statOptions, ICampaignProvider campProvider) : base(statProvider, statOptions, campProvider)
         {
             _statOptions = statOptions;
             _statProvider = statProvider;
+            _campProvider = campProvider;
         }
 
-        override protected void OnLevelUp(Character character, int timesLeveledUp)
+        override protected Task OnLevelUp(Character character, int timesLeveledUp)
         {
             for (int levelUp = 1; levelUp <= timesLeveledUp; levelUp++)
             {
@@ -39,6 +41,8 @@ namespace Frags.Core.Game.Progression
                 if (inte % 2 != 0 && (origLevel + levelUp) % 2 == 0)
                     character.SkillPoints += 1;
             }
+            
+            return Task.CompletedTask;
         }
 
         override public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)

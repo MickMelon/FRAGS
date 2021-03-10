@@ -26,16 +26,19 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly IStatisticProvider _statProvider;
 
+        private readonly ICampaignProvider _campProvider;
+
         /// <summary>
         /// Used to control how characters are setup and progress.
         /// </summary>
-        private readonly IProgressionStrategy _strategy;
+        private readonly IProgressionStrategy _fallbackStrategy;
 
-        public StatisticCharacterController(ICharacterProvider charProvider, IStatisticProvider statProvider, IProgressionStrategy strategy)
+        public StatisticCharacterController(ICharacterProvider charProvider, IStatisticProvider statProvider, IProgressionStrategy strategy, ICampaignProvider campProvider)
         {
             _charProvider = charProvider;
             _statProvider = statProvider;
-            _strategy = strategy;
+            _fallbackStrategy = strategy;
+            _campProvider = campProvider;
         }
 
         /// <summary>
@@ -67,7 +70,9 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            await _strategy.AddExperience(character, xp);
+            var strategy = await GetProgressionStrategy(character);
+
+            await strategy.AddExperience(character, xp);
             await _charProvider.UpdateCharacterAsync(character);
 
             return CharacterResult.CharacterUpdatedSuccessfully();
@@ -100,7 +105,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            bool result = await _strategy.ResetCharacter(character);
+            bool result = await _fallbackStrategy.ResetCharacter(character);
             if (!result) return CharacterResult.LevelTooLow();
             await _charProvider.UpdateCharacterAsync(character);
 
@@ -120,7 +125,9 @@ namespace Frags.Presentation.Controllers
             if (character.Statistics == null || character.Statistics.Count <= 0)
                 return StatisticResult.CharacterStatisticsNotSet();
 
-            return StatisticResult.ShowCharacter(character, await _strategy.GetCharacterStatisticsInfo(character));
+            var strategy = await GetProgressionStrategy(character);
+
+            return StatisticResult.ShowCharacter(character, await strategy.GetCharacterStatisticsInfo(character));
         }
 
         /// <summary>
@@ -136,6 +143,8 @@ namespace Frags.Presentation.Controllers
             Statistic statistic = await _statProvider.GetStatisticAsync(statName, character.Campaign);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
+            var strategy = await GetProgressionStrategy(character);
+
             try
             {
                 if (force)
@@ -147,7 +156,7 @@ namespace Frags.Presentation.Controllers
                 }
                 else
                 {
-                    await _strategy.SetStatistic(character, statistic, newValue);
+                    await strategy.SetStatistic(character, statistic, newValue);
                 }
 
                 await _charProvider.UpdateCharacterAsync(character);
@@ -180,7 +189,8 @@ namespace Frags.Presentation.Controllers
             {
                 var currentVal = character.GetStatistic(statistic).Value;
 
-                await _strategy.SetStatistic(character, statistic, newValue + currentVal);
+                var strategy = await GetProgressionStrategy(character);
+                await strategy.SetStatistic(character, statistic, newValue + currentVal);
 
                 await _charProvider.UpdateCharacterAsync(character);
                 return StatisticResult.StatisticSetSucessfully();
@@ -217,7 +227,8 @@ namespace Frags.Presentation.Controllers
                 }
                 else
                 {
-                    await _strategy.SetProficiency(character, statistic, isProficient);
+                    var strategy = await GetProgressionStrategy(character);
+                    await strategy.SetProficiency(character, statistic, isProficient);
                 }
                 
                 await _charProvider.UpdateCharacterAsync(character);
@@ -228,6 +239,14 @@ namespace Frags.Presentation.Controllers
                 return GenericResult.Failure(e.Message);
                 throw e;
             }
+        }
+
+        private async Task<IProgressionStrategy> GetProgressionStrategy(Character character)
+        {
+            if (character.Campaign != null)
+                return await _campProvider.GetProgressionStrategy(character.Campaign);
+            
+            return _fallbackStrategy;
         }
     }
 }

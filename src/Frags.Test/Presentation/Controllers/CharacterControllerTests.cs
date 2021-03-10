@@ -209,7 +209,11 @@ namespace Frags.Test.Presentation.Controllers
                 ExpEnabledChannels = new List<Channel> { new Channel(1) },
                 ExpMessageLengthDivisor = 1
             };
-            var strategy = new GenericProgressionStrategy(statProvider, statOptions);
+
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
+
+            var strategy = new GenericProgressionStrategy(statProvider, statOptions, campProvider);
             //var campaignProvider = new MockCampaignProvider();
             var controller = new CharacterController(provider, new MockProgressionStrategy(), new GeneralOptions(), new MockUserProvider(), null);
 
@@ -229,7 +233,10 @@ namespace Frags.Test.Presentation.Controllers
                 ExpEnabledChannels = new List<Channel> { new Channel(1) },
                 ExpMessageLengthDivisor = 1
             };
-            var strategy = new GenericProgressionStrategy(statProvider, statOptions);
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
+
+            var strategy = new GenericProgressionStrategy(statProvider, statOptions, campProvider);
             //var campaignProvider = new MockCampaignProvider();
             var controller = new CharacterController(provider, strategy, new GeneralOptions(), new MockUserProvider() , null);
 
@@ -249,7 +256,10 @@ namespace Frags.Test.Presentation.Controllers
                 ExpEnabledChannels = new List<Channel> { new Channel(1) },
                 ExpMessageLengthDivisor = 1
             };
-            var strategy = new GenericProgressionStrategy(statProvider, statOptions);
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
+
+            var strategy = new GenericProgressionStrategy(statProvider, statOptions, campProvider);
             //var campaignProvider = new MockCampaignProvider();
             var controller = new CharacterController(provider, strategy, new GeneralOptions(), new MockUserProvider() , null);
 

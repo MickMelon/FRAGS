@@ -214,7 +214,12 @@ namespace Frags.Presentation.Controllers
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return false;
 
-            bool result = await _progStrategy.AddExperienceFromMessage(character, channelId, message);
+            IProgressionStrategy strategy = _progStrategy;
+
+            if (character.Campaign != null)
+                strategy = await _campProvider.GetProgressionStrategy(character.Campaign);
+
+            bool result = await strategy.AddExperienceFromMessage(character, channelId, message);
             _ = _provider.UpdateCharacterAsync(character);
             return result;
         }

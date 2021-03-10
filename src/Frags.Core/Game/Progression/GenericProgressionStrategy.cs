@@ -15,13 +15,49 @@ namespace Frags.Core.Game.Progression
 {
     public class GenericProgressionStrategy : IProgressionStrategy
     {
+        private readonly ICampaignProvider _campProvider;
         private readonly IStatisticProvider _statProvider;
         private readonly StatisticOptions _statOptions;
 
-        public GenericProgressionStrategy(IStatisticProvider statProvider, StatisticOptions statOptions)
+        public GenericProgressionStrategy(IStatisticProvider statProvider, StatisticOptions statOptions, ICampaignProvider campProvider)
         {
             _statProvider = statProvider;
             _statOptions = statOptions;
+            _campProvider = campProvider;
+        }
+
+        protected Character currentChar = null;
+        protected StatisticOptions statOptCache = null;
+        protected IEnumerable<Statistic> statisticCache = null;
+
+        protected async Task<StatisticOptions> GetStatisticOptions(Character character)
+        {
+            if (character == currentChar && statOptCache != null)
+                return statOptCache;
+
+            currentChar = character;
+
+            if (character.Campaign != null)
+                statOptCache = await _campProvider.GetStatisticOptionsAsync(character.Campaign);
+            else
+                statOptCache = _statOptions;
+
+            return statOptCache;
+        }
+
+        protected async Task<IEnumerable<Statistic>> GetStatistics(Character character)
+        {
+            if (character == currentChar && statisticCache != null)
+                return statisticCache;
+
+            currentChar = character;
+
+            if (character.Campaign != null)
+                statisticCache = await _statProvider.GetAllStatisticsFromCampaignAsync(character.Campaign);
+            else
+                statisticCache = await _statProvider.GetAllStatisticsAsync();
+
+            return statisticCache;
         }
 
         /// <summary>
@@ -42,32 +78,30 @@ namespace Frags.Core.Game.Progression
 
         protected async Task InitializeStatistics(Character character)
         {
-            IEnumerable<Statistic> stats;
-
-            if (character.Campaign != null)
-                stats = await _statProvider.GetAllStatisticsFromCampaignAsync(character.Campaign);
-            else
-                stats = await _statProvider.GetAllStatisticsAsync();
+            IEnumerable<Statistic> stats = await GetStatistics(character);
+            StatisticOptions statOpts = await GetStatisticOptions(character);
 
             foreach (var stat in stats)
             {
                 if (character.GetStatistic(stat) == null)
                 {
                     if (stat is Attribute)
-                        character.SetStatistic(stat, new StatisticValue(_statOptions.InitialAttributeMin));
+                        character.SetStatistic(stat, new StatisticValue(statOpts.InitialAttributeMin));
                     if (stat is Skill)
-                        character.SetStatistic(stat, new StatisticValue(_statOptions.InitialSkillMin));
+                        character.SetStatistic(stat, new StatisticValue(statOpts.InitialSkillMin));
                 }
             }
         }
 
         virtual public async Task<bool> SetStatistic(Character character, Statistic statistic, int? newValue)
         {
+            StatisticOptions statOpts = await GetStatisticOptions(character);
+
             await InitializeStatistics(character);
 
             var level = GetCharacterLevel(character);
             if (!newValue.HasValue) throw new ProgressionException(Messages.INVALID_INPUT);
-            if (level <= _statOptions.InitialSetupMaxLevel || !await InitialAttributesSet(character) || !await InitialSkillsSet(character))
+            if (level <= (statOpts).InitialSetupMaxLevel || !await InitialAttributesSet(character) || !await InitialSkillsSet(character))
                 return await SetInitialStatistic(character, statistic, newValue.Value);
 
             // Character is above setup level and has their attributes & skills set
@@ -76,14 +110,14 @@ namespace Frags.Core.Game.Progression
                 var current = character.GetStatistic(attribute);
 
                 if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
-                if (newValue.Value > _statOptions.AttributeMax) throw new ProgressionException(Messages.TOO_HIGH);
+                if (newValue.Value > (statOpts).AttributeMax) throw new ProgressionException(Messages.TOO_HIGH);
 
                 if (character.AttributePoints + current.Value - newValue.Value >= 0)
                 {
                     int amt = newValue.Value - current.Value;
 
                     if (current.IsProficient)
-                        newValue += (int)(amt * _statOptions.ProficientAttributeMultiplier);
+                        newValue += (int)(amt * (statOpts).ProficientAttributeMultiplier);
 
                     current.Value = newValue.Value;
 
@@ -101,14 +135,14 @@ namespace Frags.Core.Game.Progression
                 var current = character.GetStatistic(skill);
 
                 if (newValue.Value < current.Value) throw new ProgressionException(Messages.INVALID_INPUT);
-                if (newValue.Value > _statOptions.SkillMax) throw new ProgressionException(Messages.TOO_HIGH);
+                if (newValue.Value > (statOpts).SkillMax) throw new ProgressionException(Messages.TOO_HIGH);
 
                 if (character.SkillPoints + current.Value - newValue.Value >= 0)
                 {
                     int amt = newValue.Value - current.Value;
 
                     if (current.IsProficient)
-                        newValue += (int)(amt * _statOptions.ProficientAttributeMultiplier);
+                        newValue += (int)(amt * (statOpts).ProficientAttributeMultiplier);
 
                     current.Value = newValue.Value;
 
@@ -130,30 +164,31 @@ namespace Frags.Core.Game.Progression
             int statMin, statMax, statsAtMax, points, level = GetCharacterLevel(character);
             // This is either an enumerable of all the character's attributes or skills, never both.
             IEnumerable<int> stats;
+            StatisticOptions statOpts = await GetStatisticOptions(character);
 
             // Set variables
             if (statistic is Attribute attrib)
             {
-                statMin = _statOptions.InitialAttributeMin; 
-                statMax = _statOptions.InitialAttributeMax; 
-                points = _statOptions.InitialAttributePoints;
-                statsAtMax = _statOptions.InitialAttributesAtMax;
+                statMin = statOpts.InitialAttributeMin; 
+                statMax = statOpts.InitialAttributeMax; 
+                points = statOpts.InitialAttributePoints;
+                statsAtMax = statOpts.InitialAttributesAtMax;
 
                 stats = character.Attributes.Select(x => x.Value.Value);
 
-                if (level > _statOptions.InitialSetupMaxLevel && await InitialAttributesSet(character))
+                if (level > statOpts.InitialSetupMaxLevel && await InitialAttributesSet(character))
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
             }
             else
             {
-                statMin = _statOptions.InitialSkillMin;
-                statMax = _statOptions.InitialSkillMax;
-                points = _statOptions.InitialSkillPoints;
-                statsAtMax = _statOptions.InitialSkillsAtMax;
+                statMin = statOpts.InitialSkillMin;
+                statMax = statOpts.InitialSkillMax;
+                points = statOpts.InitialSkillPoints;
+                statsAtMax = statOpts.InitialSkillsAtMax;
 
                 stats = character.Skills.Select(x => x.Value.Value);
 
-                if (level > _statOptions.InitialSetupMaxLevel && await InitialSkillsSet(character)) 
+                if (level > statOpts.InitialSetupMaxLevel && await InitialSkillsSet(character)) 
                     throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
             }
 
@@ -184,28 +219,30 @@ namespace Frags.Core.Game.Progression
             return true;
         }
 
-        virtual public Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)
+        virtual public async Task<bool> SetProficiency(Character character, Statistic statistic, bool proficient)
         {
+            StatisticOptions statOpts = await GetStatisticOptions(character);
+
             int alreadySet, level = GetCharacterLevel(character), initialProficient;
             if (statistic is Attribute attrib)
             {
                 alreadySet = character.Attributes.Count(x => x.Value.IsProficient);
-                initialProficient = _statOptions.InitialAttributesProficient;
+                initialProficient = (statOpts).InitialAttributesProficient;
             }
             else
             {
                 alreadySet = character.Skills.Count(x => x.Value.IsProficient);
-                initialProficient = _statOptions.InitialSkillsProficient;
+                initialProficient = (statOpts).InitialSkillsProficient;
             }
 
-            if (level > _statOptions.InitialSetupMaxLevel && alreadySet >= initialProficient)
+            if (level > (statOpts).InitialSetupMaxLevel && alreadySet >= initialProficient)
                 throw new ProgressionException(Messages.CHAR_LEVEL_TOO_HIGH);
 
             if (proficient && alreadySet + 1 > initialProficient)
                 throw new ProgressionException(Messages.NOT_ENOUGH_POINTS);
 
             character.GetStatistic(statistic).IsProficient = proficient;
-            return Task.FromResult(true);
+            return true;
         }
 
         public async Task<bool> ResetCharacter(Character character)
@@ -219,46 +256,52 @@ namespace Frags.Core.Game.Progression
             character.AttributePoints = 0;
             character.SkillPoints = 0;
 
-            OnLevelUp(character, level - 1);
+            await OnLevelUp(character, level - 1);
 
             return true;
         }
 
         protected async Task<bool> InitialAttributesSet(Character character)
         {
+            IEnumerable<Statistic> stats = await GetStatistics(character);
+            StatisticOptions statOpts = await GetStatisticOptions(character);
+
             if (character == null || character.Statistics == null) return false;
 
             var attribs = character.Attributes;
             var sum = attribs.Sum(x => x.Value.Value);
 
             // Character attributes don't match up with database attributes
-            if (attribs.Count != (await _statProvider.GetAllStatisticsAsync()).OfType<Attribute>().Count()) return false;
+            if (attribs.Count != stats.OfType<Attribute>().Count()) return false;
             // Not all attributes are above or equal their minimum vaulue
-            if (attribs.Any(x => x.Value.Value < _statOptions.InitialAttributeMin)) return false;
+            if (attribs.Any(x => x.Value.Value < (statOpts).InitialAttributeMin)) return false;
             // Character has not set their initial attribute values
-            if (sum < _statOptions.InitialAttributePoints) return false;
+            if (sum < (statOpts).InitialAttributePoints) return false;
             
             return true;
         }
 
         protected async Task<bool> InitialSkillsSet(Character character)
         {
+            IEnumerable<Statistic> stats = await GetStatistics(character);
+            StatisticOptions statOpts = await GetStatisticOptions(character);
+
             if (character == null || character.Statistics == null) return false;
 
             var skills = character.Skills;
             var sum = skills.Sum(x => x.Value.Value);
 
             // Character attributes don't match up with database attributes
-            if (skills.Count != (await _statProvider.GetAllStatisticsAsync()).OfType<Skill>().Count()) return false;
+            if (skills.Count != stats.OfType<Skill>().Count()) return false;
             // Not all attributes are above or equal their minimum vaulue
-            if (skills.Any(x => x.Value.Value < _statOptions.InitialSkillMin)) return false;
+            if (skills.Any(x => x.Value.Value < (statOpts).InitialSkillMin)) return false;
             // Character has not set their initial attribute values
-            if (sum < _statOptions.InitialSkillPoints) return false;
+            if (sum < (statOpts).InitialSkillPoints) return false;
             
             return true;
         }
 
-        public Task<bool> AddExperience(Character character, int amount)
+        public async Task<bool> AddExperience(Character character, int amount)
         {
             int origLevel = GetCharacterLevel(character);
 
@@ -268,27 +311,32 @@ namespace Frags.Core.Game.Progression
             int difference = newLevel - origLevel;
             if (difference >= 1)
             {
-                OnLevelUp(character, difference);
-                return Task.FromResult(true);
+                await OnLevelUp(character, difference);
+                return true;
             }
 
-            return Task.FromResult(false);
+            return false;
         }
 
-        public Task<bool> AddExperienceFromMessage(Character character, ulong channelId, string message)
+        public async Task<bool> AddExperienceFromMessage(Character character, ulong channelId, string message)
         {
-            if (!_statOptions.ExpEnabledChannels.Select(x => x.Id).Contains(channelId)) return Task.FromResult(false);
-            if (string.IsNullOrWhiteSpace(message)) return Task.FromResult(false);
+            IEnumerable<Statistic> stats = await GetStatistics(character);
+            StatisticOptions statOpts = await GetStatisticOptions(character);
 
-            return AddExperience(character, message.Length / _statOptions.ExpMessageLengthDivisor);
+            if (!(statOpts).ExpEnabledChannels.Select(x => x.Id).Contains(channelId)) return false;
+            if (string.IsNullOrWhiteSpace(message)) return false;
+
+            return await AddExperience(character, message.Length / (statOpts).ExpMessageLengthDivisor);
         }
 
-        virtual protected void OnLevelUp(Character character, int timesLeveledUp)
+        virtual async protected Task OnLevelUp(Character character, int timesLeveledUp)
         {
+            StatisticOptions statOpts = await GetStatisticOptions(character);
+
             for (int levelUp = 1; levelUp <= timesLeveledUp; levelUp++)
             {
-                character.SkillPoints += _statOptions.SkillPointsOnLevelUp;
-                character.AttributePoints += _statOptions.AttributePointsOnLevelUp;
+                character.SkillPoints += (statOpts).SkillPointsOnLevelUp;
+                character.AttributePoints += (statOpts).AttributePointsOnLevelUp;
             }
         }
 
@@ -308,19 +356,21 @@ namespace Frags.Core.Game.Progression
 
         public async Task<string> GetCharacterStatisticsInfo(Character character)
         {
+            StatisticOptions statOpts = await GetStatisticOptions(character);
+
             var level = GetCharacterLevel(character);
             StringBuilder output = new StringBuilder();
 
             if (!await InitialAttributesSet(character))
             {
                 var sum = character.Attributes.Sum(x => x.Value.Value);
-                output.Append($"Remaining initial attribute points: {_statOptions.InitialAttributePoints - sum}\n");
+                output.Append($"Remaining initial attribute points: {(statOpts).InitialAttributePoints - sum}\n");
             }
 
             if (!await InitialSkillsSet(character))
             {
                 var sum = character.Skills.Sum(x => x.Value.Value);
-                output.Append($"Remaining initial skill points: {_statOptions.InitialSkillPoints - sum}\n");
+                output.Append($"Remaining initial skill points: {(statOpts).InitialSkillPoints - sum}\n");
             }
 
             return output.ToString();
