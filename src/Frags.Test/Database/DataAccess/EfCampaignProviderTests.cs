@@ -34,6 +34,9 @@ namespace Frags.Test.Database.DataAccess
         EfCharacterProvider charProvider = null;
         EfCampaignProvider campProvider = null;
 
+        List<IProgressionStrategy> progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
+        List<IRollStrategy> rollStrats = new List<IRollStrategy> { new MockRollStrategy() };
+
         public EfCampaignProviderTests(ITestOutputHelper output)
         {
             _output = output;
@@ -57,21 +60,20 @@ namespace Frags.Test.Database.DataAccess
                 DatabaseName = baseName + "_DB"
             };
 
-            var progStrats = new List<IProgressionStrategy>{ new MockProgressionStrategy() };
-            var rollStrats = new List<IRollStrategy> { new MockRollStrategy() };
+            
 
             // $camp create
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
-                
+                RefreshState(context);
+
                 await campProvider.CreateCampaignAsync(userId, campName);
             }
 
             // $camp addchannel
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -83,7 +85,7 @@ namespace Frags.Test.Database.DataAccess
             string newName = "the new name";
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
                 
@@ -93,7 +95,7 @@ namespace Frags.Test.Database.DataAccess
 
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -131,14 +133,15 @@ namespace Frags.Test.Database.DataAccess
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                campProvider = new EfCampaignProvider(context, progStrats, rollStrats);
+                RefreshState(context);
+
                 await campProvider.CreateCampaignAsync(userId, campName);
             }
 
             // $camp addchannel
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -149,7 +152,7 @@ namespace Frags.Test.Database.DataAccess
             // $camp statoptions
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
                 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -165,7 +168,7 @@ namespace Frags.Test.Database.DataAccess
             // $create (character)
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
 
                 await charProvider.CreateCharacterAsync(userId, charName);
             }
@@ -173,7 +176,7 @@ namespace Frags.Test.Database.DataAccess
             // $camp convert
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, null);
 
@@ -184,7 +187,7 @@ namespace Frags.Test.Database.DataAccess
             // $camp info
             using (var context = new RpgContext(options))
             {
-                RefreshState(context, userProvider, statProvider, effectProvider, charProvider, campProvider, progStrats, rollStrats);
+                RefreshState(context);
 
                 var campController = new CampaignController(userProvider, charProvider, campProvider, statProvider);
                 var result = await campController.GetCampaignInfoAsync(campName);
@@ -200,7 +203,7 @@ namespace Frags.Test.Database.DataAccess
             }
         }
 
-        private static void RefreshState(RpgContext context, EfUserProvider userProvider, EfStatisticProvider statProvider, EfEffectProvider effectProvider, EfCharacterProvider charProvider, EfCampaignProvider campProvider, List<IProgressionStrategy> progStrats, List<IRollStrategy> rollStrats)
+        private void RefreshState(RpgContext context)
         {
             userProvider = new EfUserProvider(context);
             statProvider = new EfStatisticProvider(context);
