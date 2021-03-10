@@ -27,7 +27,7 @@ namespace Frags.Test.Presentation.Controllers
             ulong userId = (ulong)GameRandom.Between(11, int.MaxValue - 1);
             ulong channelId = (ulong)GameRandom.Between(11, int.MaxValue - 1);
 
-            await controller.CreateCampaignAsync(userId, name);
+            await controller.CreateCampaignAsync(userId, name, channelId-1);
             var result = await controller.AddCampaignChannelAsync(name, channelId);
 
             Assert.Equal(CampaignResult.ChannelAdded(), result);
@@ -47,7 +47,7 @@ namespace Frags.Test.Presentation.Controllers
             var strategy = new MockProgressionStrategy();
             var controller = new CampaignController(userProv, charProv, provider, null);
 
-            var result = await controller.CreateCampaignAsync(userId, name);
+            var result = await controller.CreateCampaignAsync(userId, name, channelId);
 
             Assert.Equal(CampaignResult.CampaignCreated(), result);
         }
@@ -66,10 +66,10 @@ namespace Frags.Test.Presentation.Controllers
             var strategy = new MockProgressionStrategy();
             var controller = new CampaignController(userProv, charProv, provider, null);
 
-            await controller.CreateCampaignAsync(userId, name);
-            var result = await controller.CreateCampaignAsync(userId, name);
+            await controller.CreateCampaignAsync(userId, name, channelId);
+            var result = await controller.CreateCampaignAsync(userId, name, channelId+1);
 
-            Assert.Equal(CampaignResult.NameAlreadyExists(), result);
+            Assert.Equal(CampaignResult.CampaignWithNameAlreadyExists(), result);
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace Frags.Test.Presentation.Controllers
             var statProvider = new MockStatisticProvider();          
             var controller = new CampaignController(userProv, charProv, provider, statProvider);
 
-            await controller.CreateCampaignAsync(userId, name);
+            await controller.CreateCampaignAsync(userId, name,channelId-1);
             await controller.AddCampaignChannelAsync(name, channelId);
             await controller.ConfigureStatisticOptionsAsync(userId, channelId, nameof(StatisticOptions.ProgressionStrategy), progStratName);
             await controller.ConfigureRollOptionsAsync(userId, channelId, nameof(RollOptions.RollStrategy), rollStratName);

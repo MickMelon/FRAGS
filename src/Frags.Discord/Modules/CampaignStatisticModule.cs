@@ -8,12 +8,11 @@ namespace Frags.Discord.Modules
 {
     [Group("campaign statistic")]
     [Alias("campaign statistics", "campaign stat", "campaign stats", "camp statistic", "camp statistics", "camp stat", "camp stats")]
-    [RequireAdminRole]
     public class CampaignStatisticModule : ModuleBase
     {
-        private readonly CampaignStatisticController _campStatController;
+        private readonly StatisticController _campStatController;
 
-        public CampaignStatisticModule(CampaignStatisticController statController)
+        public CampaignStatisticModule(StatisticController statController)
         {
             _campStatController = statController;
         }

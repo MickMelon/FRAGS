@@ -48,10 +48,13 @@ namespace Frags.Presentation.Results
         public static CampaignResult ChannelAlreadyPresent() =>
             new CampaignResult(Messages.CAMP_CHANNEL_ALREADY_ADDED, success: false);
 
+        public static CampaignResult CampaignWithChannelAlreadyExists() =>
+            new CampaignResult(Messages.CAMP_EXISTING_CHANNEL, success: false);
+
         public static  CampaignResult NameChanged() =>
             new CampaignResult(Messages.CAMP_NAME_CHANGED);
 
-        public static CampaignResult NameAlreadyExists() =>
+        public static CampaignResult CampaignWithNameAlreadyExists() =>
             new CampaignResult(Messages.CAMP_EXISTING_NAME, success: false);
 
         public static CampaignResult NotFoundByName() =>

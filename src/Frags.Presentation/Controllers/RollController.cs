@@ -59,24 +59,17 @@ namespace Frags.Presentation.Controllers
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            Statistic stat;
+            Statistic stat = await _statProvider.GetStatisticAsync(statName, character.Campaign);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
             IRollStrategy strategy;
 
             if (character.Campaign == null)
-            {
-                stat = await _statProvider.GetStatisticAsync(statName);
                 strategy = _defaultStrategy;
-            }
-            else
-            {
-                stat = await _statProvider.GetStatisticAsync(statName, character.Campaign);
+            else 
                 strategy = await _campProvider.GetRollStrategy(character.Campaign);
-            }
 
-            if (strategy == null)
-                return RollResult.RollFailed();
-
-            if (stat == null) return StatisticResult.StatisticNotFound();
+            if (strategy == null) return RollResult.RollFailed();
 
             string result = strategy.GetRollMessage(stat, character, useEffects);
 
@@ -98,25 +91,18 @@ namespace Frags.Presentation.Controllers
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            Statistic stat;
+            Statistic stat = await _statProvider.GetStatisticAsync(statName, character.Campaign);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
             IRollStrategy strategy;
 
             if (character.Campaign == null)
-            {
-                stat = await _statProvider.GetStatisticAsync(statName);
                 strategy = _defaultStrategy;
-            }
             else
-            {
-                stat = await _statProvider.GetStatisticAsync(statName, character.Campaign);
                 strategy = await _campProvider.GetRollStrategy(character.Campaign);
-            }
 
-            if (strategy == null)
-                return RollResult.RollFailed();
-
-            if (displayName != null)
-                character.Name = displayName;
+            if (strategy == null) return RollResult.RollFailed();
+            if (displayName != null) character.Name = displayName;
 
             var current = character.GetStatistic(stat);
 
@@ -148,24 +134,17 @@ namespace Frags.Presentation.Controllers
             var target = await _provider.GetActiveCharacterAsync(targetId);
             if (target == null) return CharacterResult.CharacterNotFound();
 
-            Statistic stat;
+            Statistic stat = await _statProvider.GetStatisticAsync(statName, caller.Campaign);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
             IRollStrategy strategy;
 
             if (caller.Campaign == null)
-            {
-                stat = await _statProvider.GetStatisticAsync(statName);
                 strategy = _defaultStrategy;
-            }
             else
-            {
-                stat = await _statProvider.GetStatisticAsync(statName, caller.Campaign);
                 strategy = await _campProvider.GetRollStrategy(caller.Campaign);
-            }
 
-            if (strategy == null)
-                return RollResult.RollFailed();
-
-            if (stat == null) return StatisticResult.StatisticNotFound();
+            if (strategy == null) return RollResult.RollFailed();
 
             double? callerRoll = strategy.RollStatistic(stat, caller, useEffects);
             double? targetRoll = strategy.RollStatistic(stat, target, useEffects);

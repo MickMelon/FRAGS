@@ -54,7 +54,7 @@ namespace Frags.Discord
         [Command("create")]
         public async Task CreateCampaignAsync([Remainder]string name)
         {
-            await ReplyAsync((await _controller.CreateCampaignAsync(Context.User.Id, name)).Message);
+            await ReplyAsync((await _controller.CreateCampaignAsync(Context.User.Id, name, Context.Channel.Id)).Message);
         }
 
         [Command("rename")]

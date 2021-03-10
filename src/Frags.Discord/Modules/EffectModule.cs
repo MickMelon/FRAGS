@@ -39,7 +39,7 @@ namespace Frags.Discord.Modules
         [Command("set")]
         public async Task SetStatisticEffectAsync(string effectName, string statName, int value)
         {
-            var result = await _controller.SetStatisticEffectAsync(effectName, statName, value);
+            var result = await _controller.SetStatisticEffectAsync(Context.User.Id, effectName, statName, value);
             await ReplyAsync(result.Message);
         }
 
@@ -47,21 +47,21 @@ namespace Frags.Discord.Modules
         [Alias("desc")]
         public async Task SetEffectDescriptionAsync(string effectName, [Remainder]string desc)
         {
-            var result = await _controller.SetDescriptionAsync(effectName, desc);
+            var result = await _controller.SetEffectDescriptionAsync(Context.User.Id, effectName, desc);
             await ReplyAsync(result.Message);
         }
 
         [Command("rename")]
         public async Task RenameEffectAsync(string effectName, [Remainder]string newName)
         {
-            var result = await _controller.RenameEffectAsync(effectName, newName);
+            var result = await _controller.RenameEffectAsync(Context.User.Id, effectName, newName);
             await ReplyAsync(result.Message);
         }
 
         [Command("delete")]
         public async Task DeleteEffectAsync([Remainder]string effectName)
         {
-            var result = await _controller.DeleteEffectAsync(effectName);
+            var result = await _controller.DeleteEffectAsync(Context.User.Id, effectName);
             await ReplyAsync(result.Message);
         }
     }

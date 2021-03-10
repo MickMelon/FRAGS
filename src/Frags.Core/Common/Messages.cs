@@ -49,10 +49,12 @@ namespace Frags.Core.Common
         public static readonly string EFFECT_NAME_EXISTS = "Effect with that name already exists.";
         public static readonly string EFFECT_NOT_FOUND = "Effect not found.";
         public static readonly string EFFECT_ADDED = "Effect added sucessfully.";
+        public static readonly string EFFECT_ADDED_FROM_DEFAULT_POOL = "Warning: Failed to find an Effect from this Campaign with the given name. Added effect from the default pool to character. Please ensure that the correct effect has been added.";
         public static readonly string EFFECT_REMOVED = "Effect removed sucessfully.";
         public static readonly string EFFECT_ALREADY_ADDED = "Effect is already added.";
         public static readonly string EFFECT_TOO_MANY = "You have reached the limit of effects.";
         public static readonly string EFFECT_CHAR_NO_EFFECTS_APPLIED = "Character has no effects applied.";
+        public static readonly string EFFECT_ACCESS_DENIED = "Only the owner of the effect may change that.";
         #endregion
 
         #region Campaigns
@@ -63,6 +65,7 @@ namespace Frags.Core.Common
         public static readonly string CAMP_CHANNEL_ALREADY_ADDED = "Channel already added, action failed.";
         public static readonly string CAMP_NOT_FOUND_NAME = "A Campaign with that name was not found.";
         public static readonly string CAMP_EXISTING_NAME = "A Campaign with that name already exists.";
+        public static readonly string CAMP_EXISTING_CHANNEL = "A Campaign with that channel already exists.";
         public static readonly string CAMP_NOT_FOUND_CHANNEL = "This channel is not associated with a Campaign.";
         public static readonly string CAMP_PROPERTY_VALUECHANGED = "Setting successfully changed.";
         public static readonly string CAMP_PROPERTY_INVALID = "A setting with that name does not exist.";

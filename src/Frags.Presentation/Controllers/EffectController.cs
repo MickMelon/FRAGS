@@ -11,6 +11,8 @@ using Frags.Core.Effects;
 using Frags.Presentation.Results;
 using Frags.Presentation.ViewModels;
 using Frags.Core.Statistics;
+using Frags.Core.Campaigns;
+using Frags.Core.Common.Extensions;
 
 namespace Frags.Presentation.Controllers
 {
@@ -33,33 +35,54 @@ namespace Frags.Presentation.Controllers
         /// </summary>
         private readonly GeneralOptions _options;
 
+        private readonly ICampaignProvider _campProvider;
+
         public EffectController(ICharacterProvider charProvider, 
             IEffectProvider effectProvider, 
             IStatisticProvider statProvider,
-            GeneralOptions options)
+            GeneralOptions options,
+            ICampaignProvider campProvider)
         {
             _charProvider = charProvider;
             _effectProvider = effectProvider;
             _statProvider = statProvider;
             _options = options;
+            _campProvider = campProvider;
         }
 
         /// <summary>
-        /// Creates a new Effect in the database.
+        /// Creates a new Effect in the database associated with a campaign.
         /// </summary>
+        /// <param name="callerId">The user identifier of the owner of the new effect.</param>
         /// <param name="effectName">The name for the new effect.</param>
+        /// <param name="channelId">The channel the command was executed in to find the campaign.</param>
         /// <returns>
         /// A result detailing if the operation was successful or why it failed.
         /// </returns>
-        public async Task<IResult> CreateEffectAsync(ulong callerId, string effectName)
+        public async Task<IResult> CreateCampaignEffectAsync(ulong callerId, string effectName, ulong channelId) =>
+            await CreateEffectAsync(callerId, effectName, channelId, useCampaigns: true);
+
+        public async Task<IResult> CreateEffectAsync(ulong callerId, string effectName) =>
+            await CreateEffectAsync(callerId, effectName, 0, useCampaigns: false);
+
+        private async Task<IResult> CreateEffectAsync(ulong callerId, string effectName, ulong channelId, bool useCampaigns)
         {
-            if (await _effectProvider.GetEffectAsync(effectName) != null)
+            Campaign campaign = null;
+
+            if (useCampaigns)
+            {
+                campaign = await _campProvider.GetCampaignAsync(channelId);
+                if (campaign == null) return CampaignResult.NotFoundByChannel();
+                if (!await _campProvider.HasPermissionAsync(campaign, callerId)) return CampaignResult.AccessDenied();
+            }
+            
+            if (await _effectProvider.GetEffectAsync(effectName, campaign) != null)
                 return EffectResult.NameAlreadyExists();
 
             if ((await _effectProvider.GetOwnedEffectsAsync(callerId)).Count() >= _options.EffectsLimit)
                 return EffectResult.TooManyEffects();
 
-            var result = await _effectProvider.CreateEffectAsync(callerId, effectName);
+            var result = await _effectProvider.CreateEffectAsync(callerId, effectName, campaign);
 
             if (result == null) return EffectResult.EffectCreationFailed();
             return EffectResult.EffectCreatedSuccessfully();
@@ -77,20 +100,50 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
-        /// Sets the statistic effects of the specified effect.
+        /// Sets the statistic effects of the specified effect that is associated with a campaign.
         /// </summary>
+        /// <param name="callerId">The user identifier of the moderator or owner of the campaign.</param>
         /// <param name="effectName">The name of the effect to set the value to.</param>
         /// <param name="statName">The name of the statistic to associate the value with.</param>
         /// <param name="value">The value to add (or subtract) to the statistic.</param>
+        /// <param name="channelId">The channel the command was executed in to find the campaign.</param>
         /// <returns>
         /// A result detailing if the operation was successful or why it failed.
         /// </returns>
-        public async Task<IResult> SetStatisticEffectAsync(string effectName, string statName, int value)
+        public async Task<IResult> SetCampaignStatisticEffectAsync(ulong callerId, string effectName, string statName, int value, ulong channelId) =>
+            await SetStatisticEffectAsync(callerId, effectName, statName, value, channelId, useCampaigns: true);
+
+        /// <summary>
+        /// Sets the statistic effects of the specified effect that is associated with a campaign.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the owner of the effect.</param>
+        /// <param name="effectName">The name of the effect to set the value to.</param>
+        /// <param name="statName">The name of the statistic to associate the value with.</param>
+        /// <param name="value">The value to add (or subtract) to the statistic.</param>
+        /// <param name="channelId">The channel the command was executed in to find the campaign.</param>
+        /// <returns>
+        /// A result detailing if the operation was successful or why it failed.
+        /// </returns>
+        public async Task<IResult> SetStatisticEffectAsync(ulong callerId, string effectName, string statName, int value) =>
+            await SetStatisticEffectAsync(callerId, effectName, statName, value, 0, useCampaigns: false);
+
+        private async Task<IResult> SetStatisticEffectAsync(ulong callerId, string effectName, string statName, int value, ulong channelId, bool useCampaigns)
         {
-            var effect = await _effectProvider.GetEffectAsync(effectName);
+            Campaign campaign = null;
+
+            if (useCampaigns)
+            {
+                campaign = await _campProvider.GetCampaignAsync(channelId);
+                if (campaign == null) return CampaignResult.NotFoundByChannel();
+                if (!await _campProvider.HasPermissionAsync(campaign, callerId)) return CampaignResult.AccessDenied();
+            }
+
+            var effect = await _effectProvider.GetEffectAsync(effectName, campaign);
             if (effect == null) return EffectResult.EffectNotFound();
 
-            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (!useCampaigns && effect.Owner.UserIdentifier != callerId) return EffectResult.AccessDenied();
+
+            var stat = await _statProvider.GetStatisticAsync(statName, campaign);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
             if (effect.Statistics.ContainsKey(stat))
@@ -109,20 +162,47 @@ namespace Frags.Presentation.Controllers
         /// <summary>
         /// Renames an already existing Effect.
         /// </summary>
+        /// <param name="callerId">The user identifier of the owner of the effect.</param>
         /// <param name="effectName">The name of the Effect to rename.</param>
         /// <param name="newName">The new name of the Effect.</param>
         /// <returns>A result detailing if the operation was successful or why it failed.</returns>
         /// <remarks>This method will also clear its aliases.</remarks>
-        public async Task<IResult> RenameEffectAsync(string effectName, string newName)
-        {
-            var stat = await _effectProvider.GetEffectAsync(effectName);
-            if (stat == null) return EffectResult.EffectNotFound();
+        public async Task<IResult> RenameEffectAsync(ulong callerId, string effectName, string newName) =>
+            await RenameEffectAsync(callerId, effectName, newName, 0, useCampaigns: false);
 
-            if (await _effectProvider.GetEffectAsync(newName) != null)
+        /// <summary>
+        /// Renames an already existing Effect associated with a campaign.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the moderator or owner of the campaign.</param>
+        /// <param name="effectName">The name of the Effect to rename.</param>
+        /// <param name="newName">The new name of the Effect.</param>
+        /// <param name="channelId">The channel the command was executed in to find the campaign.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        /// <remarks>This method will also clear its aliases.</remarks>
+        public async Task<IResult> RenameCampaignEffectAsync(ulong callerId, string effectName, string newName, ulong channelId) =>
+            await RenameEffectAsync(callerId, effectName, newName, channelId, useCampaigns: true);
+
+        private async Task<IResult> RenameEffectAsync(ulong callerId, string effectName, string newName, ulong channelId, bool useCampaigns)
+        {
+            Campaign campaign = null;
+
+            if (useCampaigns)
+            {
+                campaign = await _campProvider.GetCampaignAsync(channelId);
+                if (campaign == null) return CampaignResult.NotFoundByChannel();
+                if (!await _campProvider.HasPermissionAsync(campaign, callerId)) return CampaignResult.AccessDenied();
+            }
+
+            var effect = await _effectProvider.GetEffectAsync(effectName, campaign);
+            if (effect == null) return EffectResult.EffectNotFound();
+
+            if (!useCampaigns && effect.Owner.UserIdentifier != callerId) return EffectResult.AccessDenied();
+
+            if (await _effectProvider.GetEffectAsync(newName, campaign) != null)
                 return EffectResult.NameAlreadyExists();
 
-            stat.Name = newName;
-            await _effectProvider.UpdateEffectAsync(stat);
+            effect.Name = newName;
+            await _effectProvider.UpdateEffectAsync(effect);
 
             return EffectResult.EffectUpdatedSucessfully();
         }
@@ -130,33 +210,85 @@ namespace Frags.Presentation.Controllers
         /// <summary>
         /// Sets an effect's description.
         /// </summary>
+        /// <param name="callerId">The user identifier of the owner of the effect.</param>
         /// <param name="effectName">The name of the effect to set the description to.</param>
         /// <param name="desc">The new description of the effect.</param>
+        /// <param name="channelId">The channel the command was executed in to find the campaign.</param>
         /// <returns>A result detailing if the operation was successful or why it failed.</returns>
-        public async Task<IResult> SetDescriptionAsync(string effectName, string desc)
-        {
-            var stat = await _effectProvider.GetEffectAsync(effectName);
-            if (stat == null) return EffectResult.EffectNotFound();
+        public async Task<IResult> SetEffectDescriptionAsync(ulong callerId, string effectName, string desc) =>
+            await SetEffectDescriptionAsync(callerId, effectName, desc, 0, useCampaigns: false);
 
-            stat.Description = desc;
-            await _effectProvider.UpdateEffectAsync(stat);
+        /// <summary>
+        /// Sets an effect's description that is associated with a campaign.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the moderator or owner of the campaign.</param>
+        /// <param name="effectName">The name of the effect to set the description to.</param>
+        /// <param name="desc">The new description of the effect.</param>
+        /// <param name="channelId">The channel the command was executed in to find the campaign.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        public async Task<IResult> SetCampaignEffectDescriptionAsync(ulong callerId, string effectName, string desc, ulong channelId) =>
+            await SetEffectDescriptionAsync(callerId, effectName, desc, channelId, useCampaigns: true);
+
+        private async Task<IResult> SetEffectDescriptionAsync(ulong callerId, string effectName, string desc, ulong channelId, bool useCampaigns)
+        {
+            Campaign campaign = null;
+
+            if (useCampaigns)
+            {
+                campaign = await _campProvider.GetCampaignAsync(channelId);
+                if (campaign == null) return CampaignResult.NotFoundByChannel();
+                if (!await _campProvider.HasPermissionAsync(campaign, callerId)) return CampaignResult.AccessDenied();
+            }
+
+            var effect = await _effectProvider.GetEffectAsync(effectName, campaign);
+            if (effect == null) return EffectResult.EffectNotFound();
+
+            if (!useCampaigns && effect.Owner.UserIdentifier != callerId) return EffectResult.AccessDenied();
+
+            effect.Description = desc;
+            await _effectProvider.UpdateEffectAsync(effect);
 
             return EffectResult.EffectUpdatedSucessfully();
         }
 
         /// <summary>
-        /// Deletes a Effect in the database.
+        /// Deletes a Effect from the database.
         /// </summary>
-        /// <param name="statName">The name for the new skill.</param>
+        /// <param name="callerId">The user identifier of the owner of the effect.</param>
+        /// <param name="statName">The name of the effect to delete.</param>
         /// A result detailing if the operation was successful or why it failed.
         /// </returns>
-        public async Task<IResult> DeleteEffectAsync(string statName)
-        {
-            var Effect = await _effectProvider.GetEffectAsync(statName);
-            if (Effect == null)
-                return EffectResult.EffectNotFound();
+        public async Task<IResult> DeleteEffectAsync(ulong callerId, string statName) =>
+            await DeleteEffectAsync(callerId, statName, 0, useCampaigns: false);
 
-            await _effectProvider.DeleteEffectAsync(Effect);
+        /// <summary>
+        /// Deletes a Effect from the database that is associated with a campaign.
+        /// </summary>
+        /// <param name="callerId">The user identifier of the moderator or owner of the campaign.</param>
+        /// <param name="statName">The name of the effect to delete.</param>
+        /// <param name="channelId">The channel the command was executed in to find the campaign.</param>
+        /// A result detailing if the operation was successful or why it failed.
+        /// </returns>
+        public async Task<IResult> DeleteCampaignEffectAsync(ulong callerId, string statName, ulong channelId) =>
+            await DeleteEffectAsync(callerId, statName, channelId, useCampaigns: true);
+
+        private async Task<IResult> DeleteEffectAsync(ulong callerId, string statName, ulong channelId, bool useCampaigns)
+        {
+            Campaign campaign = null;
+
+            if (useCampaigns)
+            {
+                campaign = await _campProvider.GetCampaignAsync(channelId);
+                if (campaign == null) return CampaignResult.NotFoundByChannel();
+                if (!await _campProvider.HasPermissionAsync(campaign, callerId)) return CampaignResult.AccessDenied();
+            }
+
+            var effect = await _effectProvider.GetEffectAsync(statName, campaign);
+            if (effect == null) return EffectResult.EffectNotFound();
+
+            if (!useCampaigns && effect.Owner.UserIdentifier != callerId) return EffectResult.AccessDenied();
+
+            await _effectProvider.DeleteEffectAsync(effect);
             return EffectResult.EffectDeletedSuccessfully();
         }
 
@@ -177,17 +309,45 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
-        /// Used to add an effect to a character.
+        /// Used to add an effect assoicated with a campaign to a character.
         /// </summary>
         /// <param name="callerId">The user identifier of the caller.</param>
         /// <param name="effectName">The name of the effect to add to the character.</param>
-        public async Task<IResult> AddEffectAsync(ulong callerId, string effectName)
+        /// <param name="channelId">The optional identifier for the channel the command was executed in used to find the campaign.</param>
+        public async Task<IResult> AddEffectAsync(ulong callerId, string effectName, ulong? channelId = null)
         {
+            // Potentially we can find three different effects with the same name
+            // 1. From the "default" pool of Effects which have a null Campaign
+            // 2. From the current channel's associated campaign, if applicable
+            // 3. From the character's campaign, if applicable
+
+            // As it currently stands, this method will give priority as follows:
+            // #2 then #1
+            // ignore #3
+
+            // TODO: write a unit test to guarantee this ^^^
+
+            Campaign campaign;
+
+            if (channelId.HasValue)
+                campaign = await _campProvider.GetCampaignAsync(channelId.Value);
+            else 
+                campaign = null;
+
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            var effect = await _effectProvider.GetEffectAsync(effectName);
-            if (effect == null) return EffectResult.EffectNotFound();
+            // #2
+            Effect effect = await _effectProvider.GetEffectAsync(effectName, campaign);
+
+            bool failedToFindFromCampaign = false;
+            if (effect == null)
+            {
+                // #1
+                failedToFindFromCampaign = true;
+                effect = await _effectProvider.GetEffectAsync(effectName, null);
+                if (effect == null) return EffectResult.EffectNotFound();
+            }
 
             if (character.Effects == null)
                 character.Effects = new List<Effect>();
@@ -197,7 +357,10 @@ namespace Frags.Presentation.Controllers
 
             character.Effects.Add(effect);
             await _charProvider.UpdateCharacterAsync(character);
-            
+
+            // Task failed successfully : ^)
+            if (failedToFindFromCampaign) return EffectResult.EffectAddedFromDefaultPool();
+
             return EffectResult.EffectAdded();
         }
 
@@ -211,10 +374,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            var effect = await _effectProvider.GetEffectAsync(effectName);
-            if (effect == null) return EffectResult.EffectNotFound();
-
-            var match = character.Effects.FirstOrDefault(x => x.Equals(effect));
+            var match = character.Effects.FirstOrDefault(x => x.Name.EqualsIgnoreCase(effectName));
 
             if (match == null)
                 return EffectResult.EffectNotFound();

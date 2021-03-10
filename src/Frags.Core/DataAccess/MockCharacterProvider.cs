@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
 
@@ -35,11 +36,22 @@ namespace Frags.Core.DataAccess
             return await Task.FromResult(true);
         }
 
+        public Task DeleteCharacterAsync(Character character)
+        {
+            _characters.Remove(character);
+            return Task.CompletedTask;
+        }
+
         /// <inheritdoc/>
         public async Task<Character> GetActiveCharacterAsync(ulong discordId)
         {
             await Task.Delay(0); // just to ignore warning
             return _characters.Where(c => c.User.UserIdentifier == discordId).FirstOrDefault();            
+        }
+
+        public Task<List<Character>> GetAllCampaignCharactersAsync(Campaign campaign)
+        {
+            return Task.FromResult(_characters.Where(c => c.Campaign == campaign).ToList());
         }
 
         /// <inheritdoc/>

@@ -27,6 +27,9 @@ namespace Frags.Presentation.Results
         public static EffectResult EffectAdded() =>
             new EffectResult(Messages.EFFECT_ADDED, true);
 
+        public static EffectResult EffectAddedFromDefaultPool() =>
+            new EffectResult(Messages.EFFECT_ADDED_FROM_DEFAULT_POOL, true);
+
         public static EffectResult EffectRemoved() =>
             new EffectResult(Messages.EFFECT_REMOVED, true);
 
@@ -62,5 +65,8 @@ namespace Frags.Presentation.Results
 
         public static EffectResult CharacterHasNoEffectsApplied() =>
             new EffectResult(Messages.EFFECT_CHAR_NO_EFFECTS_APPLIED, false);
+
+        public static EffectResult AccessDenied() =>
+            new EffectResult(Messages.EFFECT_ACCESS_DENIED, false);
     }
 }

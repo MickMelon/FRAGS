@@ -49,7 +49,7 @@ namespace Frags.Presentation.Controllers
                 return CampaignResult.AccessDenied();
 
             if (await _campProvider.GetCampaignAsync(newName) != null)
-                return CampaignResult.NameAlreadyExists();
+                return CampaignResult.CampaignWithNameAlreadyExists();
 
             await _campProvider.RenameCampaignAsync(campaign, newName);
             return CampaignResult.NameChanged();
@@ -168,12 +168,15 @@ namespace Frags.Presentation.Controllers
             return CampaignResult.CharacterConverted();
         }
 
-        public async Task<IResult> CreateCampaignAsync(ulong userIdentifier, string name)
+        public async Task<IResult> CreateCampaignAsync(ulong userIdentifier, string name, ulong channelId)
         {
-            if (await _campProvider.GetCampaignAsync(name) != null)
-                return CampaignResult.NameAlreadyExists();
+            if (await _campProvider.GetCampaignAsync(channelId) != null)
+                return CampaignResult.CampaignWithChannelAlreadyExists();
 
-            await _campProvider.CreateCampaignAsync(userIdentifier, name);
+            if (await _campProvider.GetCampaignAsync(name) != null)
+                return CampaignResult.CampaignWithNameAlreadyExists();
+
+            await _campProvider.CreateCampaignAsync(userIdentifier, name, channelId);
 
             return CampaignResult.CampaignCreated();
         }
@@ -189,7 +192,7 @@ namespace Frags.Presentation.Controllers
             if (campaign == null) return GenericResult.Failure("Campaign not found!");
 
             List<Channel> channels = await _campProvider.GetChannelsAsync(campaign);
-            List<Character> characters = await _campProvider.GetCharactersAsync(campaign);
+            List<Character> characters = await _charProvider.GetAllCampaignCharactersAsync(campaign);
             StatisticOptions statOptions = await _campProvider.GetStatisticOptionsAsync(campaign);
             RollOptions rollOptions = await _campProvider.GetRollOptionsAsync(campaign);
             IEnumerable<Statistic> statistics = await _statProvider.GetAllStatisticsFromCampaignAsync(campaign);

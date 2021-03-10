@@ -30,9 +30,12 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions());
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
 
-            var effect = await effectProvider.CreateEffectAsync(1, "ValidInput");
+            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions(), campProvider);
+
+            var effect = await effectProvider.CreateEffectAsync(1, "ValidInput", null);
 
             // Act
             await controller.AddEffectAsync(1, "ValidInput");
@@ -49,9 +52,12 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions());
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
+            
+            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions(), campProvider);
 
-            var effect = await effectProvider.CreateEffectAsync(1, "ValidInput");
+            var effect = await effectProvider.CreateEffectAsync(1, "ValidInput", null);
 
             // Act
             await controller.AddEffectAsync(1, "ValidInput");
@@ -71,10 +77,13 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions());
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
 
-            var effect = await effectProvider.CreateEffectAsync(1, "ValidInput");
-            var effect2 = await effectProvider.CreateEffectAsync(1, "ValidInput2");
+            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions(), campProvider);
+
+            var effect = await effectProvider.CreateEffectAsync(1, "ValidInput", null);
+            var effect2 = await effectProvider.CreateEffectAsync(1, "ValidInput2", null);
 
             // Act
             await controller.AddEffectAsync(1, "ValidInput");
@@ -94,7 +103,9 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions());
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
+            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions(), campProvider);
 
             var result = await controller.CreateEffectAsync(1, "ValidInput");
 
@@ -107,7 +118,9 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
-            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions());
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
+            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions(), campProvider);
 
             await controller.CreateEffectAsync(1, "AlreadyExists");
             var result = await controller.CreateEffectAsync(1, "AlreadyExists");
@@ -124,12 +137,14 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
             var effectProvider = new MockEffectProvider();
-            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions());
+            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions(), campProvider);
 
             // Act
-            await effectProvider.CreateEffectAsync(1, "ValidInput");
-            var result = await controller.DeleteEffectAsync("ValidInput");
+            await effectProvider.CreateEffectAsync(1, "ValidInput", null);
+            var result = await controller.DeleteEffectAsync(1, "ValidInput");
 
             // Assert
             Assert.Equal(result, EffectResult.EffectDeletedSuccessfully());
@@ -141,11 +156,13 @@ namespace Frags.Test.Presentation.Controllers
             // Arrange
             var charProvider = new MockCharacterProvider();
             var statProvider = new MockStatisticProvider();
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
             var effectProvider = new MockEffectProvider();
-            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions());
+            var controller = new EffectController(charProvider, effectProvider, statProvider, new GeneralOptions(), campProvider);
 
             // Act
-            var result = await controller.DeleteEffectAsync("DoesNotExist");
+            var result = await controller.DeleteEffectAsync(1, "DoesNotExist");
 
             // Assert
             Assert.Equal(result, EffectResult.EffectNotFound());
@@ -163,11 +180,13 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
 
-            var controller = new EffectController(charProvider, effectProvider, statProvider, null);
+            var controller = new EffectController(charProvider, effectProvider, statProvider, null, campProvider);
 
-            await effectProvider.CreateEffectAsync(1, "ValidInput");
-            var result = await controller.SetStatisticEffectAsync("ValidInput", "Strength", 1);
+            await effectProvider.CreateEffectAsync(1, "ValidInput", null);
+            var result = await controller.SetStatisticEffectAsync(1, "ValidInput", "Strength", 1);
 
             Assert.Equal(EffectResult.EffectUpdatedSucessfully(), result);
         }
@@ -179,10 +198,12 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
 
-            var controller = new EffectController(charProvider, effectProvider, statProvider, null);
+            var controller = new EffectController(charProvider, effectProvider, statProvider, null, campProvider);
 
-            var result = await controller.SetStatisticEffectAsync("DoesNotExist", "Strength", 1);
+            var result = await controller.SetStatisticEffectAsync(1, "DoesNotExist", "Strength", 1);
 
             Assert.Equal(EffectResult.EffectNotFound(), result);
         }
@@ -194,11 +215,13 @@ namespace Frags.Test.Presentation.Controllers
             var charProvider = new MockCharacterProvider();
             var effectProvider = new MockEffectProvider();
             var statProvider = new MockStatisticProvider();
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
 
-            var controller = new EffectController(charProvider, effectProvider, statProvider, null);
+            var controller = new EffectController(charProvider, effectProvider, statProvider, null, campProvider);
 
-            await effectProvider.CreateEffectAsync(1, "ValidInput");
-            var result = await controller.SetStatisticEffectAsync("ValidInput", "DoesNotExist", 1);
+            await effectProvider.CreateEffectAsync(1, "ValidInput", null);
+            var result = await controller.SetStatisticEffectAsync(1, "ValidInput", "DoesNotExist", 1);
 
             Assert.Equal(StatisticResult.StatisticNotFound(), result);
         }

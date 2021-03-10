@@ -53,7 +53,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            Statistic statistic = await GetStatistic(statName, character);
+            Statistic statistic = await _statProvider.GetStatisticAsync(statName, character.Campaign);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
             var statValue = character.GetStatistic(statistic);
@@ -133,7 +133,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            Statistic statistic = await GetStatistic(statName, character);
+            Statistic statistic = await _statProvider.GetStatisticAsync(statName, character.Campaign);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
             try
@@ -173,7 +173,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            Statistic statistic = await GetStatistic(statName, character);
+            Statistic statistic = await _statProvider.GetStatisticAsync(statName, character.Campaign);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
             try
@@ -205,7 +205,7 @@ namespace Frags.Presentation.Controllers
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
 
-            Statistic statistic = await GetStatistic(statName, character);
+            Statistic statistic = await _statProvider.GetStatisticAsync(statName, character.Campaign);
             if (statistic == null) return StatisticResult.StatisticNotFound();
 
             try
@@ -228,14 +228,6 @@ namespace Frags.Presentation.Controllers
                 return GenericResult.Failure(e.Message);
                 throw e;
             }
-        }
-
-        private async Task<Statistic> GetStatistic(string statName, Character character)
-        {
-            if (character.Campaign != null)
-                return await _statProvider.GetStatisticAsync(statName, character.Campaign);
-            else
-                return await _statProvider.GetStatisticAsync(statName);
         }
     }
 }

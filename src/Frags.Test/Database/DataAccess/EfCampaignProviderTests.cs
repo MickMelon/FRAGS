@@ -67,7 +67,7 @@ namespace Frags.Test.Database.DataAccess
             {
                 RefreshState(context);
 
-                await campProvider.CreateCampaignAsync(userId, campName);
+                await campProvider.CreateCampaignAsync(userId, campName, channelId+1);
             }
 
             // $camp addchannel
@@ -135,7 +135,7 @@ namespace Frags.Test.Database.DataAccess
 
                 RefreshState(context);
 
-                await campProvider.CreateCampaignAsync(userId, campName);
+                await campProvider.CreateCampaignAsync(userId, campName, 9);
             }
 
             // $camp addchannel

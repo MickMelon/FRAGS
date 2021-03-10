@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Effects;
 
 namespace Frags.Core.DataAccess
@@ -12,7 +13,7 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="name">Effect's name.</param>
         /// <returns>The added effect if successful, null if not.</returns>
-        Task<Effect> CreateEffectAsync(ulong ownerId, string name);
+        Task<Effect> CreateEffectAsync(ulong ownerId, string name, Campaign campaign);
 
         /// <summary>
         /// Deletes an effect from the database. 
@@ -33,7 +34,7 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="name">Effects's name.</param>
         /// <returns>The matching effect or null if none.</returns>
-        Task<Effect> GetEffectAsync(string name);
+        Task<Effect> GetEffectAsync(string name, Campaign campaign);
 
         /// <summary>
         /// Gets every Effect created by the given user identifier.
@@ -45,7 +46,13 @@ namespace Frags.Core.DataAccess
         /// Gets every Effect currently in use.
         /// </summary>
         /// <returns>An Enumerable of Effects currently in use.</returns>
-        Task<IEnumerable<Effect>> GetAllEffectsAsync();
+        Task<IEnumerable<Effect>> GetAllEffectsAsync(bool includeCampaignEffects = false);
+
+        /// <summary>
+        /// Gets every Effect currently in use.
+        /// </summary>
+        /// <returns>An Enumerable of Effects currently in use.</returns>
+        Task<IEnumerable<Effect>> GetAllEffectsFromCampaignAsync(Campaign campaign);
 
         /// <summary>
         /// Updates a Effect in the database.

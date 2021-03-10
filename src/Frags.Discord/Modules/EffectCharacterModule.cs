@@ -20,7 +20,7 @@ namespace Frags.Discord.Modules
         [Alias("effect apply", "applyeffect")]
         public async Task AddEffectAsync([Remainder]string effectName)
         {
-            var result = await _controller.AddEffectAsync(Context.User.Id, effectName);
+            var result = await _controller.AddEffectAsync(Context.User.Id, effectName, Context.Channel.Id);
             await ReplyAsync(result.Message);
         }
 

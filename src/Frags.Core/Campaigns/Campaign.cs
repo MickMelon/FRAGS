@@ -30,13 +30,13 @@ namespace Frags.Core.Campaigns
         /// </summary>
         /// <param name="owner">The unique identifier of user that owns the campaign.</param>
         /// <param name="name">The campaigns's name.</param>
-        public Campaign(User owner, string name)
+        public Campaign(User owner, string name, Channel firstChannel)
         {
             Owner = owner;
             Name = name;
 
             ModeratedCampaigns = new List<Moderator>();
-            Channels = new List<Channel>();
+            Channels = new List<Channel> { firstChannel };
             Characters = new List<Character>();
             Statistics = new List<Statistic>();
             Effects = new List<Effect>();

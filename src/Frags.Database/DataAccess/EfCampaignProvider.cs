@@ -32,16 +32,19 @@ namespace Frags.Database.DataAccess
             _rollStrategies = rollStrategies;
         }
 
-        public async Task CreateCampaignAsync(ulong userIdentifier, string name)
+        public async Task CreateCampaignAsync(ulong userIdentifier, string name, ulong channelId)
         {
             User user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == userIdentifier);
+            
             if (user == null)
             {
                 user = new User(userIdentifier);
                 await _context.AddAsync(user);
             }
 
-            Campaign newCamp = new Campaign(user,name);
+            Channel newChannel = new Channel(channelId);
+            Campaign newCamp = new Campaign(user, name, newChannel);
+
             await _context.AddAsync(newCamp);
             await _context.SaveChangesAsync();
         }

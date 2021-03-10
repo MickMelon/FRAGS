@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 
 namespace Frags.Core.DataAccess
@@ -32,9 +33,22 @@ namespace Frags.Core.DataAccess
         Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier);
 
         /// <summary>
+        /// Gets all the characters from the given campaign.
+        /// </summary>
+        /// <param name="campaign">The campaign to retrieve characters from.</param>
+        /// <returns>A list containing all the campaign's characters.</returns>
+        Task<List<Character>> GetAllCampaignCharactersAsync(Campaign campaign);
+
+        /// <summary>
         /// Saves a character in the database.
         /// </summary>
-        /// <param name="userIdentifier">The character to be saved.</param>
+        /// <param name="character">The character to be saved.</param>
         Task UpdateCharacterAsync(Character character);
+
+        /// <summary>
+        /// Deletes a character from the database.
+        /// </summary>
+        /// <param name="character">The character to be deleted.</param>
+        Task DeleteCharacterAsync(Character character);
     }
 }

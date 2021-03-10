@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Frags.Core.Campaigns;
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
@@ -26,14 +26,14 @@ namespace Frags.Database.DataAccess
             _statProvider = statProvider;
         }
 
-        public async Task<Effect> CreateEffectAsync(ulong ownerId, string name)
+        public async Task<Effect> CreateEffectAsync(ulong ownerId, string name, Campaign campaign)
         {
             User user = await _context.Users.FirstOrDefaultAsync(x => x.UserIdentifier == ownerId);
 
             if (user == null)
                 user = await _userProvider.CreateUserAsync(ownerId);
 
-            Effect effect = new Effect(user, name);
+            Effect effect = new Effect(user, name, campaign);
 
             await _context.Effects.AddAsync(effect);
             await _context.SaveChangesAsync();
@@ -53,13 +53,12 @@ namespace Frags.Database.DataAccess
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Effect>> GetAllEffectsAsync()
+        public async Task<IEnumerable<Effect>> GetAllEffectsAsync(bool includeCampaignEffects = false)
         {
-            var effectList = await _context.Effects.ToListAsync();
-            //foreach (var effect in effectList)
-                //effect.StatisticEffects = ...
+            if (includeCampaignEffects)
+                return await _context.Effects.ToListAsync();
 
-            return effectList;
+            return await _context.Effects.Where(x => x.Campaign == null).ToListAsync();
         }
 
         public async Task<Effect> GetEffectAsync(int id)
@@ -72,9 +71,9 @@ namespace Frags.Database.DataAccess
             return effect;
         }
 
-        public async Task<Effect> GetEffectAsync(string name)
+        public async Task<Effect> GetEffectAsync(string name, Campaign campaign)
         {
-            Effect effect = await _context.Effects.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name));
+            Effect effect = await _context.Effects.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(name) && x.Campaign == campaign);
             if (effect == null) return null;
 
             await LoadRelatedEffectData(effect);
@@ -97,6 +96,7 @@ namespace Frags.Database.DataAccess
         {
             StatisticList statlist = await _context.StatisticLists.FirstOrDefaultAsync(x => x.EffectId == effect.Id);
             effect.Statistics = await DbHelper.GetStatisticDictionary(statlist, _statProvider);
+            await _context.Entry(effect).Reference(x => x.Campaign).LoadAsync();
         }
 
         public async Task UpdateEffectAsync(Effect effect)
@@ -105,6 +105,11 @@ namespace Frags.Database.DataAccess
 
             _context.Update(effect);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Effect>> GetAllEffectsFromCampaignAsync(Campaign campaign)
+        {
+            return await _context.Effects.Where(x => x.Campaign == campaign).ToListAsync();
         }
     }
 }

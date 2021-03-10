@@ -18,7 +18,7 @@ namespace Frags.Core.DataAccess
         /// <param name="name">Attributes's name.</param>
         /// <param name="campaign">The optional campaign to associate this Statistic with.</param>
         /// <returns>The added attribute if successful, null if not.</returns>
-        Task<Attribute> CreateAttributeAsync(string name, Campaign campaign = null);
+        Task<Attribute> CreateAttributeAsync(string name, Campaign campaign);
 
         /// <summary>
         /// Adds a new skill to the database.
@@ -28,7 +28,7 @@ namespace Frags.Core.DataAccess
         /// <param name="attribName">Attributes's name.</param>
         /// <param name="campaign">The optional campaign to associate this Statistic with.</param>
         /// <returns>The added skill if successful, null if not.</returns>
-        Task<Skill> CreateSkillAsync(string name, string attribName, Campaign campaign = null);
+        Task<Skill> CreateSkillAsync(string name, string attribName, Campaign campaign);
 
         /// <summary>
         /// Deletes a statistic from the database. 
@@ -51,7 +51,7 @@ namespace Frags.Core.DataAccess
         /// <param name="name">Statistics's name or alias.</param>
         /// <param name="campaign">The optional Campaign to search from. Must be specified if the Statistic is associated with a Campaign, otherwise returns null.</param>
         /// <returns>The matching statistic or null if none.</returns>
-        Task<Statistic> GetStatisticAsync(string name, Campaign campaign = null);
+        Task<Statistic> GetStatisticAsync(string name, Campaign campaign);
 
         /// <summary>
         /// Gets every statistic currently in use.

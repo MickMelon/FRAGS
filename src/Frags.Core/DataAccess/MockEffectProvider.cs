@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.Effects;
@@ -13,9 +14,9 @@ namespace Frags.Core.DataAccess
 
         private int id = 1;
 
-        public Task<Effect> CreateEffectAsync(ulong ownerId, string name)
+        public Task<Effect> CreateEffectAsync(ulong ownerId, string name, Campaign campaign)
         {
-            var effect = new Effect(new User(ownerId), name) { Id = id++ };
+            var effect = new Effect(new User(ownerId), name, campaign) { Id = id++ };
             _effects.Add(effect);
             return Task.FromResult(effect);
         }
@@ -26,9 +27,17 @@ namespace Frags.Core.DataAccess
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<Effect>> GetAllEffectsAsync()
+        public Task<IEnumerable<Effect>> GetAllEffectsAsync(bool includeCampaignEffects = false)
         {
-            return Task.FromResult<IEnumerable<Effect>>(_effects);
+            if (includeCampaignEffects)
+                return Task.FromResult<IEnumerable<Effect>>(_effects);
+                
+            return Task.FromResult<IEnumerable<Effect>>(_effects.Where(x => x.Campaign == null));
+        }
+
+        public Task<IEnumerable<Effect>> GetAllEffectsFromCampaignAsync(Campaign campaign)
+        {
+            return Task.FromResult<IEnumerable<Effect>>(_effects.Where(x => x.Campaign == campaign));
         }
 
         public Task<Effect> GetEffectAsync(int id)
@@ -36,9 +45,9 @@ namespace Frags.Core.DataAccess
             return Task.FromResult(_effects.FirstOrDefault(x => x.Id == id));
         }
 
-        public Task<Effect> GetEffectAsync(string name)
+        public Task<Effect> GetEffectAsync(string name, Campaign campaign)
         {
-            return Task.FromResult(_effects.FirstOrDefault(x => x.Name.EqualsIgnoreCase(name)));
+            return Task.FromResult(_effects.FirstOrDefault(x => x.Name.EqualsIgnoreCase(name) && x.Campaign == campaign));
         }
 
         public Task<IEnumerable<Effect>> GetOwnedEffectsAsync(ulong userId)

@@ -183,7 +183,7 @@ namespace Frags.Test.Presentation.Controllers
 
             await userProvider.CreateUserAsync(1);
 
-            await campProvider.CreateCampaignAsync(1, "myCampaign");
+            await campProvider.CreateCampaignAsync(1, "myCampaign", 123);
             var campaign = await campProvider.GetCampaignAsync("myCampaign");
 
             var rollOptions = new RollOptions { RollStrategy = "Frags" };
@@ -191,7 +191,7 @@ namespace Frags.Test.Presentation.Controllers
 
             var attribName = "Constitution";
             await statProvider.CreateAttributeAsync(attribName, campaign);
-            var attribute = await statProvider.GetStatisticAsync(attribName);
+            var attribute = await statProvider.GetStatisticAsync(attribName, campaign);
 
             var provider = new MockCharacterProvider();
             var chars = await provider.GetAllCharactersAsync(1);

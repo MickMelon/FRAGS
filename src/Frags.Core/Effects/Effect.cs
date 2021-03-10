@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Frags.Core.Campaigns;
 using Frags.Core.Characters;
 using Frags.Core.Common;
 using Frags.Core.Statistics;
@@ -11,11 +12,12 @@ namespace Frags.Core.Effects
     {
         protected Effect() { }
 
-        public Effect(User owner, string name)
+        public Effect(User owner, string name, Campaign campaign)
         {
             Statistics = new Dictionary<Statistic, StatisticValue>();
             Name = name;
             Owner = owner;
+            Campaign = campaign;
         }
 
         public int Id { get; set; }
@@ -24,6 +26,8 @@ namespace Frags.Core.Effects
         public string Description { get; set; }
 
         public User Owner { get; set; }
+
+        public Campaign Campaign { get; set; }
 
         /// <summary>
         /// The effect on a Statsheet after it is applied.

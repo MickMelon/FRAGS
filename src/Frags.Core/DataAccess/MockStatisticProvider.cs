@@ -90,7 +90,7 @@ namespace Frags.Core.DataAccess
         public async Task<Statistic> GetStatisticAsync(string name, Campaign campaign = null)
         {
             if (campaign == null)
-                return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
+                return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign == null));
 
             return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase) && x.Campaign?.Id == campaign.Id));
         }

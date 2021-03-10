@@ -39,6 +39,8 @@ namespace Frags.Presentation.Results
 
             if (viewModel != null && ViewModelAttribute.IsViewModel(viewModel))
                 ViewModel = viewModel;
+            else if (viewModel != null)
+                throw new Exception("Tried to use a ViewModel in a Result without the " + nameof(ViewModelAttribute) + " attribute!");
         }
 
         /// <summary>

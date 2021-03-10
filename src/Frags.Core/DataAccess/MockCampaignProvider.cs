@@ -28,14 +28,23 @@ namespace Frags.Core.DataAccess
             _userProvider = userProvider;
         }
 
-        public async Task CreateCampaignAsync(ulong userIdentifier, string name)
+        public async Task CreateCampaignAsync(ulong userIdentifier, string name, ulong channelId)
         {
+            if (await GetCampaignAsync(channelId) != null)
+                throw new CampaignException(Messages.CAMP_EXISTING_CHANNEL);
+
+            if (await GetCampaignAsync(name) != null)
+                throw new CampaignException(Messages.CAMP_EXISTING_NAME);
+
             User user = await _userProvider.GetUserAsync(userIdentifier);
 
             if (user == null)
                 user = await _userProvider.CreateUserAsync(userIdentifier);
 
-            _campaigns.Add(new Campaign(user, name));
+            Channel channel = new Channel(channelId);
+            Campaign campaign = new Campaign(user, name, channel);
+
+            _campaigns.Add(campaign);
         }
 
         public Task DeleteCampaignAsync(Campaign campaign)

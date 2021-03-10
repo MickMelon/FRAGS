@@ -130,7 +130,7 @@ namespace Frags.Test.Database.DataAccess
             using (var context = new RpgContext(genOptions))
             {
                 var campProvider = new EfCampaignProvider(context, null, null);
-                await campProvider.CreateCampaignAsync(1, "campaign");
+                await campProvider.CreateCampaignAsync(1, "campaign", 123);
             }
 
             using (var context = new RpgContext(genOptions))
@@ -148,7 +148,7 @@ namespace Frags.Test.Database.DataAccess
                 var provider = new EfStatisticProvider(context);
                 var userProvider = new EfUserProvider(context);
                 var effectProvider = new EfEffectProvider(context, userProvider, provider);
-            var charProvider = new EfCharacterProvider(context, userProvider, provider, effectProvider);
+                var charProvider = new EfCharacterProvider(context, userProvider, provider, effectProvider);
 
                 await charProvider.CreateCharacterAsync(1, "bob");
             }

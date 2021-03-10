@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Text.Json;
 using Frags.Database.Models;
+using Frags.Core.Campaigns;
 
 namespace Frags.Database.DataAccess
 {
@@ -95,6 +96,17 @@ namespace Frags.Database.DataAccess
             await DbHelper.EfUpdateOrCreateEffectList(character, _context);
 
             _context.Update(character);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Character>> GetAllCampaignCharactersAsync(Campaign campaign)
+        {
+            return await _context.Characters.Where(x => x.Campaign == campaign).ToListAsync();
+        }
+
+        public async Task DeleteCharacterAsync(Character character)
+        {
+            _context.Remove(character);
             await _context.SaveChangesAsync();
         }
     }
