@@ -130,17 +130,17 @@ namespace Frags.Discord
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<GeneralOptions>>().Value)
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<RollOptions>>().Value)
                 .AddScoped(cfg => cfg.GetService<IOptionsSnapshot<StatisticOptions>>().Value)
-                .AddTransient<FragsRollStrategy>()
-                .AddTransient<MockRollStrategy>()
-                .AddTransient<GenericProgressionStrategy>()
-                .AddTransient<MockProgressionStrategy>()
-                .AddTransient<NewVegasProgressionStrategy>()
-                .AddTransient(provider =>
+                .AddScoped<FragsRollStrategy>()
+                .AddScoped<MockRollStrategy>()
+                .AddScoped<GenericProgressionStrategy>()
+                .AddScoped<MockProgressionStrategy>()
+                .AddScoped<NewVegasProgressionStrategy>()
+                .AddScoped(provider =>
                     ResolveServices<IRollStrategy>(provider, provider.GetRequiredService<RollOptions>().RollStrategy))
-                .AddTransient(provider =>
+                .AddScoped(provider =>
                     ResolveServices<IProgressionStrategy>(provider, provider.GetRequiredService<StatisticOptions>().ProgressionStrategy))
-                .AddTransient(provider => AddServiceLists<IRollStrategy>(provider))
-                .AddTransient(provider => AddServiceLists<IProgressionStrategy>(provider));
+                .AddScoped<List<IRollStrategy>>(provider => provider.GetServices<IRollStrategy>().ToList())
+                .AddScoped<List<IProgressionStrategy>>(provider => provider.GetServices<IProgressionStrategy>().ToList());
         }
 
         private static T ResolveServices<T>(IServiceProvider provider, string typeName)
@@ -153,19 +153,29 @@ namespace Frags.Discord
             return (T)provider.GetRequiredService(type);
         }
 
-        private static List<T> AddServiceLists<T>(IServiceProvider provider)
-        {
-            // Search plugins & the interface's assembly's types
-            var matchingTypes = _pluginTypes.Union(typeof(T).Assembly.ExportedTypes)
-                .Where(x => typeof(T).IsAssignableFrom(x));
+        // private static List<T> AddServiceLists<T>(IServiceProvider provider)
+        // {
+            // Console.WriteLine("Running AddServiceLists");
 
-            var list = new List<T>();
+            // var theInterface = typeof(T);
 
-            foreach (var type in matchingTypes)
-                list.Add((T)provider.GetRequiredService(type));
+            // // Search plugins & the interface's assembly's types
+            // var interfaceAssemblyTypes = typeof(T).Assembly.ExportedTypes;
 
-            return list;
-        }
+            // var matchingTypes = _pluginTypes.Union(interfaceAssemblyTypes).Where(type => theInterface.IsAssignableFrom(type));
+
+            // var list = new List<T>();
+
+            // foreach (var type in matchingTypes)
+            // {
+            //     if (type.Equals(theInterface))
+            //         continue;
+
+            //     list.Add((T)provider.GetRequiredService(type));
+            // }
+
+            // return list;
+        // }
 
         private static readonly List<Type> _pluginTypes = new List<Type>();
 

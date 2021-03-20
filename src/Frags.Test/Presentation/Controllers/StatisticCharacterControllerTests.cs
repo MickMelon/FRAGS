@@ -1,5 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Frags.Core.Campaigns;
+using Frags.Core.Characters;
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
@@ -409,6 +411,58 @@ namespace Frags.Test.Presentation.Controllers
 
             // Assert
             Assert.Equal(StatisticResult.StatisticNotFound(), result);
+        }
+        #endregion
+
+        #region Campaign Tests
+        [Fact]
+        public async Task SetStatisticAsync_CampaignStrategyDiffersFromDefault_ReturnSuccess()
+        {
+            // Arrange
+            var charProvider = new MockCharacterProvider();
+            var statProvider = new MockStatisticProvider();
+            var userProvider = new MockUserProvider();
+            var campProvider = new MockCampaignProvider(userProvider);
+
+            string campaignName = "thecamp";
+            ulong userId = 1, channelId = 123;
+
+            await campProvider.CreateCampaignAsync(userId, campaignName, channelId);
+            Campaign campaign = await campProvider.GetCampaignAsync(channelId);
+            campaign.StatisticOptions = new StatisticOptions { ProgressionStrategy = nameof(MockProgressionStrategy) };
+            await campProvider.UpdateCampaignAsync(campaign);
+
+            await charProvider.CreateCharacterAsync(userId, "bob");
+            Character bob = await charProvider.GetActiveCharacterAsync(userId);
+            bob.Campaign = campaign;
+            await charProvider.UpdateCharacterAsync(bob);
+
+            ulong secondUserId = 2;
+            await charProvider.CreateCharacterAsync(secondUserId, "jane");
+
+            string campaignStatName = "cheese";
+            await statProvider.CreateAttributeAsync(campaignStatName, campaign);
+
+            StatisticOptions defaultStatOptions = new StatisticOptions();
+            defaultStatOptions.ProgressionStrategy = nameof(GenericProgressionStrategy);
+            defaultStatOptions.InitialAttributePoints = 3;
+            defaultStatOptions.InitialAttributeMax = 3;
+
+            var controller = new StatisticCharacterController(charProvider, statProvider, new GenericProgressionStrategy(statProvider, defaultStatOptions, campProvider), campProvider);
+
+            // Act
+
+            // This should result in not found since the character is in a campaign.
+            var notFound = await controller.SetStatisticAsync(userId, "Strength", 3);
+
+            // This should succeed since the other character does not belong to a campaign.
+            var defaultPoolSuccess = await controller.SetStatisticAsync(secondUserId, "Strength", 3);
+
+            // This should work since the campaign's ProgressionStrategy is set to Mock.
+            var campaignSuccess = await controller.SetStatisticAsync(userId, campaignStatName, 111);
+
+            // Assert
+            Assert.True(notFound.Equals(StatisticResult.StatisticNotFound()) && campaignSuccess.Equals(StatisticResult.StatisticSetSucessfully()) && defaultPoolSuccess.Equals(StatisticResult.StatisticSetSucessfully()));
         }
         #endregion
     }

@@ -19,30 +19,32 @@ namespace Frags.Test.Core
         [Fact]
         public void JsonConfig_ExpEnabledChannels_EntityMatchesInput()
         {
-            // string json = "{ ";
-            // //json += "\"" + nameof(StatisticOptions) + "\": { ";
-            // json += "\"" + nameof(StatisticOptions.ExpEnabledChannels) + "\": ";
-            // ulong channel1 = 123, channel2 = 456;
-            // json += "[ " + channel1 + ", " + channel2 + " ] ";
-            // //json += "} }";
-            // json += "}";
+            string json = "{ ";
+            //json += "\"" + nameof(StatisticOptions) + "\": { ";
+            json += "\"" + nameof(StatisticOptions.ExpEnabledChannels) + "\": ";
+            ulong channel1 = 123, channel2 = 456;
+            json += "[ " + "{ \"Id\": " + channel1 + ", \"IsExperienceEnabled\": true }, " + "{ \"Id\": " + channel2 + ", \"IsExperienceEnabled\": true } " + " ] ";
+            //json += "} }";
+            json += "}";
 
-            //StatisticOptions statOpts = JsonSerializer.Deserialize<StatisticOptions>(json);
+            StatisticOptions statOpts = JsonSerializer.Deserialize<StatisticOptions>(json);
 
-            //_output.WriteLine(json);
+            _output.WriteLine(json);
+
+            foreach (var channel in statOpts.ExpEnabledChannels) 
+                _output.WriteLine(channel.Id + " " + channel.IsExperienceEnabled);
+
+            // StatisticOptions statOpts = new StatisticOptions
+            // {
+            //     ExpEnabledChannels = new List<Channel>{ new Channel(123), new Channel(456) }
+            // };
+
+            // JsonSerializerOptions jsonOpts = new JsonSerializerOptions
+            // {
+            //     WriteIndented = true
+            // };
+
             //_output.WriteLine(statOpts.ExpEnabledChannels.ToString());
-
-            StatisticOptions statOpts = new StatisticOptions
-            {
-                ExpEnabledChannels = new List<Channel>{ new Channel(123), new Channel(456) }
-            };
-
-            JsonSerializerOptions jsonOpts = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-
-            _output.WriteLine(JsonSerializer.Serialize(statOpts, jsonOpts));
         }
     }
 }

@@ -31,10 +31,13 @@
     "InitialSkillPoints": 58,
     "InitialSkillsAtMax": 13,
     "InitialSkillsProficient": 3,
-
+    
     "ExpMessageLengthDivisor": 1,
     "ExpEnabledChannels": [
-      462432825539297280
+      {
+        "Id": 462432825539297280,
+        "IsExperienceEnabled": true
+      }
     ],
 
     "SkillPointsOnLevelUp": 10,

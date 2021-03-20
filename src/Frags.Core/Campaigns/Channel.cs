@@ -7,11 +7,11 @@ namespace Frags.Core.Campaigns
     public class Channel
     {
         private Channel() { }
-        public Channel(ulong channelId, Campaign campaign = null, bool expEnabled = false)
+        public Channel(ulong id, Campaign campaign = null, bool isExperienceEnabled = false)
         {
-            Id = channelId;
+            Id = id;
             Campaign = campaign;
-            IsExperienceEnabled = expEnabled;
+            IsExperienceEnabled = isExperienceEnabled;
         }
 
         public ulong Id { get; set; }
