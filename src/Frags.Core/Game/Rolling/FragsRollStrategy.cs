@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Text;
 using Frags.Core.Characters;
 using Frags.Core.Common;
+using Frags.Core.Common.Extensions;
 using Frags.Core.Statistics;
 using Attribute = Frags.Core.Statistics.Attribute;
 
@@ -9,15 +11,19 @@ namespace Frags.Core.Game.Rolling
 {
     public class FragsRollStrategy : IRollStrategy
     {
+        private static readonly double HIGHEST_MAX_SUCCESS_ROLL = 95;
+
         #region Messages
-        private static readonly string ROLL_SUCCESS_5 = "**CRITICAL {0} SUCCESS!!!**";
+        private static readonly string ROLL_SUCCESS_CRIT = "**C R I T I C A L {0} SUCCESS!!!**";
+        private static readonly string ROLL_SUCCESS_5 = "__***AMAZING {0} SUCCESS!***__";
         private static readonly string ROLL_SUCCESS_4 = "__GREAT {0} SUCCESS__";
         private static readonly string ROLL_SUCCESS_3 = "*Very good {0} success*";
         private static readonly string ROLL_SUCCESS_2 = "*Good {0} success*";
         private static readonly string ROLL_SUCCESS_1 = "*Above average {0} success*";
         private static readonly string ROLL_SUCCESS_0 = "__***CLOSE CALL! {0} success***__";
-        
-        private static readonly string ROLL_FAILURE_5 = "**CRITICAL {0} FAILURE!!!**";
+
+        private static readonly string ROLL_FAILURE_CRIT = "**Critical {0} failure!!!**";
+        private static readonly string ROLL_FAILURE_5 = "__***GRUESOME {0} FAILURE!***___";
         private static readonly string ROLL_FAILURE_4 = "__TERRIBLE {0} FAILURE__";
         private static readonly string ROLL_FAILURE_3 = "*Pretty bad {0} failure*";
         private static readonly string ROLL_FAILURE_2 = "*Bad {0} failure*";
@@ -34,25 +40,65 @@ namespace Frags.Core.Game.Rolling
         /// </inheritdoc>
         public double? RollStatistic(Statistic stat, Character character, bool useEffects = false)
         {
-            if (character == null || stat == null) return null;
+            StatisticValue sv = character?.GetStatistic(stat, useEffects);
+            if (character == null || sv == null) return null;
 
             int rng = GameRandom.Between(1, 100);
             double maxSuccessRoll;
-
-            int? statValue = character.GetStatistic(stat, useEffects)?.Value;
-            if (statValue == null) return null;
-            if (statValue <= 0) return -125;
+            
+            int statNum = sv.Value;
+            if (statNum <= 0) return -999;
 
             if (stat is Attribute)
             {
-                maxSuccessRoll = Math.Round(32.2 * Math.Sqrt(statValue.Value) - 7);
+                maxSuccessRoll = Math.Round(32.2 * Math.Sqrt(statNum) - 7);
             }
             else
             {
-                maxSuccessRoll = Math.Round(10 * Math.Sqrt(statValue.Value) - 0.225 * statValue.Value - 1);
+                maxSuccessRoll = Math.Round(10 * Math.Sqrt(statNum) - 0.225 * statNum - 1);
             }
 
+            Attribute luckStat = character.Statistics.Select(x => x.Statistic).OfType<Attribute>().FirstOrDefault(x => x.Aliases.ContainsIgnoreCase("luck"));
+            double luckInfluence = 1.0;
+            int luckDifference = 0;
+
+            if (luckStat != null)
+            {
+                // each point of LCK above/below 5 prolly shoulda been +/-1% flat chance max
+                // Do that, but ALSO make each point in luck a +/-0.1% chance for  mega crit
+
+                int luckValue = character.GetStatistic(luckStat, useEffects).Value;
+                luckDifference = luckValue - 5;
+
+                luckInfluence += luckDifference * 0.01;
+                maxSuccessRoll *= luckInfluence;
+            }
+
+            maxSuccessRoll = Math.Min(maxSuccessRoll, HIGHEST_MAX_SUCCESS_ROLL);
+
             double resultPercent = (maxSuccessRoll - rng) / maxSuccessRoll;
+
+            int critRng = GameRandom.Between(1, 1000);
+            // Success
+            if (resultPercent >= 0)
+            {
+                double maxCritSuccessRoll = 1 + (1 * luckDifference);
+                
+                // Minimum 1, maximum 10
+                maxCritSuccessRoll = Math.Max(1, Math.Min(maxCritSuccessRoll, 10));
+
+                if (critRng <= maxCritSuccessRoll)
+                    return 999;
+            }
+            // Failure
+            else
+            {
+                double maxCritFailRoll = 6 - (1 * luckDifference);
+                maxCritFailRoll = Math.Min(maxCritFailRoll, 10);
+                
+                if (critRng <= maxCritFailRoll)
+                    return -999;
+            }
             
             return Math.Round(resultPercent * 100.0, 1);
         }
@@ -69,7 +115,9 @@ namespace Frags.Core.Game.Rolling
 
             if (percent >= 0)
             {
-                if (percent >= 95)
+                if (percent == 999)
+                    result.Append(string.Format(ROLL_SUCCESS_CRIT, stat.Name.ToUpper()));
+                else if (percent >= 125)
                     result.Append(string.Format(ROLL_SUCCESS_5, stat.Name.ToUpper()));
                 else if (percent >= 80)
                     result.Append(string.Format(ROLL_SUCCESS_4, stat.Name.ToUpper()));
@@ -86,7 +134,9 @@ namespace Frags.Core.Game.Rolling
             }
             else
             {
-                if (percent <= -125)
+                if (percent == 999)
+                    result.Append(string.Format(ROLL_FAILURE_CRIT, stat.Name.ToUpper()));
+                else if (percent <= -125)
                     result.Append(string.Format(ROLL_FAILURE_5, stat.Name.ToUpper()));
                 else if (percent <= -80)
                     result.Append(string.Format(ROLL_FAILURE_4, stat.Name.ToUpper()));
