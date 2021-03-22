@@ -115,7 +115,7 @@ namespace Frags.Core.Game.Rolling
 
             if (percent >= 0)
             {
-                if (percent == 999)
+                if (percent >= 999)
                     result.Append(string.Format(ROLL_SUCCESS_CRIT, stat.Name.ToUpper()));
                 else if (percent >= 125)
                     result.Append(string.Format(ROLL_SUCCESS_5, stat.Name.ToUpper()));
@@ -134,7 +134,7 @@ namespace Frags.Core.Game.Rolling
             }
             else
             {
-                if (percent == 999)
+                if (percent <= -999)
                     result.Append(string.Format(ROLL_FAILURE_CRIT, stat.Name.ToUpper()));
                 else if (percent <= -125)
                     result.Append(string.Format(ROLL_FAILURE_5, stat.Name.ToUpper()));
