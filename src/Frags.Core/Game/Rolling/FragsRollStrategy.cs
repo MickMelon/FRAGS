@@ -23,7 +23,7 @@ namespace Frags.Core.Game.Rolling
         private static readonly string ROLL_SUCCESS_0 = "__***CLOSE CALL! {0} success***__";
 
         private static readonly string ROLL_FAILURE_CRIT = "**Critical {0} failure!!!**";
-        private static readonly string ROLL_FAILURE_5 = "__***GRUESOME {0} FAILURE!***___";
+        private static readonly string ROLL_FAILURE_5 = "__***GRUESOME {0} FAILURE!***__";
         private static readonly string ROLL_FAILURE_4 = "__TERRIBLE {0} FAILURE__";
         private static readonly string ROLL_FAILURE_3 = "*Pretty bad {0} failure*";
         private static readonly string ROLL_FAILURE_2 = "*Bad {0} failure*";
