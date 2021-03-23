@@ -203,6 +203,23 @@ namespace Frags.Presentation.Controllers
         }
 
         /// <summary>
+        /// Sets the order of an already existing statistic.
+        /// </summary>
+        /// <param name="statName">The name of the statistic to set the order of.</param>
+        /// <param name="order">The order to sort the statistic in a descending manner.</param>
+        /// <returns>A result detailing if the operation was successful or why it failed.</returns>
+        public async Task<IResult> SetOrderAsync(string statName, int order)
+        {
+            var stat = await _statProvider.GetStatisticAsync(statName);
+            if (stat == null) return StatisticResult.StatisticNotFound();
+
+            stat.Order = order;
+            await _statProvider.UpdateStatisticAsync(stat);
+            
+            return StatisticResult.StatisticUpdatedSucessfully();
+        }
+
+        /// <summary>
         /// Deletes a statistic in the database.
         /// </summary>
         /// <param name="statName">The name for the new skill.</param>

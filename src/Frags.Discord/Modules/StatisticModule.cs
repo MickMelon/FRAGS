@@ -59,6 +59,13 @@ namespace Frags.Discord.Modules
             await ReplyAsync(result.Message);
         }
 
+        [Command("order")]
+        public async Task SetOrderAsync(string statName, int order)
+        {
+            var result = await _statController.SetOrderAsync(statName, order);
+            await ReplyAsync(result.Message);
+        }
+
         [Command("rename")]
         public async Task RenameStatisticAsync(string statName, [Remainder]string newName)
         {
@@ -138,7 +145,7 @@ namespace Frags.Discord.Modules
                     output.Append("*");
 
                 // Loop through associated skills with attribute
-                foreach (var skill in viewModel.Statistics[attrib].OrderBy(x => x.Name))
+                foreach (var skill in viewModel.Statistics[attrib].OrderByDescending(x => x.Order))
                 {
                     // Example: "Powerlifting: 50" or "Powerlifting: N/A"
                     output.Append($"**{skill.Name}:** {skill.Value?.ToString() ?? "N/A"}");
