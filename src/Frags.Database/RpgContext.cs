@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using Frags.Core.Characters;
+using Frags.Core.Effects;
 using Frags.Core.Statistics;
-using Frags.Database.Characters;
-using Frags.Database.Effects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database
@@ -9,11 +9,13 @@ namespace Frags.Database
     public class RpgContext : DbContext
     {
         public DbSet<Attribute> Attributes { get; set; }
-        public DbSet<CharacterDto> Characters { get; set; }
-        public DbSet<EffectDto> Effects { get; set; }
+        public DbSet<Character> Characters { get; set; }
+        public DbSet<Effect> Effects { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<Statistic> Statistics { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<StatisticMapping> StatisticMappings { get; set; }
+        public DbSet<EffectMapping> EffectMappings { get; set; }
 
         private readonly GeneralOptions _options;
 
@@ -32,6 +34,8 @@ namespace Frags.Database
             {
                 optionsBuilder.UseSqlite($"Filename={_options.DatabaseName}.db");
             }
+
+            optionsBuilder.EnableSensitiveDataLogging();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -41,20 +45,10 @@ namespace Frags.Database
                     .WithMany()
                     .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<EffectMapping>()
-                .HasKey(ec => new { ec.EffectId, ec.CharacterId });
-
-            builder.Entity<EffectMapping>()
-                .HasOne(ec => ec.Effect)
-                .WithMany(e => e.EffectMappings)
-                .HasForeignKey(ec => ec.EffectId);
-
-            builder.Entity<EffectMapping>()
-                .HasOne(ec => ec.Character)
-                .WithMany(c => c.EffectMappings)
-                .HasForeignKey(ec => ec.CharacterId);
-
-            builder.Entity<CharacterDto>().Metadata.FindNavigation(nameof(CharacterDto.EffectMappings)).IsEagerLoaded = true;
+            builder.Entity<Character>()
+                .HasMany(c => c.Effects)
+                .WithMany(e => e.Characters)
+                .UsingEntity<EffectMapping>();
         }
     }
 }

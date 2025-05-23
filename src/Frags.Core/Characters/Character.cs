@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Frags.Core.Common;
@@ -93,7 +94,7 @@ namespace Frags.Core.Characters
         /// <summary>
         /// A list of which Effects are currently applied to this character.
         /// </summary>
-        public virtual IList<Effect> Effects { get; set; }
+        public List<Effect> Effects { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Character" /> class.

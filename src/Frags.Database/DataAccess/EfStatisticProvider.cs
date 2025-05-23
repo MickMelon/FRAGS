@@ -33,7 +33,7 @@ namespace Frags.Database.DataAccess
 
         public async Task<Skill> CreateSkillAsync(string name, string attribName)
         {
-            var attrib = await _context.Attributes.FirstOrDefaultAsync(x => x.Name.EqualsIgnoreCase(attribName));
+            var attrib = await _context.Attributes.AsAsyncEnumerable().Where(x => x.Name.EqualsIgnoreCase(attribName)).FirstOrDefaultAsync();
             if (attrib == null) return null;
 
             var skill = new Skill(attrib, name);
@@ -55,9 +55,12 @@ namespace Frags.Database.DataAccess
             return await _context.Statistics.ToListAsync();
         }
 
-        public async Task<Statistic> GetStatisticAsync(string name)
+        public async Task<Statistic> GetStatisticAsync(string name, bool tracking = true)
         {
-            return await _context.Statistics.FirstOrDefaultAsync(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase));
+            if (!tracking)
+                return await _context.Statistics.AsNoTracking().AsAsyncEnumerable().Where(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)).FirstOrDefaultAsync();
+
+            return await _context.Statistics.AsAsyncEnumerable().Where(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)).FirstOrDefaultAsync();
         }
 
         public async Task UpdateStatisticAsync(Statistic statistic)

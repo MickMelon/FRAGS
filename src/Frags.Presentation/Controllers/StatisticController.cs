@@ -89,6 +89,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _charProvider.LoadStatistics(character);
 
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
@@ -136,6 +137,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(id);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _charProvider.LoadStatistics(character);
 
             bool result = await _strategy.ResetCharacter(character);
             if (!result) return CharacterResult.LevelTooLow();
@@ -244,6 +246,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _charProvider.LoadStatistics(character);
 
             if (character.Statistics == null || character.Statistics.Count <= 0)
                 return StatisticResult.StatisticNotFound();
@@ -260,6 +263,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _charProvider.LoadStatistics(character);
 
             var statistic = await _statProvider.GetStatisticAsync(statName);
             if (statistic == null) return StatisticResult.StatisticNotFound();
@@ -287,7 +291,7 @@ namespace Frags.Presentation.Controllers
                     System.Console.WriteLine(e);
 
                 return GenericResult.Failure(e.Message);
-                throw e;
+                throw;
             }
         }
 
@@ -300,6 +304,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _charProvider.LoadStatistics(character);
 
             var statistic = await _statProvider.GetStatisticAsync(statName);
             if (statistic == null) return StatisticResult.StatisticNotFound();
@@ -319,7 +324,7 @@ namespace Frags.Presentation.Controllers
                     System.Console.WriteLine(e);
 
                 return GenericResult.Failure(e.Message);
-                throw e;
+                throw;
             }
         }
 
@@ -332,6 +337,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _charProvider.LoadStatistics(character);
 
             var statistic = await _statProvider.GetStatisticAsync(statName);
             if (statistic == null) return StatisticResult.StatisticNotFound();
@@ -354,7 +360,7 @@ namespace Frags.Presentation.Controllers
             catch (System.Exception e)
             {
                 return GenericResult.Failure(e.Message);
-                throw e;
+                throw;
             }
         }
     }

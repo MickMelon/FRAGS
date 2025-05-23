@@ -89,18 +89,12 @@ namespace Frags.Presentation.Controllers
         {
             var effect = await _effectProvider.GetEffectAsync(effectName);
             if (effect == null) return EffectResult.EffectNotFound();
+            await _effectProvider.LoadStatistics(effect);
 
-            var stat = await _statProvider.GetStatisticAsync(statName);
+            var stat = await _statProvider.GetStatisticAsync(statName, false);
             if (stat == null) return StatisticResult.StatisticNotFound();
 
-            var match = effect.StatisticEffects.FirstOrDefault(x => x.Statistic.Equals(stat));
-
-            if (match == null)
-                effect.StatisticEffects.Add(new StatisticMapping(stat, new StatisticValue(value)));
-            else
-                match.StatisticValue.Value = value;
-
-            await _effectProvider.UpdateEffectAsync(effect);
+            await _effectProvider.SetStatisticEffect(effect, stat, new StatisticValue(value));
             return EffectResult.EffectUpdatedSucessfully();
         }
 
@@ -167,6 +161,7 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _charProvider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _charProvider.LoadEffects(character);
 
             if (character.Effects == null || character.Effects.Count <= 0)
                 return EffectResult.NoEffects();
@@ -187,15 +182,10 @@ namespace Frags.Presentation.Controllers
             var effect = await _effectProvider.GetEffectAsync(effectName);
             if (effect == null) return EffectResult.EffectNotFound();
 
-            if (character.Effects == null)
-                character.Effects = new List<Effect>();
-
             if (character.Effects.Count(x => x.Id == effect.Id) > 0)
                 return EffectResult.EffectAlreadyAdded();
 
-            character.Effects.Add(effect);
-            await _charProvider.UpdateCharacterAsync(character);
-            
+            await _effectProvider.AddEffectToCharacter(effect, character);
             return EffectResult.EffectAdded();
         }
 

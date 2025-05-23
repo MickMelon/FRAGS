@@ -5,7 +5,6 @@ using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 using Frags.Database;
-using Frags.Database.Characters;
 using Frags.Database.DataAccess;
 using Frags.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;

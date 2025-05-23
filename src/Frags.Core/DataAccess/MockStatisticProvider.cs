@@ -71,7 +71,7 @@ namespace Frags.Core.DataAccess
             return await Task.FromResult(_statistics);
         }
 
-        public async Task<Statistic> GetStatisticAsync(string name)
+        public async Task<Statistic> GetStatisticAsync(string name, bool tracking = true)
         {
             return await Task.FromResult(_statistics.FirstOrDefault(x => x.AliasesArray.Contains(name, StringComparer.OrdinalIgnoreCase)));
         }

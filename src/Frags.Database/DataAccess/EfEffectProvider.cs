@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using Frags.Core.Characters;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
 using Frags.Core.Effects;
-using Frags.Database.Effects;
+using Frags.Core.Statistics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Frags.Database.DataAccess
@@ -14,26 +14,28 @@ namespace Frags.Database.DataAccess
     {
         private readonly RpgContext _context;
 
-        private readonly IMapper _mapper;
 
         public EfEffectProvider(RpgContext context)
         {
             _context = context;
+        }
 
-            var mapperConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Effect, EffectDto>();
-                cfg.CreateMap<EffectDto, Effect>();
+        public async Task AddEffectToCharacter(Effect effect, Character character)
+        {
+            _context.ChangeTracker.Clear();
+            await _context.EffectMappings.AddAsync(new EffectMapping
+            {
+                CharacterId = character.Id,
+                EffectId = effect.Id
             });
-            
-            _mapper = new Mapper(mapperConfig);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Effect> CreateEffectAsync(ulong ownerId, string name)
         {
             var effect = new Effect(ownerId, name);
-            var dto = _mapper.Map<EffectDto>(effect);
 
-            await _context.Effects.AddAsync(dto);
+            await _context.Effects.AddAsync(effect);
             await _context.SaveChangesAsync();
             return effect;
         }
@@ -52,28 +54,57 @@ namespace Frags.Database.DataAccess
 
         public async Task<IEnumerable<Effect>> GetAllEffectsAsync()
         {
-            return _mapper.Map<List<Effect>>(await _context.Effects
+            return await _context.Effects
                 .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
                 .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .ToListAsync());
+                .ToListAsync();
         }
 
         public async Task<Effect> GetEffectAsync(string name)
         {
-            return _mapper.Map<Effect>(await _context.Effects
+            return await _context.Effects
+                .AsAsyncEnumerable()
                 .Where(x => x.Name.EqualsIgnoreCase(name))
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .FirstOrDefaultAsync());
+                .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Effect>> GetUserEffectsAsync(ulong userId)
         {
-            return _mapper.Map<List<Effect>>(await _context.Effects
+            return await _context.Effects
                 .Where(x => x.OwnerUserIdentifier == userId)
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.Statistic)
-                .Include(x => x.StatisticEffects).ThenInclude(y => y.StatisticValue)
-                .ToListAsync());
+                .ToListAsync();
+        }
+
+        public async Task LoadStatistics(Effect effect)
+        {
+            await _context.Entry(effect).Collection(x => x.StatisticEffects).Query()
+                .Include(x => x.Statistic)
+                .Include(x => x.StatisticValue)
+                .LoadAsync();
+        }
+
+        public async Task SetStatisticEffect(Effect effect, Statistic stat, StatisticValue statVal)
+        {
+            await LoadStatistics(effect);
+            _context.ChangeTracker.Clear();
+            var statMap = effect.StatisticEffects.FirstOrDefault(x => x.Statistic.Equals(stat));
+            if (statMap == null)
+            {
+                statMap = new StatisticMapping()
+                {
+                    Effect = effect,
+                    Statistic = stat,
+                    StatisticValue = statVal
+                };
+            }
+            else
+            {
+                statMap.StatisticValue = statVal;
+            }
+
+            // _context.Entry(statMap.Statistic).State = EntityState.Detached;
+            _context.Update(statMap);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateEffectAsync(Effect effect)
@@ -82,10 +113,7 @@ namespace Frags.Database.DataAccess
             if (await _context.Effects.CountAsync(c => c.Id.Equals(effect.Id)) <= 0)
                 return;
 
-            var dto = await _context.Effects.FirstOrDefaultAsync(x => x.Id.Equals(effect.Id));
-            _mapper.Map<Effect, EffectDto>(effect, dto);
-            dto.EffectMappings = await _context.Set<EffectMapping>().Where(x => x.EffectId.Equals(effect.Id)).ToListAsync();
-            _context.Update(dto);
+            _context.Update(effect);
 
             await _context.SaveChangesAsync();
         }

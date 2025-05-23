@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Frags.Core.Common;
 using Frags.Core.Common.Extensions;
 using Frags.Core.DataAccess;
+using Frags.Core.Effects;
 using Frags.Core.Game.Progression;
 using Frags.Core.Statistics;
 using Frags.Presentation.Controllers;
@@ -39,7 +40,8 @@ namespace Frags.Test.Presentation.Controllers
 
             // Assert
             var character = await charProvider.GetActiveCharacterAsync(1);
-            Assert.True(character.Effects.Contains(effect));
+            //Assert.Contains(character.Effects, effect);
+            Assert.Contains(effect, character.Effects);
         }
 
         [Fact]

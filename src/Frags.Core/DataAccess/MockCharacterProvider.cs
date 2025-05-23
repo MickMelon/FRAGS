@@ -48,6 +48,16 @@ namespace Frags.Core.DataAccess
             return _characters.Where(c => c.UserIdentifier == discordId).ToList();
         }
 
+        public Task LoadEffects(Character character)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task LoadStatistics(Character character)
+        {
+            return Task.CompletedTask;
+        }
+
         /// <inheritdoc/>
         public async Task UpdateCharacterAsync(Character character)
         {

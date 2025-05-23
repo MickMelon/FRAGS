@@ -75,7 +75,8 @@ namespace Frags.Discord
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     LogLevel = LogSeverity.Verbose,
-                    MessageCacheSize = 1000
+                    MessageCacheSize = 1000,
+                    GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.MessageContent
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {

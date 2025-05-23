@@ -38,8 +38,9 @@ namespace Frags.Core.DataAccess
         /// Gets the statistic with the matching name or one of its aliases.
         /// </summary>
         /// <param name="name">Statistics's name or alias.</param>
+        /// <param name="tracking">Tell Entity Framework to not track the returned object instance.</param>
         /// <returns>The matching statistic or null if none.</returns>
-        Task<Statistic> GetStatisticAsync(string name);
+        Task<Statistic> GetStatisticAsync(string name, bool tracking = true);
 
         /// <summary>
         /// Gets every statistic currently in use.

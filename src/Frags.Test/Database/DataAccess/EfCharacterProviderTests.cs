@@ -4,7 +4,6 @@ using AutoMapper;
 using Frags.Core.Characters;
 using Frags.Core.Statistics;
 using Frags.Database;
-using Frags.Database.Characters;
 using Frags.Database.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Xunit;

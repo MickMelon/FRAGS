@@ -31,6 +31,9 @@ namespace Frags.Core.DataAccess
         /// <returns>A list containing all the user's characters.</returns>
         Task<List<Character>> GetAllCharactersAsync(ulong userIdentifier);
 
+        Task LoadStatistics(Character character);
+        Task LoadEffects(Character character);
+
         /// <summary>
         /// Saves a character in the database.
         /// </summary>

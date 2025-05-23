@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Frags.Core.Characters;
 using Frags.Core.Effects;
+using Frags.Core.Statistics;
 
 namespace Frags.Core.DataAccess
 {
@@ -45,5 +47,10 @@ namespace Frags.Core.DataAccess
         /// </summary>
         /// <param name="Effect">The Effect to be saved.</param>
         Task UpdateEffectAsync(Effect Effect);
+
+        Task AddEffectToCharacter(Effect effect, Character character);
+
+        Task LoadStatistics(Effect effect);
+        Task SetStatisticEffect(Effect effect, Statistic stat, StatisticValue statVal);
     }
 }

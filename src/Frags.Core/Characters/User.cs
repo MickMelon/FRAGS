@@ -2,7 +2,7 @@ using Frags.Core.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frags.Database.Characters
+namespace Frags.Core.Characters
 {
     /// <summary>
     /// Keeps track of active characters in the database.
@@ -13,6 +13,7 @@ namespace Frags.Database.Characters
 
         public ulong UserIdentifier { get; set; }
 
-        public CharacterDto ActiveCharacter { get; set; }
+        public Character ActiveCharacter { get; set; }
+        public int ActiveCharacterId { get; set; }
     }
 }

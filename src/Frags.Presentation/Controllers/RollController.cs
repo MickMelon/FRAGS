@@ -51,6 +51,8 @@ namespace Frags.Presentation.Controllers
         {
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _provider.LoadStatistics(character);
+            if (useEffects) await _provider.LoadEffects(character);
 
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
@@ -77,6 +79,7 @@ namespace Frags.Presentation.Controllers
 
             var character = await _provider.GetActiveCharacterAsync(callerId);
             if (character == null) return CharacterResult.CharacterNotFound();
+            await _provider.LoadStatistics(character);
 
             if (displayName != null)
                 character.Name = displayName;
@@ -107,9 +110,13 @@ namespace Frags.Presentation.Controllers
         {
             var caller = await _provider.GetActiveCharacterAsync(callerId);
             if (caller == null) return CharacterResult.CharacterNotFound();
+            await _provider.LoadStatistics(caller);
+            if (useEffects) await _provider.LoadEffects(caller);
 
             var target = await _provider.GetActiveCharacterAsync(targetId);
             if (target == null) return CharacterResult.CharacterNotFound();
+            await _provider.LoadStatistics(target);
+            if (useEffects) await _provider.LoadEffects(target);
 
             var stat = await _statProvider.GetStatisticAsync(statName);
             if (stat == null) return StatisticResult.StatisticNotFound();
