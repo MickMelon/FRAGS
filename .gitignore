@@ -267,3 +267,6 @@ __pycache__/
 # macOS
 .DS_Store
 *.pubxml
+
+# Debugging configuration
+src/*/Properties/launchSettings.json
